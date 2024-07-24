@@ -1,15 +1,7 @@
 <?php
 
-use PhpSlides\Foundations\Application;
+use PhpSlides\Foundation\Application;
 use PhpSlides\Loader\FileLoader;
-
-/**
- * Handle preflight requests (OPTIONS method)
- */
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-	http_response_code(200);
-	exit();
-}
 
 $cors = (new FileLoader())
 	->load(Application::$configsDir . 'cors.php')
@@ -17,8 +9,15 @@ $cors = (new FileLoader())
 
 foreach ($cors as $key => $value) {
 	$key = str_replace('_', '-', ucwords($key, '_'));
-	$value = implode($value, ', ');
+	$value = is_array($value) ? implode(', ', $value) : $value;
 
 	$header_value = $key . ': ' . $value;
-	echo $value;
+	header($header_value);
+}
+
+/**
+ * Handle preflight requests (OPTIONS method)
+ */
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+	http_response_code(200);
 }
