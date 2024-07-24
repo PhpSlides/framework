@@ -35,13 +35,13 @@ class Console
 		);
 		$strict =
 			$ct === '-s' || $ct === '--strict'
-				? "declare(strict_types=1);\n\n"
+				? "declare(strict_types=1);"
 				: '';
 
 		$content = str_replace('ControllerName', $cn, $content);
 		$content = str_replace(
 			'<?php',
-			"<?php\n\n" . $strict . 'namespace ' . $namespace . ';',
+			"<?php $strict\n\n" . 'namespace ' . $namespace . ';',
 			$content
 		);
 
@@ -87,7 +87,7 @@ class Console
 		);
 		$strict =
 			$ct === '-s' || $ct === '--strict'
-				? "declare(strict_types=1);\n\n"
+				? "declare(strict_types=1);"
 				: '';
 
 		$req = Request::class;
@@ -97,7 +97,7 @@ class Console
 		$content = str_replace('ControllerName', $cn, $content);
 		$content = str_replace(
 			'<?php',
-			"<?php\n\n" . $strict . 'namespace ' . $namespace . ';' . $use,
+			"<?php $strict\n\n" . 'namespace ' . $namespace . ';' . $use,
 			$content
 		);
 
@@ -146,7 +146,7 @@ class Console
 		);
 		$strict =
 			$ct === '-s' || $ct === '--strict'
-				? "declare(strict_types=1);\n\n"
+				? "declare(strict_types=1);"
 				: '';
 
 		$req = Request::class;
@@ -156,7 +156,7 @@ class Console
 		$content = str_replace('MiddlewareName', $cn, $content);
 		$content = str_replace(
 			'<?php',
-			"<?php\n\n" . $strict . 'namespace ' . $namespace . ';' . $use,
+			"<?php $strict\n\n" . 'namespace ' . $namespace . ';' . $use,
 			$content
 		);
 
