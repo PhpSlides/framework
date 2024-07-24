@@ -17,9 +17,9 @@ class Application
 	public static string $stylesDir;
 	public static string $scriptsDir;
 
-	public static function configure(string $rootPath): self
+	public static function configure(string $basePath): self
 	{
-		self::$basePath = $rootPath . '/';
+		self::$basePath = $basePath . '/';
 		return new self();
 	}
 
