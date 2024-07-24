@@ -2,17 +2,11 @@
 
 <?php
 
-
 use PhpSlides\Http\Console;
 
 # Check for the command and arguments
 $command = $argv[1] ?? '';
 $args = array_slice($argv, 2);
-
-shell_exec('composer dump-autoload');
-
-# Load autoloader if needed
-include_once dirname(__DIR__) . '/vendor/autoload.php';
 
 # Handle commands
 switch ($command)

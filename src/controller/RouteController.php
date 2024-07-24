@@ -97,7 +97,7 @@ class RouteController
 				include $gen_file;
 				$output = ob_get_clean();
 
-				if ($output !== false || strlen($output ?? '') > 0)
+				if ($output !== false && strlen($output ?? '') > 0)
 				{
 					return $output;
 				}
