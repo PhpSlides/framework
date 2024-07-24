@@ -1,2 +1,3 @@
 /test export-ignore
 /.github export-ignore
+.ChangeLog.md export-ignore
