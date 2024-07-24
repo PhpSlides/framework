@@ -1,9 +1,0 @@
-<?php
-
-final class ControllerName extends Controller
-{
-	public function index()
-	{
-		return '';
-	}
-}
