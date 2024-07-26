@@ -2,11 +2,12 @@
 
 namespace PhpSlides\Loader;
 
+use Exception;
 use PhpSlides\Foundation\Application;
 
 class FileLoader
 {
-	private array $result;
+	private array $result = [];
 
 	/**
 	 * Load File, and include it in your project
@@ -29,7 +30,7 @@ class FileLoader
 
 			return $this;
 		} else {
-			throw new Exception("File not found: $filePath");
+			throw new Exception("File not found: $file");
 		}
 	}
 
@@ -38,6 +39,9 @@ class FileLoader
 	 */
 	public function getLoad()
 	{
+	   if (count($this->result) === 1) {
+		return $this->result[0];
+	   }
 		return $this->result;
 	}
 
@@ -66,7 +70,7 @@ class FileLoader
 				return '';
 			}
 		} else {
-			throw new Exception("File not found: $filePath");
+			throw new Exception("File not found: $file");
 		}
 	}
 }

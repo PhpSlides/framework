@@ -28,10 +28,10 @@ class Application
 		self::$apiPath = $api;
 		self::$webPath = $web;
 
-		self::$configsDir = self::$basePath . 'configs/';
-		self::$viewsDir = self::$basePath . 'resources/views/';
-		self::$stylesDir = self::$basePath . 'resources/src/styles/';
-		self::$scriptsDir = self::$basePath . 'resources/src/scripts/';
+		self::$configsDir = self::$basePath . 'src/configs/';
+		self::$stylesDir = self::$basePath . 'src/resources/styles/';
+		self::$scriptsDir = self::$basePath . 'src/resources/src/';
+		self::$viewsDir = self::$basePath . 'src/resources/views/';
 
 		return $this;
 	}

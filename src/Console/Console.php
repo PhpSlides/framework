@@ -6,7 +6,7 @@ class Console extends Command
 {
 	public function __construct($args)
 	{
-		exit(print_r($argv));
+		exit(print_r($args));
 		# Check for the command and arguments
 		$command = $args[1] ?? '';
 		$args = array_slice($args, 2);
