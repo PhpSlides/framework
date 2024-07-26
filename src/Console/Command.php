@@ -2,7 +2,7 @@
 
 namespace PhpSlides\Console;
 
-use PhpSlides\Interface\Console\CommandInterface;
+use PhpSlides\Console\Interface\CommandInterface;
 
 class Command implements CommandInterface
 {

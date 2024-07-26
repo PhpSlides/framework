@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpSlides\Interface\Console;
+namespace PhpSlides\Console\Interface;
 
 interface CommandInterface
 {
