@@ -6,10 +6,10 @@ class Command implements CommandInterface
 {
    private static $output;
 
-	public static function showHelp(): string
+	public static function showHelp(): void
 	{
 		self::$output= file_get_contents(
-			dirname(__DIR__) . '/controller/template/commands/Commands.php.dist'
+			dirname(__DIR__) . '/Controller/template/commands/Commands.md.dist'
 		);
 	}
 
@@ -28,7 +28,7 @@ class Command implements CommandInterface
 
 		$content = file_get_contents(
 			dirname(__DIR__) .
-				'/controller/template/controller/Controller.php.dist'
+				'/Controller/template/controller/Controller.php.dist'
 		);
 		$strict =
 			$ct === '-s' || $ct === '--strict'
@@ -47,8 +47,10 @@ class Command implements CommandInterface
 			self::$output = "\033[31mFile name already exists: \033[4m`controller/" .
 					$cn .
 					".php`\033[0m\n";
+         exit();
 		} elseif (class_exists($classname)) {
 			self::$output = ("\033[31mController class already exists: $cn\033[0m\n");
+         exit();
 		}
 
 		if (
@@ -57,11 +59,12 @@ class Command implements CommandInterface
 				$content
 			)
 		) {
-			exit("\033[31mError while creating controller: $cn\033[0m\n");
+         self::$output = "\033[31mError while creating controller: $cn\033[0m\n";
+			exit();
 		}
 
-		echo shell_exec('composer dump-autoload');
-		sleep(1);
+		shell_exec('composer dump-autoload');
+      exit();
 	}
 
 	public static function createApiController($cn, $ct): void
@@ -78,7 +81,7 @@ class Command implements CommandInterface
 		$classname = $namespace . '\\' . $cn;
 
 		$content = file_get_contents(
-			dirname(__DIR__) . '/controller/template/api/ApiController.php.dist'
+			dirname(__DIR__) . '/Controller/template/api/ApiController.php.dist'
 		);
 		$strict =
 			$ct === '-s' || $ct === '--strict'
@@ -100,11 +103,10 @@ class Command implements CommandInterface
 		if (
 			file_exists(dirname(__DIR__) . '/../controller/api/' . $cn . '.php')
 		) {
-			exit(
+			self::$output =
 				"\033[31mFile name already exists: \033[4m`controller/api/" .
 					$cn .
-					".php`\033[0m\n"
-			);
+					".php`\033[0m\n";
 		} elseif (class_exists($classname)) {
 			exit("\033[31mController class already exists: $cn\n\033[0m");
 		}
@@ -137,7 +139,7 @@ class Command implements CommandInterface
 
 		$content = file_get_contents(
 			dirname(__DIR__) .
-				'/controller/template/middleware/Middleware.php.dist'
+				'/Controller/template/middleware/Middleware.php.dist'
 		);
 		$strict =
 			$ct === '-s' || $ct === '--strict'
@@ -179,8 +181,8 @@ class Command implements CommandInterface
 		sleep(1);
 	}
 
-	public static function finally(): void
+	public static function finally(): string
 	{
-		return("\n");
+		return self::$output . "\n";
 	}
 }
