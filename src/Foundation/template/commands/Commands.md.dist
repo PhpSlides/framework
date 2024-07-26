@@ -1,0 +1,22 @@
+Usage: php slides [command] [options] [..args]
+
+Commands:
+  make:controller <name>      Create a route controller class
+  make:api-controller <name>  Create an API controller class
+  make:middleware <name>      Create a middleware class
+
+Options:
+  -h, --help                  Show this help message and exit
+  -s, --strict                Enforce strict class standards for the generated code
+
+Examples:
+  php slides make:controller User --strict
+    Creates a route controller class named `User` with strict coding standards.
+
+  php slides make:api-controller Product
+    Creates an API controller class named `Product`.
+
+  php slides make:middleware AuthMiddleware
+    Creates a middleware class named `AuthMiddleware`.
+
+For more information on each command, use `php slides <command> --help`.

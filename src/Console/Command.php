@@ -6,16 +6,15 @@ use PhpSlides\Console\Interface\CommandInterface;
 
 class Command implements CommandInterface
 {
-	private static $output;
-
-	public static function showHelp(): void
+	public static function showHelp (): void
 	{
-		self::$output = file_get_contents(
-			dirname(__DIR__) . '/Controller/template/commands/Commands.md.dist'
+		echo file_get_contents(
+		 dirname(__DIR__) . '/Foundation/template/commands/Commands.md.dist'
 		);
+		exit;
 	}
 
-	public static function createController($cn, $ct): void
+	public static function createController ($cn, $ct): void
 	{
 		/**
 		 * Converts controller class to CamelCase
@@ -29,37 +28,41 @@ class Command implements CommandInterface
 		$classname = $namespace . '\\' . $cn;
 
 		$content = file_get_contents(
-			dirname(__DIR__) .
-				'/Controller/template/controller/Controller.php.dist'
+		 dirname(__DIR__) .
+		  '/Foundation/template/controller/Controller.php.dist'
 		);
 		$strict =
-			$ct === '-s' || $ct === '--strict' ? 'declare(strict_types=1);' : '';
+		 $ct === '-s' || $ct === '--strict' ? 'declare(strict_types=1);' : '';
 
 		$content = str_replace('ControllerName', $cn, $content);
 		$content = str_replace(
-			'<?php',
-			"<?php $strict\n\n" . 'namespace ' . $namespace . ';',
-			$content
+		 '<?php',
+		 "<?php $strict\n\n" . 'namespace ' . $namespace . ';',
+		 $content
 		);
 
 		// checks if controller file or class already exists
-		if (file_exists(dirname(__DIR__) . '/../controller/' . $cn . '.php')) {
+		if (file_exists(dirname(__DIR__) . '/../controller/' . $cn . '.php'))
+		{
 			self::$output =
-				"\033[31mFile name already exists: \033[4m`controller/" .
-				$cn .
-				".php`\033[0m\n";
+			 "\033[31mFile name already exists: \033[4m`controller/" .
+			 $cn .
+			 ".php`\033[0m\n";
 			exit();
-		} elseif (class_exists($classname)) {
+		}
+		elseif (class_exists($classname))
+		{
 			self::$output = "\033[31mController class already exists: $cn\033[0m\n";
 			exit();
 		}
 
 		if (
-			!file_put_contents(
-				dirname(__DIR__) . '/../controller/' . $cn . '.php',
-				$content
-			)
-		) {
+		!file_put_contents(
+		dirname(__DIR__) . '/../controller/' . $cn . '.php',
+		$content
+		)
+		)
+		{
 			self::$output = "\033[31mError while creating controller: $cn\033[0m\n";
 			exit();
 		}
@@ -68,7 +71,7 @@ class Command implements CommandInterface
 		exit();
 	}
 
-	public static function createApiController($cn, $ct): void
+	public static function createApiController ($cn, $ct): void
 	{
 		/**
 		 * Converts controller class to CamelCase
@@ -82,10 +85,10 @@ class Command implements CommandInterface
 		$classname = $namespace . '\\' . $cn;
 
 		$content = file_get_contents(
-			dirname(__DIR__) . '/Controller/template/api/ApiController.php.dist'
+		 dirname(__DIR__) . '/Foundation/template/api/ApiController.php.dist'
 		);
 		$strict =
-			$ct === '-s' || $ct === '--strict' ? 'declare(strict_types=1);' : '';
+		 $ct === '-s' || $ct === '--strict' ? 'declare(strict_types=1);' : '';
 
 		$req = Request::class;
 		$api_c = ApiController::class;
@@ -93,29 +96,33 @@ class Command implements CommandInterface
 
 		$content = str_replace('ControllerName', $cn, $content);
 		$content = str_replace(
-			'<?php',
-			"<?php $strict\n\n" . 'namespace ' . $namespace . ';' . $use,
-			$content
+		 '<?php',
+		 "<?php $strict\n\n" . 'namespace ' . $namespace . ';' . $use,
+		 $content
 		);
 
 		// checks if controller file or class already exists
 		if (
-			file_exists(dirname(__DIR__) . '/../controller/api/' . $cn . '.php')
-		) {
+		file_exists(dirname(__DIR__) . '/../controller/api/' . $cn . '.php')
+		)
+		{
 			self::$output =
-				"\033[31mFile name already exists: \033[4m`controller/api/" .
-				$cn .
-				".php`\033[0m\n";
-		} elseif (class_exists($classname)) {
+			 "\033[31mFile name already exists: \033[4m`controller/api/" .
+			 $cn .
+			 ".php`\033[0m\n";
+		}
+		elseif (class_exists($classname))
+		{
 			exit("\033[31mController class already exists: $cn\n\033[0m");
 		}
 
 		if (
-			!file_put_contents(
-				dirname(__DIR__) . '/../controller/api/' . $cn . '.php',
-				$content
-			)
-		) {
+		!file_put_contents(
+		dirname(__DIR__) . '/../controller/api/' . $cn . '.php',
+		$content
+		)
+		)
+		{
 			exit("\033[31mError while creating api controller: $cn\033[0m\n");
 		}
 
@@ -123,7 +130,7 @@ class Command implements CommandInterface
 		sleep(1);
 	}
 
-	public static function createMiddleware($cn, $ct): void
+	public static function createMiddleware ($cn, $ct): void
 	{
 		/**
 		 * Converts middleware class to CamelCase
@@ -137,11 +144,11 @@ class Command implements CommandInterface
 		$classname = $namespace . '\\' . $cn;
 
 		$content = file_get_contents(
-			dirname(__DIR__) .
-				'/Controller/template/middleware/Middleware.php.dist'
+		 dirname(__DIR__) .
+		  '/Foundation/template/middleware/Middleware.php.dist'
 		);
 		$strict =
-			$ct === '-s' || $ct === '--strict' ? 'declare(strict_types=1);' : '';
+		 $ct === '-s' || $ct === '--strict' ? 'declare(strict_types=1);' : '';
 
 		$req = Request::class;
 		$mwc = MiddlewareInterface::class;
@@ -149,27 +156,31 @@ class Command implements CommandInterface
 
 		$content = str_replace('MiddlewareName', $cn, $content);
 		$content = str_replace(
-			'<?php',
-			"<?php $strict\n\n" . 'namespace ' . $namespace . ';' . $use,
-			$content
+		 '<?php',
+		 "<?php $strict\n\n" . 'namespace ' . $namespace . ';' . $use,
+		 $content
 		);
 
 		// checks if middleware file or class already exists
-		if (file_exists(dirname(__DIR__) . '/../middleware/' . $cn . '.php')) {
+		if (file_exists(dirname(__DIR__) . '/../middleware/' . $cn . '.php'))
+		{
 			self::$output =
-				"\033[31mFile name already exists: \033[4m`middleware/" .
-				$cn .
-				".php`\033[0m\n";
-		} elseif (class_exists($classname)) {
+			 "\033[31mFile name already exists: \033[4m`middleware/" .
+			 $cn .
+			 ".php`\033[0m\n";
+		}
+		elseif (class_exists($classname))
+		{
 			exit("Middleware class already exists: $cn\n");
 		}
 
 		if (
-			!file_put_contents(
-				dirname(__DIR__) . '/../middleware/' . $cn . '.php',
-				$content
-			)
-		) {
+		!file_put_contents(
+		dirname(__DIR__) . '/../middleware/' . $cn . '.php',
+		$content
+		)
+		)
+		{
 			exit("\033[31mError while creating middleware: $cn\n\033[0m");
 		}
 
@@ -177,8 +188,7 @@ class Command implements CommandInterface
 		sleep(1);
 	}
 
-	public static function finally(): string
+	public function serve (): void
 	{
-		return self::$output . "\n";
 	}
 }

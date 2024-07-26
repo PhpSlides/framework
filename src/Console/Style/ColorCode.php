@@ -15,7 +15,7 @@ class ColorCode implements ColorCodeInterface
 	const RED = 31;
 	const GREEN = 32;
 	const YELLOW = 33;
-	const Blue = 34;
+	const BLUE = 34;
 	const MAGENTA = 35;
 	const CYAN = 36;
 	const WHITE = 37;

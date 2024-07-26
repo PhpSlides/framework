@@ -1,10 +1,10 @@
 <?php
 
-use PhpSlides\Foundation\Application;
 use PhpSlides\Loader\FileLoader;
+use PhpSlides\Foundation\Application;
 
 $middleware = (new FileLoader())
 	->load(Application::$configsDir . 'middleware.php')
-	->getLoad()[0];
+	->getLoad();
 
 return $middleware;
