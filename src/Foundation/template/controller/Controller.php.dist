@@ -1,6 +1,6 @@
 <?php
 
-final class ControllerName extends Controller
+final class {{name}} extends Controller
 {
 	public function index()
 	{

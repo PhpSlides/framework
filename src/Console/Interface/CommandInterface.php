@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace PhpSlides\Console\Interface;
 
@@ -6,9 +6,18 @@ interface CommandInterface
 {
 	public static function showHelp(): void;
 
-	public static function createController($cn, $ct): void;
+	public static function makeController(
+		array $arguments,
+		string $baseDir
+	): void;
 
-	public static function createApiController($cn, $ct): void;
+	public static function makeApiController(
+		array $arguments,
+		string $baseDir
+	): void;
 
-	public static function createMiddleware($cn, $ct): void;
+	public static function makeMiddleware(
+		array $arguments,
+		string $baseDir
+	): void;
 }

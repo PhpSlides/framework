@@ -43,5 +43,5 @@ interface ServerInterface
 	 *
 	 * @param string $input The input string.
 	 */
-	public function handleInputCommands ($input): void;
+	public function handleInputCommands (string $input): void;
 }

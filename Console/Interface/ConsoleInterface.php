@@ -12,10 +12,10 @@ interface ConsoleInterface
 	/**
 	 * Resolve the path for the server.
 	 *
-	 * @param string $file The path to the server bootstrap file.
+	 * @param string $baseDir The project root directory path.
 	 * @return self
 	 */
-	public function resolve(string $file): self;
+	public function resolve(string $baseDir): self;
 
 	/**
 	 * Set the host and port for the server to listen on.

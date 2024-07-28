@@ -1,6 +1,6 @@
 <?php
 
-final class ControllerName implements ApiController
+final class {{name}} implements ApiController
 {
 	public function index(Request $request)
 	{
