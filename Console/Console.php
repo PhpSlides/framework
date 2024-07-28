@@ -7,7 +7,6 @@ use PhpSlides\Console\Style\ColorCode;
 use PhpSlides\Console\Interface\CommandInterface;
 use PhpSlides\Console\Interface\ConsoleInterface;
 use PhpSlides\Console\Style\Console as StyleConsole;
-use PhpSlides\Loader\FileLoader;
 
 /**
  * PhpSlides Console
@@ -27,21 +26,23 @@ class Console extends Command implements CommandInterface, ConsoleInterface
 	 *
 	 * @param array $argv The command line arguments.
 	 */
-	public function __construct(array $argv)
+	public function __construct (array $argv)
 	{
 		# Check for the command and arguments
 		$command = $argv;
 		array_shift($command);
 
 		$arguments = array_slice($command, 1);
-		$options = getopt('h', ['help']);
+		$options = getopt('h', [ 'help' ]);
 
-		if (isset($options['help']) || isset($options['h'])) {
+		if (isset($options['help']) || isset($options['h']))
+		{
 			self::showHelp();
 		}
 
 		# Handle commands
-		switch ($command[0]) {
+		switch ($command[0])
+		{
 			case 'serve':
 				self::$serve = true;
 				break;
@@ -51,11 +52,11 @@ class Console extends Command implements CommandInterface, ConsoleInterface
 				break;
 
 			default:
-				$styles = [ColorCode::WHITE, ColorCode::BG_RED];
+				$styles = [ ColorCode::WHITE, ColorCode::BG_RED ];
 
 				echo StyleConsole::text(
-					'Command not Recognized! Type --help for list of commands',
-					...$styles
+				 'Command not Recognized! Type --help for list of commands',
+				 ...$styles
 				);
 				break;
 		}
@@ -64,13 +65,14 @@ class Console extends Command implements CommandInterface, ConsoleInterface
 	/**
 	 * Console destructor.
 	 */
-	public function __destruct()
+	public function __destruct ()
 	{
-		if (self::$serve) {
+		if (self::$serve)
+		{
 			new Server(
-				addr: self::$listen,
-				is_debug: self::$is_debug,
-				resolve: self::$resolve
+			 addr: self::$listen,
+			 is_debug: self::$is_debug,
+			 resolve: self::$resolve
 			);
 		}
 		echo "\n";
@@ -82,7 +84,7 @@ class Console extends Command implements CommandInterface, ConsoleInterface
 	 * @param string $file The path to the server bootstrap file.
 	 * @return self
 	 */
-	public function resolve(string $file): self
+	public function resolve (string $file): self
 	{
 		self::$resolve = $file;
 		return $this;
@@ -95,9 +97,9 @@ class Console extends Command implements CommandInterface, ConsoleInterface
 	 * @param int $port The port number.
 	 * @return self
 	 */
-	public function listen(string $host, int $port): self
+	public function listen (string $host, int $port): self
 	{
-		self::$listen = [$host, $port];
+		self::$listen = [ $host, $port ];
 		return $this;
 	}
 
@@ -107,7 +109,7 @@ class Console extends Command implements CommandInterface, ConsoleInterface
 	 * @param bool $is_debug True to enable debug mode, false to disable.
 	 * @return self
 	 */
-	public function debug(bool $is_debug): self
+	public function debug (bool $is_debug): self
 	{
 		self::$is_debug = $is_debug;
 		return $this;
