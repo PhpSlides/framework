@@ -7,7 +7,7 @@ Commands:
 
 Options:
   -h, --help                  Show this help message and exit
-  -s, --strict                Enforce strict class standards for the generated code
+      --strict                Enforce strict class standards for the generated code
 
 Examples:
   php slides make:controller User --strict

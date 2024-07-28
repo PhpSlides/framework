@@ -17,11 +17,6 @@ class FileLoader
 	public function load($file): self
 	{
 		/**
-		 * Root Directory for PhpSlides Project
-		 */
-		$basePath = Application::$basePath;
-
-		/**
 		 * Checks if File exists
 		 */
 		if (file_exists($file)) {
