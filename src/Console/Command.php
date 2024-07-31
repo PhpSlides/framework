@@ -6,7 +6,7 @@ use PhpSlides\Controller\Controller;
 use PhpSlides\Console\Interface\CommandInterface;
 use PhpSlides\Console\Style\Console;
 use PhpSlides\Interface\MiddlewareInterface;
-use PhpSlides\Http\ApiController;
+use PhpSlides\Http\Interface\ApiController;
 use PhpSlides\Http\Request;
 
 class Command implements CommandInterface

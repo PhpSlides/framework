@@ -23,7 +23,7 @@
     },
     "autoload": {
         "psr-4": {
-            "PhpSlides\\": ["src/", "Console/"]
+            "PhpSlides\\": ["src/", "Console/", "Router/"]
         }
     },
     "autoload-dev": {

@@ -27,10 +27,11 @@ class Server implements ServerInterface
 	 *
 	 * @return bool True if the port is in use, false otherwise.
 	 */
-	public function isPortInUse(): bool
+	public function isPortInUse (): bool
 	{
 		$connection = @fsockopen($this->host, $this->port);
-		if (is_resource($connection)) {
+		if (is_resource($connection))
+		{
 			fclose($connection);
 			return true;
 		}
@@ -42,40 +43,43 @@ class Server implements ServerInterface
 	 *
 	 * @return bool True if the server started successfully, false otherwise.
 	 */
-	public function startServer(): bool
+	public function startServer (): bool
 	{
 		$descriptorspec = [
-			0 => ['pipe', 'r'], // stdin is a pipe that the child will read from
-			1 => ['pipe', 'w'], // stdout is a pipe that the child will write to
-			2 => ['pipe', 'w'] // stderr is a pipe that the child will write to
+		 0 => [ 'pipe', 'r' ], // stdin is a pipe that the child will read from
+		 1 => [ 'pipe', 'w' ], // stdout is a pipe that the child will write to
+		 2 => [ 'pipe', 'w' ] // stderr is a pipe that the child will write to
 		];
 
 		$command = sprintf(
-			'php -S %s:%s -t %s %s 2>&1 > /dev/null',
-			$this->host,
-			$this->port,
-			$this->resolve,
-			$this->resolve . 'app.php'
+		 'php -S %s:%s -t %s %s',
+		 $this->host,
+		 $this->port,
+		 $this->resolve,
+		 $this->resolve . 'app.php'
 		);
 
 		$this->process = proc_open($command, $descriptorspec, $pipes);
 		$this->pipes = $pipes;
 
-		if (is_resource($this->process)) {
+		if (is_resource($this->process))
+		{
 			$this->pid = proc_get_status($this->process)['pid'];
 
 			echo Console::bold(
-				"Started server at http://{$this->host}:{$this->port}\n"
+			 "Started server at http://{$this->host}:{$this->port}\n"
 			);
 			echo Console::text(
-				"Type 'stop' or Ctrl+C to stop the server.",
-				ColorCode::BG_CYAN,
-				ColorCode::BOLD
+			 "Type 'stop' or Ctrl+C to stop the server.",
+			 ColorCode::BG_CYAN,
+			 ColorCode::BOLD
 			);
 			echo "\n\n";
 
 			return true;
-		} else {
+		}
+		else
+		{
 			return false;
 		}
 	}
@@ -83,9 +87,10 @@ class Server implements ServerInterface
 	/**
 	 * Stop the PHP server.
 	 */
-	public function stopServer(): void
+	public function stopServer (): void
 	{
-		if (is_resource($this->process)) {
+		if (is_resource($this->process))
+		{
 			proc_terminate($this->process);
 			proc_close($this->process);
 			echo "Server stopped.\n";
@@ -95,13 +100,16 @@ class Server implements ServerInterface
 	/**
 	 * Display the current status of the server.
 	 */
-	public function serverStatus(): void
+	public function serverStatus (): void
 	{
 		$status = proc_get_status($this->process);
 
-		if ($status['running']) {
+		if ($status['running'])
+		{
 			echo "Server running with PID {$status['pid']}\n";
-		} else {
+		}
+		else
+		{
 			echo "Server is not running.\n";
 		}
 	}
@@ -109,7 +117,7 @@ class Server implements ServerInterface
 	/**
 	 * Display available server commands.
 	 */
-	public function showCommands(): void
+	public function showCommands (): void
 	{
 		echo "stop    - Stop the server\n";
 		echo "status  - Display server status\n";
@@ -124,49 +132,51 @@ class Server implements ServerInterface
 	 * @param bool $is_debug Enable or disable debug mode.
 	 * @param string $resolve The directory to serve files from.
 	 */
-	public function __construct(array $addr, bool $is_debug, string $resolve)
+	public function __construct (array $addr, bool $is_debug, string $resolve)
 	{
 		$this->host = $addr[0];
 		$this->port = $addr[1];
 		$this->resolve = $resolve . '/src/bootstrap/';
 
 		// Check if the provided local address and its port is in use.
-		if ($this->isPortInUse()) {
+		if ($this->isPortInUse())
+		{
 			echo Console::bgRed('Error: ');
 			echo Console::bold(" Port {$this->port} is already in use.\n");
 			exit(1);
 		}
 
 		// Start the server, and check if the server started successfully.
-		if (!$this->startServer()) {
+		if (!$this->startServer())
+		{
 			exit(
-				Console::text(
-					"Error while starting server.\n",
-					ColorCode::BG_RED,
-					ColorCode::BOLD
-				)
+			 Console::text(
+			  "Error while starting server.\n",
+			  ColorCode::BG_RED,
+			  ColorCode::BOLD
+			 )
 			);
 		}
 		$this->showCommands();
 
 		// Register the stopServer function to be called on script termination
-		register_shutdown_function(function () {
+		register_shutdown_function(function ()
+		{
 			$this->stopServer();
 		}, $this->process);
 
-		// Open stdin for reading commands
-		//$stdin = fopen('php://stdin', 'r');
-		//stream_set_blocking($stdin, false);
-
-		while (true) {
+		while (true)
+		{
 			$input = fgets(STDIN); // Using STDIN directly
 
-			if (trim($input) === 'stop') {
+			if (trim($input) === 'stop')
+			{
 				$this->stopServer();
 				break;
 			}
 
-			if ($input !== false) {
+			if ($input !== false)
+			{
 				$input = trim($input);
 				$this->handleInputCommands($input);
 			}
@@ -174,7 +184,6 @@ class Server implements ServerInterface
 			sleep(1);
 		}
 
-		//fclose($stdin);
 		exit();
 	}
 
@@ -183,9 +192,10 @@ class Server implements ServerInterface
 	 *
 	 * @param string $input The input string.
 	 */
-	public function handleInputCommands(string $input): void
+	public function handleInputCommands (string $input): void
 	{
-		switch ($input) {
+		switch ($input)
+		{
 			case 'status':
 				$this->serverStatus();
 				break;

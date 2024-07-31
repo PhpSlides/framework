@@ -1,9 +1,9 @@
 <?php
 
-use PhpSlides\Controller\RouteController;
+use PhpSlides\Loader\ViewLoader;
+use PhpSlides\Foundation\Application;
 
-define('__ROOT__', dirname(__DIR__));
-define('APP_DEBUG', getenv('APP_DEBUG', true));
+define('__ROOT__', Application::$basePath);
 
 const GET = 'GET';
 const PUT = 'PUT';
@@ -12,7 +12,6 @@ const PATCH = 'PATCH';
 const DELETE = 'DELETE';
 const RELATIVE_PATH = 'path';
 const ROOT_RELATIVE_PATH = 'root_path';
-const SLIDES_VERSION = '1.2.2';
 
 /**
  *    -----------------------------------------------------------
@@ -24,8 +23,8 @@ const SLIDES_VERSION = '1.2.2';
  */
 function slides_include ($filename)
 {
-	$output = RouteController::slides_include($filename);
-	return $output;
+	$loaded = (new ViewLoader())->load($filename);
+	return $loaded->getLoad();
 }
 
 $routes = [];
@@ -65,7 +64,7 @@ function route (
 		{
 			if (preg_match_all('/(?<={).+?(?=})/', $value))
 			{
-				$route_class->$key = function (string ...$args) use ($routes, $value, $key, )
+				$route_class->$key = function (string ...$args) use ($routes, $value, $key)
 				{
 					$route = '';
 
@@ -83,7 +82,7 @@ function route (
 								 '/\{[^}]+\}/',
 								 $args[$i],
 								 $value,
-								 1,
+								 1
 								);
 							}
 							else
@@ -92,7 +91,7 @@ function route (
 								 '/\{[^}]+\}/',
 								 $args[$i],
 								 $route,
-								 1,
+								 1
 								);
 							}
 						}
@@ -132,7 +131,7 @@ function route (
 						 '/\{[^}]+\}/',
 						 $param[$i],
 						 $routes[$name],
-						 1,
+						 1
 						);
 					}
 					else
@@ -150,32 +149,42 @@ function route (
  * Getting public files
  *
  * @param string $filename The name of the file to get from public directory
- * @param string $path_type Path to start location which uses either `RELATIVE_PATH` for path `../` OR `ROOT_RELATIVE_PATH` for root `/`
+ * @param string $path_type Path to start location which uses either `RELATIVE_PATH`
+ * for path `../` OR `ROOT_RELATIVE_PATH` for root `/`
  */
 function asset (string $filename, $path_type = RELATIVE_PATH): string
 {
 	$filename = preg_replace('/(::)|::/', '/', $filename);
 	$filename = strtolower(trim($filename, '\/\/'));
 
-	$path = './';
-	if (!empty(urldecode($_REQUEST['uri'])))
+	if (php_sapi_name() == 'cli-server')
 	{
-		$reqUri = explode('/', trim(urldecode($_REQUEST['uri']), '/'));
+		$root_path = '/';
+	}
+	else
+	{
+		$find = '/src/bootstrap/app.php';
+		$self = $_SERVER['PHP_SELF'];
 
-		for ($i = 0; $i < count($reqUri); $i++)
+		$root_path = substr_replace(
+		 $self,
+		 '/',
+		 strrpos($self, $find),
+		 strlen($find)
+		);
+	}
+
+	$path = './';
+	if (!empty(Application::$request_uri))
+	{
+		$root_pathExp = explode('/', trim($root_path, '/'));
+		$reqUri = explode('/', trim(Application::$request_uri, '/'));
+
+		for ($i = 0; $i < count($reqUri) - count($root_pathExp); $i++)
 		{
 			$path .= '../';
 		}
 	}
-
-	$find = '/src/autoload.php';
-	$self = $_SERVER['PHP_SELF'];
-	$root_path = substr_replace(
-	 $self,
-	 '/',
-	 strrpos($self, $find),
-	 strlen($find),
-	);
 
 	switch ($path_type)
 	{
@@ -184,6 +193,6 @@ function asset (string $filename, $path_type = RELATIVE_PATH): string
 		case ROOT_RELATIVE_PATH:
 			return $root_path . $filename;
 		default:
-			return '';
+			return $filename;
 	}
 }

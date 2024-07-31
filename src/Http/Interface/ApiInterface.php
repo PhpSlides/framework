@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpSlides\Interface;
+namespace PhpSlides\Http\Interface;
 
 interface ApiInterface
 {

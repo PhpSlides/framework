@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
-declare(strict_types=1);
+namespace PhpSlides\Http\Interface;
 
-namespace PhpSlides\Http;
+use PhpSlides\Http\Request;
 
 /**
  * Interface ApiController

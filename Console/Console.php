@@ -7,6 +7,7 @@ use PhpSlides\Console\Style\ColorCode;
 use PhpSlides\Console\Interface\CommandInterface;
 use PhpSlides\Console\Interface\ConsoleInterface;
 use PhpSlides\Console\Style\Console as StyleConsole;
+use PhpSlides\Foundation\Application;
 
 /**
  * PhpSlides Console
@@ -87,6 +88,7 @@ class Console extends Command implements CommandInterface, ConsoleInterface
 	/**
 	 * Console destructor.
 	 */
+	const SERVE_FROM_TERMINAL = 'true';
 	public function __destruct()
 	{
 		if (self::$serve) {

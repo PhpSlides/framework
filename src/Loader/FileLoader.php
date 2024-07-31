@@ -3,7 +3,6 @@
 namespace PhpSlides\Loader;
 
 use Exception;
-use PhpSlides\Foundation\Application;
 
 class FileLoader
 {
@@ -30,23 +29,23 @@ class FileLoader
 	}
 
 	/**
-	 * Get Included File Result
+	 * Get Loaded File Result
 	 */
 	public function getLoad()
 	{
-	   if (count($this->result) === 1) {
-		return $this->result[0];
-	   }
+		if (count($this->result) === 1) {
+			return $this->result[0];
+		}
 		return $this->result;
 	}
 
 	/**
-	 * Get File Contents
-	 * Get Contents as String
+	 * Load File Contents and return Parsed Content
+	 * Load Included Contents as String
 	 *
-	 * @return string File content as `string` and if no content, returns empty `string`
+	 * @return self Parsed File content as `string` and if no content, returns empty `string`
 	 */
-	public function getFileContents(string $file): string
+	public function parseLoad(string $file): self
 	{
 		/**
 		 * Checks if File exists
@@ -60,10 +59,11 @@ class FileLoader
 			$output = ob_get_clean();
 
 			if ($output !== false && strlen($output ?? '') > 0) {
-				return $output;
+				$this->result[] = $output;
 			} else {
-				return '';
+				$this->result[] = '';
 			}
+			return $this;
 		} else {
 			throw new Exception("File not found: $file");
 		}

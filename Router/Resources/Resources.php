@@ -7,11 +7,11 @@ use PhpSlides\view;
 use PhpSlides\Route;
 use PhpSlides\Http\Request;
 use PhpSlides\Controller\Controller;
+use PhpSlides\Foundation\Application;
 use PhpSlides\Interface\MiddlewareInterface;
 
-abstract class Resources extends Controller
+class Resources extends Controller
 {
-
 	protected static mixed $action = null;
 
 	protected static ?array $middleware = null;
@@ -29,8 +29,8 @@ abstract class Resources extends Controller
 	/**
 	 * Get's all full request URL
 	 *
-	 * @static $root_dir
-	 * @var string $root_dir
+	 * @static $request_uri
+	 * @var string $request_uri
 	 * @return string
 	 */
 	protected static string $request_uri;
@@ -105,7 +105,7 @@ abstract class Resources extends Controller
 
 		for ($i = 0; $i < count((array) $middleware); $i++)
 		{
-			include_once dirname(__DIR__) . '/configs/middlewares.php';
+			include_once Application::$configsDir . 'middleware.php';
 
 			if (array_key_exists($middleware[$i], $middlewares))
 			{
@@ -113,11 +113,15 @@ abstract class Resources extends Controller
 			}
 			else
 			{
-				throw new Exception('No Registered Middleware as `' . $middleware[$i] . '`');
+				self::log();
+				throw new Exception(
+				 'No Registered Middleware as `' . $middleware[$i] . '`'
+				);
 			}
 
 			if (!class_exists($middleware))
 			{
+				self::log();
 				throw new Exception(
 				 "Middleware class does not exist: `{$middleware}`"
 				);
@@ -150,6 +154,7 @@ abstract class Resources extends Controller
 					}
 					else
 					{
+						self::log();
 						throw new Exception('Cannot use middleware with this method');
 					}
 				};
@@ -158,6 +163,7 @@ abstract class Resources extends Controller
 			}
 			else
 			{
+				self::log();
 				throw new Exception(
 				 'Middleware class must implements `MiddlewareInterface`'
 				);
@@ -185,12 +191,15 @@ abstract class Resources extends Controller
 
 		if (!preg_match('/(?=.*Controller)(?=.*::)/', $controller))
 		{
-			exit('invalid parameter $controller Controller type');
+			self::log();
+			throw new Exception(
+			 'Parameter $controller must match Controller named rule.'
+			);
 		}
 
 		[ $c_name, $c_method ] = explode('::', $controller);
 
-		$cc = 'PhpSlides\\Controller\\' . $c_name;
+		$cc = 'App\\Controllers\\' . $c_name;
 
 		if (class_exists($cc))
 		{
@@ -210,7 +219,8 @@ abstract class Resources extends Controller
 		}
 		else
 		{
-			echo "No class controller found as: `$cc`";
+			self::log();
+			throw new Exception("No class controller found as: `$cc`");
 		}
 
 		self::log();
