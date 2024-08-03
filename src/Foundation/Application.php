@@ -15,7 +15,7 @@ class Application implements ApplicationInterface
 	/**
 	 * The version of the PhpSlides application.
 	 */
-	const PHPSLIDES_VERSION = '1.0.0';
+	const PHPSLIDES_VERSION = '1.2.3';
 
 	/**
 	 * @var string $basePath

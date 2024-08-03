@@ -4,7 +4,7 @@ namespace PhpSlides\Http;
 
 use stdClass;
 use PhpSlides\Foundation\Application;
-use PhpSlides\Traits\Auth\Authentication;
+use PhpSlides\Http\Auth\Authentication;
 use PhpSlides\Http\Interface\RequestInterface;
 
 /**

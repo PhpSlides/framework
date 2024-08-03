@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Traits\Auth;
+namespace PhpSlides\Http\Auth;
 
 trait Authentication
 {
@@ -9,9 +9,10 @@ trait Authentication
 	private static function getAuthorizationHeader()
 	{
 		$headers = getallheaders();
-		self::$authorizationHeader = isset($headers['Authorization']) ? $headers['Authorization'] : null;
+		self::$authorizationHeader = isset($headers['Authorization'])
+			? $headers['Authorization']
+			: null;
 	}
-
 
 	/**
 	 * Get Basic Authentication Credentials
@@ -20,16 +21,18 @@ trait Authentication
 	{
 		self::getAuthorizationHeader();
 
-		if (self::$authorizationHeader && strpos(self::$authorizationHeader, 'Basic ') === 0) {
+		if (
+			self::$authorizationHeader &&
+			strpos(self::$authorizationHeader, 'Basic ') === 0
+		) {
 			$base64Credentials = substr(self::$authorizationHeader, 6);
 			$decodedCredentials = base64_decode($base64Credentials);
 
-			list($username, $password) = explode(':', $decodedCredentials, 2);
-			return ['username' => $username, 'password' => $password];
+			[$username, $password] = explode(':', $decodedCredentials, 2);
+			return ['username' => trim(htmlspecialchars($username)), 'password' => trim(htmlspecialchars($password))];
 		}
 		return null;
 	}
-
 
 	/**
 	 * Get Bearer Token Authentication
@@ -38,7 +41,10 @@ trait Authentication
 	{
 		self::getAuthorizationHeader();
 
-		if (self::$authorizationHeader && strpos(self::$authorizationHeader, 'Bearer ') === 0) {
+		if (
+			self::$authorizationHeader &&
+			strpos(self::$authorizationHeader, 'Bearer ') === 0
+		) {
 			$token = substr(self::$authorizationHeader, 7);
 			return $token;
 		}

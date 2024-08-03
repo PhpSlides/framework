@@ -160,10 +160,7 @@ class Server implements ServerInterface
 		$this->showCommands();
 
 		// Register the stopServer function to be called on script termination
-		register_shutdown_function(function ()
-		{
-			$this->stopServer();
-		}, $this->process);
+		register_shutdown_function([ $this, 'stopServer' ], $this->process);
 
 		while (true)
 		{
