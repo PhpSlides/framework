@@ -4,16 +4,16 @@
     "homepage": "https://github.com/phpslides/framework",
     "type": "library",
     "license": "MIT",
-    "keywords": ["framework", "phpslides"],
+    "keywords": [ "framework", "phpslides" ],
     "support": {
         "issues": "https://github.com/phpslides/framework/issues",
         "source": "https://github.com/phpslides/framework"
     },
-    "authors": [{
-        "name": "Dave Conco",
-        "email": "concodave@gmail.com",
-        "homepage": "https://dconco.github.io"
-    }],
+    "authors": [ {
+            "name": "Dave Conco",
+            "email": "concodave@gmail.com",
+            "homepage": "https://dconco.github.io"
+        } ],
     "require": {
         "php": "^8.0",
         "vlucas/phpdotenv": "^5.6"
@@ -23,7 +23,7 @@
     },
     "autoload": {
         "psr-4": {
-            "PhpSlides\\": ["src/", "Console/", "Router/"]
+            "PhpSlides\\": [ "src/", "Console/", "Router/", "src/Exception/" ]
         }
     },
     "autoload-dev": {
