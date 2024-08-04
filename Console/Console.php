@@ -2,11 +2,11 @@
 
 namespace PhpSlides\Console;
 
-use PhpSlides\Console\Server;
-use PhpSlides\Console\Style\ColorCode;
-use PhpSlides\Console\Interface\CommandInterface;
+use PhpSlides\ConsoleL\Server;
+use PhpSlides\ConsoleL\Style\ColorCode;
+use PhpSlides\ConsoleL\Interface\CommandInterface;
+use PhpSlides\ConsoleL\Style\Console as StyleConsole;
 use PhpSlides\Console\Interface\ConsoleInterface;
-use PhpSlides\Console\Style\Console as StyleConsole;
 use PhpSlides\Foundation\Application;
 
 /**
@@ -88,7 +88,6 @@ class Console extends Command implements CommandInterface, ConsoleInterface
 	/**
 	 * Console destructor.
 	 */
-	const SERVE_FROM_TERMINAL = 'true';
 	public function __destruct()
 	{
 		if (self::$serve) {
