@@ -12,7 +12,7 @@ $code_keys = json_encode(array_keys($codeSnippet['parsedCode']));
 <head>
    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-   <title>There was an Unexpected Error</title>
+   <title>Parse Error</title>
 </head>
 
 <style type="text/css" media="all">
