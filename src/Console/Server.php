@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\ConsoleL;
+namespace PhpSlides\Console;
 
-use PhpSlides\ConsoleL\Style\Console;
-use PhpSlides\ConsoleL\Style\ColorCode;
-use PhpSlides\ConsoleL\Interface\ServerInterface;
+use PhpSlides\Console\Style\Console;
+use PhpSlides\Console\Style\ColorCode;
+use PhpSlides\Console\Interface\ServerInterface;
 
 /**
  * PhpSlides Server
