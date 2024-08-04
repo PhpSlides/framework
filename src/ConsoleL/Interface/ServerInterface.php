@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Console\Interface;
+namespace PhpSlides\ConsoleL\Interface;
 
 /**
  * Interface ServerInterface

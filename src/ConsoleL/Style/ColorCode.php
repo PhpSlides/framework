@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Console\Style;
+namespace PhpSlides\ConsoleL\Style;
 
-use PhpSlides\Console\Interface\ColorCodeInterface;
+use PhpSlides\ConsoleL\Interface\ColorCodeInterface;
 
 class ColorCode implements ColorCodeInterface
 {
