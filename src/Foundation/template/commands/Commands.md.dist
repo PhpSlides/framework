@@ -1,4 +1,4 @@
-Usage: php slides [command] [options] [..args]
+Usage: php slide [command] [options] [..args]
 
 Commands:
   serve                       Run and serve the PhpSlides project in development mode.
@@ -11,13 +11,13 @@ Options:
       --strict                Enforce strict class standards for the generated code.
 
 Examples:
-  php slides make:controller User --strict
-    Creates a route controller class named `User` with strict coding standards.
+  php slide make:controller User --strict
+    Creates a route controller class named `UserController` with strict coding standards.
 
-  php slides make:api-controller Product
-    Creates an API controller class named `Product`.
+  php slide make:api-controller Product
+    Creates an API controller class named `ProductController`.
 
-  php slides make:middleware AuthMiddleware
+  php slide make:middleware Auth
     Creates a middleware class named `AuthMiddleware`.
 
-For more information on each command, use `php slides <command> --help`.
+For more information on each command, use `php slide <command> --help`.

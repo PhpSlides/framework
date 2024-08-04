@@ -3,10 +3,11 @@
 namespace PhpSlides;
 
 use PhpSlides\ConsoleL\Server;
+use PhpSlides\ConsoleL\Command;
 use PhpSlides\ConsoleL\Style\ColorCode;
 use PhpSlides\ConsoleL\Interface\CommandInterface;
 use PhpSlides\ConsoleL\Style\Console as StyleConsole;
-use PhpSlides\Console\Interface\ConsoleInterface;
+use PhpSlides\Interface\ConsoleInterface;
 use PhpSlides\Foundation\Application;
 
 /**
