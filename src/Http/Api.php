@@ -2,8 +2,8 @@
 
 namespace PhpSlides\Http;
 
-use Exception;
 use PhpSlides\MapRoute;
+use PhpSlides\Exception;
 use PhpSlides\Http\Interface\ApiInterface;
 use PhpSlides\Http\Resources\ApiResources;
 

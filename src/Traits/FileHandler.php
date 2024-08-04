@@ -2,7 +2,7 @@
 
 namespace PhpSlides\Traits;
 
-use Exception;
+use PhpSlides\Exception;
 use PhpSlides\Logger\Logger;
 
 trait FileHandler

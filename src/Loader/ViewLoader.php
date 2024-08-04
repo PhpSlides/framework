@@ -2,7 +2,7 @@
 
 namespace PhpSlides\Loader;
 
-use Exception;
+use PhpSlides\Exception;
 
 class ViewLoader
 {
@@ -33,10 +33,6 @@ class ViewLoader
 				$this->result[] = $parsedLoad->getLoad();
 
 				return $this;
-			}
-			catch ( Exception $e )
-			{
-				throw new Exception($e->getMessage(), 1);
 			}
 			finally
 			{
@@ -84,10 +80,10 @@ class ViewLoader
 			 $val = trim($matches[1]);
 			 $val = trim($val, ';');
 			 return '<' . '?php print_r(' . $val . ') ?>';
-},
-$formattedContents
-);
+		 },
+		$formattedContents
+		);
 
-return $formattedContents;
-}
+		return $formattedContents;
+	}
 }

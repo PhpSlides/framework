@@ -2,7 +2,7 @@
 
 namespace PhpSlides\Http\Resources;
 
-use Exception;
+use PhpSlides\Exception;
 use PhpSlides\Http\Request;
 use PhpSlides\Logger\Logger;
 use PhpSlides\Loader\FileLoader;

@@ -2,7 +2,7 @@
 
 namespace PhpSlides;
 
-use Exception;
+use PhpSlides\Exception;
 use PhpSlides\Logger\Logger;
 use PhpSlides\Traits\FileHandler;
 use PhpSlides\Controller\Controller;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace PhpSlides\Controller;
 
-use Exception;
+use PhpSlides\Exception;
 
 
 /**
@@ -25,26 +25,23 @@ class ClassController extends Controller
      *  @return mixed From class methods and __invoke function
      */
 
-    protected static function __class(object|string $class, string $method, array|null $param = null)
+    protected static function __class (object|string $class, string $method, array|null $param = null)
     {
-        try
+        if (class_exists($class))
         {
-            if (class_exists($class))
-            {
-                $instance = new $class;
-                $class_info = [
-                    'method' => $method,
-                    'class_name' => $class,
-                    'class_methods' => get_class_methods($instance)
-                ];
+            $instance = new $class;
+            $class_info = [
+                'method' => $method,
+                'class_name' => $class,
+                'class_methods' => get_class_methods($instance)
+            ];
 
-                return self::class_info($class_info, $param);
-            }
-            else
-            {
-               self::log();
-                throw new Exception("No controller class found as - $class", 1);
-            }
+            return self::class_info($class_info, $param);
+        }
+        else
+        {
+            self::log();
+            throw new Exception("No controller class found as - $class", 1);
         }
     }
 }
