@@ -79,7 +79,7 @@ class Console extends Command implements CommandInterface, ConsoleInterface
 				$styles = [ColorCode::WHITE, ColorCode::BG_RED];
 
 				echo StyleConsole::text(
-					'Command not Recognized! See \'php slides --help\'',
+					'Command not Recognized! See \'php slide --help\'',
 					...$styles
 				);
 				break;

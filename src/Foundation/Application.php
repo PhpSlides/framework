@@ -18,6 +18,16 @@ class Application implements ApplicationInterface
 	const PHPSLIDES_VERSION = '1.2.3';
 
 	/**
+	 *  `$log` method prints logs in `.log` file in the root of the project each time any request has been received, when setted to true.
+	 *   It's been setted to true by default, can be changed anytime.
+	 *
+	 *   @static $log
+	 *   @var bool $log
+	 *   @return bool
+	 */
+	public static bool $log;
+
+	/**
 	 * @var string $basePath
 	 * The base path of the application.
 	 */
@@ -71,18 +81,15 @@ class Application implements ApplicationInterface
 	 * @param string $basePath The base path of the application.
 	 * @return self Returns an instance of the Application class.
 	 */
-	public static function configure (string $basePath): self
+	public static function configure(string $basePath): self
 	{
 		self::$basePath = rtrim($basePath, '/') . '/';
 
-		if (php_sapi_name() == 'cli-server')
-		{
+		if (php_sapi_name() == 'cli-server') {
 			self::$request_uri = urldecode($_SERVER['REQUEST_URI']);
-		}
-		else
-		{
+		} else {
 			self::$request_uri = urldecode(
-			 $_REQUEST['uri'] ?? $_SERVER['REQUEST_URI']
+				$_REQUEST['uri'] ?? $_SERVER['REQUEST_URI']
 			);
 		}
 
@@ -96,7 +103,7 @@ class Application implements ApplicationInterface
 	 * @param string $web The path for web routes.
 	 * @return self Returns the current instance of the Application class.
 	 */
-	public function routing (string $api, string $web): self
+	public function routing(string $api, string $web): self
 	{
 		self::$apiPath = $api;
 		self::$webPath = $web;
@@ -114,16 +121,18 @@ class Application implements ApplicationInterface
 	 *
 	 * @return void
 	 */
-	public function create (): void
+	public function create(): void
 	{
 		$loader = new FileLoader();
 		$loader->load(__DIR__ . '/../Config/env.config.php');
 		$loader->load(__DIR__ . '/../Config/config.php');
 
-		Route::config((bool) (getenv('APP_DEBUG') ?? true));
+		self::$log = strtolower(getenv('APP_DEBUG')) === 'true' ? true : false;
+		Route::config();
+
 		$loader
-		 ->load(__DIR__ . '/../Globals/Functions.php')
-		 ->load(self::$apiPath)
-		 ->load(self::$webPath);
+			->load(__DIR__ . '/../Globals/Functions.php')
+			->load(self::$apiPath)
+			->load(self::$webPath);
 	}
 }

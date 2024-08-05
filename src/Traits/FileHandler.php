@@ -88,7 +88,7 @@ trait FileHandler
 						return 'application/vnd.oasis.opendocument.text';
 
 					default:
-						return $file_type;
+						return 'text/html';
 				}
 			}
 			else

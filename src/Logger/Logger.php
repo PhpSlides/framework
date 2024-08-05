@@ -3,7 +3,6 @@
 namespace PhpSlides\Logger;
 
 use DateTime;
-use PhpSlides\Route;
 use PhpSlides\Foundation\Application;
 
 trait Logger
@@ -34,7 +33,7 @@ trait Logger
 		// all content messages to log
 		$content = "$remote_addr - - [$date] \"$method $uri $http_protocol\" $http_code\n";
 
-		if (Route::$log === true) {
+		if (Application::$log === true) {
 			$log = fopen($log_path, 'a');
 			fwrite($log, $content);
 			fclose($log);

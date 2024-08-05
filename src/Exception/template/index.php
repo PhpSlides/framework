@@ -89,7 +89,7 @@ header span {
 
 .code-wrapper pre code {
    padding: 10px 0;
-   font-size: 16px;
+   font-size: 14px;
    min-height: 20px;
    border-radius: 7px;
    background-color: #b8a9a9;

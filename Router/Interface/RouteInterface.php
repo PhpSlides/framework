@@ -39,22 +39,15 @@ interface RouteInterface
 	/**
 	 *   ---------------------------------------------------------------------------------------------------------
 	 *
-	 *   If `$request_log` is set to true, it prints logs in `.log` file in the root of the project each time any request has been received.
-	 *   It's been setted to true by default
-	 *
-	 *
 	 *   This function handles getting files request and describe the type of request to handle according to `phpslides.config.json` file in the root of the project,
 	 *   for more security, it disallow users in navigating to wrong paths or files of the project.
 	 *
 	 *
 	 *   This config method must be called before writing any other Route method or codes.
-	 *   |
-	 *
-	 *   @param bool $request_log The parameter indicates request logger to prints out logs output on each received request
-	 *
+	 * 
 	 *   ---------------------------------------------------------------------------------------------------------
 	 */
-	public static function config (bool $request_log): void;
+	public static function config (): void;
 
 	/**
 	 *   ------------------------------------------------------------------------
