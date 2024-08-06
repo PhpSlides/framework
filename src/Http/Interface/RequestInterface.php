@@ -11,7 +11,7 @@ use stdClass;
  */
 interface RequestInterface
 {
-	public function __construct(array $routeParam);
+	public function __construct (array $routeParam);
 
 
 	/**
@@ -19,7 +19,7 @@ interface RequestInterface
 	 *
 	 * @return object The URL parameters.
 	 */
-	public function urlParam(): object;
+	public function urlParam (): object;
 
 
 	/**
@@ -27,7 +27,7 @@ interface RequestInterface
 	 *
 	 * @return stdClass The parsed query parameters.
 	 */
-	public function urlQuery(): stdClass;
+	public function urlQuery (): stdClass;
 
 
 	/**
@@ -36,7 +36,7 @@ interface RequestInterface
 	 * @param ?string $name Optional header name to retrieve a specific header.
 	 * @return array|string The headers, or a specific header value if $name is provided.
 	 */
-	public function headers(?string $name = null): array|string;
+	public function headers (?string $name = null): array|string;
 
 
 	/**
@@ -44,7 +44,7 @@ interface RequestInterface
 	 *
 	 * @return stdClass The authentication credentials.
 	 */
-	public function Auth(): stdClass;
+	public function Auth (): stdClass;
 
 
 	/**
@@ -52,34 +52,37 @@ interface RequestInterface
 	 *
 	 * @return ?array The request body data, or null if parsing fails.
 	 */
-	public function body(): ?array;
+	public function body (): ?array;
 
 
 	/**
 	 * Retrieves a GET parameter by key.
+	 * And if no parameter is provided, returns all key and values in pairs
 	 *
-	 * @param string $key The key of the GET parameter.
-	 * @return ?string The parameter value, or null if not set.
+	 * @param ?string $key The key of the GET parameter.
+	 * @return string|array|null The parameter value, or null if not set.
 	 */
-	public function get(string $key): ?string;
+	public function get (?string $key = null): string|array|null;
 
 
 	/**
 	 * Retrieves a POST parameter by key.
+	 * And if no parameter is provided, returns all key and values in pairs
 	 *
 	 * @param string $key The key of the POST parameter.
-	 * @return ?string The parameter value, or null if not set.
+	 * @return string|array|null The parameter values, or null if not set.
 	 */
-	public function post(string $key): ?string;
+	public function post (?string $key = null): string|array|null;
 
 
 	/**
 	 * Retrieves a request parameter by key from all input sources.
+	 * And if no parameter is provided, returns all key and values in pairs
 	 *
-	 * @param string $key The key of the request parameter.
-	 * @return ?string The parameter value, or null if not set.
+	 * @param ?string $key The key of the request parameter.
+	 * @return string|array|null The parameter value, or null if not set.
 	 */
-	public function request(string $key): ?string;
+	public function request (?string $key = null): string|array|null;
 
 
 	/**
@@ -88,7 +91,7 @@ interface RequestInterface
 	 * @param string $name The name of the file input.
 	 * @return ?object File data, or null if not set.
 	 */
-	public function files(string $name): ?object;
+	public function files (string $name): ?object;
 
 
 	/**
@@ -97,7 +100,16 @@ interface RequestInterface
 	 * @param ?string $key Optional cookie key.
 	 * @return string|object|null The cookie value, all cookies as an object, or null if key is provided but not found.
 	 */
-	public function cookie(?string $key = null): string|object|null;
+	public function cookie (?string $key = null): string|object|null;
+
+
+	/**
+	 * Retrieves a session value by key, or all session if no key is provided.
+	 *
+	 * @param ?string $key Optional cookie key.
+	 * @return string|object|null The cookie value, all cookies as an object, or null if key is provided but not found.
+	 */
+	public function session (?string $key = null): string|object|null;
 
 
 	/**
@@ -105,7 +117,7 @@ interface RequestInterface
 	 *
 	 * @return string The HTTP method (e.g., GET, POST).
 	 */
-	public function method(): string;
+	public function method (): string;
 
 
 	/**
@@ -113,7 +125,7 @@ interface RequestInterface
 	 *
 	 * @return string The URI.
 	 */
-	public function uri(): string;
+	public function uri (): string;
 
 
 	/**
@@ -121,7 +133,7 @@ interface RequestInterface
 	 *
 	 * @return object The parsed URL components.
 	 */
-	public function url(): object;
+	public function url (): object;
 
 
 	/**
@@ -129,7 +141,7 @@ interface RequestInterface
 	 *
 	 * @return string The client's IP address.
 	 */
-	public function ip(): string;
+	public function ip (): string;
 
 
 	/**
@@ -137,7 +149,7 @@ interface RequestInterface
 	 *
 	 * @return string The user agent string.
 	 */
-	public function userAgent(): string;
+	public function userAgent (): string;
 
 
 	/**
@@ -145,7 +157,7 @@ interface RequestInterface
 	 *
 	 * @return bool True if the request is an AJAX request, false otherwise.
 	 */
-	public function isAjax(): bool;
+	public function isAjax (): bool;
 
 
 	/**
@@ -153,7 +165,7 @@ interface RequestInterface
 	 *
 	 * @return string|null The referrer URL, or null if not set.
 	 */
-	public function referrer(): ?string;
+	public function referrer (): ?string;
 
 
 	/**
@@ -161,7 +173,7 @@ interface RequestInterface
 	 *
 	 * @return string The server protocol.
 	 */
-	public function protocol(): string;
+	public function protocol (): string;
 
 
 	/**
@@ -169,7 +181,7 @@ interface RequestInterface
 	 *
 	 * @return array The combined input data.
 	 */
-	public function all(): array;
+	public function all (): array;
 
 
 	/**
@@ -178,7 +190,7 @@ interface RequestInterface
 	 * @param string $key The key of the server parameter.
 	 * @return string|null The server parameter value, or null if not set.
 	 */
-	public function server(string $key): ?string;
+	public function server (string $key): ?string;
 
 
 	/**
@@ -187,7 +199,7 @@ interface RequestInterface
 	 * @param string $method The HTTP method to check.
 	 * @return bool True if the request method matches, false otherwise.
 	 */
-	public function isMethod(string $method): bool;
+	public function isMethod (string $method): bool;
 
 
 	/**
@@ -195,7 +207,7 @@ interface RequestInterface
 	 *
 	 * @return bool True if the request is HTTPS, false otherwise.
 	 */
-	public function isHttps(): bool;
+	public function isHttps (): bool;
 
 
 	/**
@@ -203,5 +215,5 @@ interface RequestInterface
 	 *
 	 * @return int The request time as a Unix timestamp.
 	 */
-	public function requestTime(): int;
+	public function requestTime (): int;
 }
