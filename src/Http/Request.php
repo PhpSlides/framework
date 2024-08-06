@@ -60,7 +60,7 @@ class Request extends Application implements RequestInterface
 		while ($i < count($parsed)) {
 			$p = mb_split('=', $parsed[$i]);
 			$key = $p[0];
-			$value = $p[1] ?? null;
+			$value = $p[1] ? htmlspecialchars($p[1], ENT_NOQUOTES) : null;
 
 			$cl->$key = $value;
 			$i++;
@@ -78,7 +78,9 @@ class Request extends Application implements RequestInterface
 	public function headers(?string $name = null): array|string
 	{
 		$headers = getallheaders();
-		return !$name ? $headers : htmlspecialchars($headers[$name]);
+		return !$name
+			? array_map('htmlspecialchars', $headers)
+			: htmlspecialchars($headers[$name], ENT_NOQUOTES);
 	}
 
 	/**
@@ -110,8 +112,8 @@ class Request extends Application implements RequestInterface
 
 		$res = [];
 		foreach ($data as $key => $value) {
-			$key = trim(htmlspecialchars($key));
-			$value = trim(htmlspecialchars($value));
+			$key = trim(htmlspecialchars($key), ENT_NOQUOTES);
+			$value = trim(htmlspecialchars($value), ENT_NOQUOTES);
 
 			$res[$key] = $value;
 		}
@@ -120,60 +122,76 @@ class Request extends Application implements RequestInterface
 
 	/**
 	 * Retrieves a GET parameter by key.
+	 * And if no parameter is provided, returns all key and values in pairs
 	 *
-	 * @param string $key The key of the GET parameter.
-	 * @return ?string The parameter value, or null if not set.
+	 * @param ?string $key The key of the GET parameter.
+	 * @return string|array|null The parameter value, or null if not set.
 	 */
-	public function get(string $key): ?string
+	public function get(?string $key = null): string|array|null
 	{
+		if (!$key) {
+			return array_map('htmlspecialchars', $_GET);
+		}
 		if (!isset($_GET[$key])) {
 			return null;
 		}
 
-		$data = trim(htmlspecialchars($_GET[$key]));
+		$data = trim(htmlspecialchars($_GET[$key]), ENT_NOQUOTES);
 		return $data;
 	}
 
 	/**
 	 * Retrieves a POST parameter by key.
+	 * And if no parameter is provided, returns all key and values in pairs
 	 *
 	 * @param string $key The key of the POST parameter.
-	 * @return ?string The parameter value, or null if not set.
+	 * @return string|array|null The parameter values, or null if not set.
 	 */
-	public function post(string $key): ?string
+	public function post(?string $key = null): string|array|null
 	{
+		if (!$key) {
+			return array_map('htmlspecialchars', $_POST);
+		}
 		if (!isset($_POST[$key])) {
 			return null;
 		}
 
-		$data = trim(htmlspecialchars($_POST[$key]));
+		$data = trim(htmlspecialchars($_POST[$key], ENT_NOQUOTES));
 		return $data;
 	}
 
 	/**
 	 * Retrieves a request parameter by key from all input sources.
+	 * And if no parameter is provided, returns all key and values in pairs
 	 *
-	 * @param string $key The key of the request parameter.
-	 * @return ?string The parameter value, or null if not set.
+	 * @param ?string $key The key of the request parameter.
+	 * @return string|array|null The parameter value, or null if not set.
 	 */
-	public function request(string $key): ?string
+	public function request(?string $key = null): string|array|null
 	{
+		if (!$key) {
+			return array_map('htmlspecialchars', $_REQUEST);
+		}
 		if (!isset($_REQUEST[$key])) {
 			return null;
 		}
 
-		$data = trim(htmlspecialchars($_REQUEST[$key]));
+		$data = trim(htmlspecialchars($_REQUEST[$key], ENT_NOQUOTES));
 		return $data;
 	}
 
 	/**
 	 * Retrieves file data from the request by name.
+	 * And if no parameter is provided, returns all key and values in pairs
 	 *
-	 * @param string $name The name of the file input.
-	 * @return ?object File data, or null if not set.
+	 * @param ?string $name The name of the file input.
+	 * @return object|null File data, or null if not set.
 	 */
-	public function files(string $name): ?object
+	public function files(?string $name = null): ?object|null
 	{
+		if (!$name) {
+			return (object) $_FILES;
+		}
 		if (!isset($_FILES[$name])) {
 			return null;
 		}
@@ -193,7 +211,26 @@ class Request extends Application implements RequestInterface
 		if (!$key) {
 			return (object) $_COOKIE;
 		}
-		return htmlspecialchars($_COOKIE[$key]);
+		return isset($_COOKIE[$key])
+			? htmlspecialchars($_COOKIE[$key], ENT_NOQUOTES)
+			: null;
+	}
+
+	/**
+	 * Retrieves a session value by key, or all session if no key is provided.
+	 *
+	 * @param ?string $key Optional cookie key.
+	 * @return string|object|null The cookie value, all cookies as an object, or null if key is provided but not found.
+	 */
+	public function session(?string $key = null): string|object|null
+	{
+		session_status() < 2 && session_start();
+		if (!$key) {
+			return (object) $_SESSION;
+		}
+		return isset($_SESSION[$key])
+			? htmlspecialchars($_SESSION[$key], ENT_NOQUOTES)
+			: null;
 	}
 
 	/**
@@ -239,7 +276,7 @@ class Request extends Application implements RequestInterface
 	 */
 	public function ip(): string
 	{
-		return $_SERVER['REMOTE_ADDR'];
+		return htmlspecialchars($_SERVER['REMOTE_ADDR'], ENT_NOQUOTES);
 	}
 
 	/**
@@ -249,7 +286,7 @@ class Request extends Application implements RequestInterface
 	 */
 	public function userAgent(): string
 	{
-		return $_SERVER['HTTP_USER_AGENT'];
+		return htmlspecialchars($_SERVER['HTTP_USER_AGENT'], ENT_NOQUOTES);
 	}
 
 	/**
@@ -270,7 +307,9 @@ class Request extends Application implements RequestInterface
 	 */
 	public function referrer(): ?string
 	{
-		return isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : null;
+		return isset($_SERVER['HTTP_REFERER'])
+			? htmlspecialchars($_SERVER['HTTP_REFERER'], ENT_NOQUOTES)
+			: null;
 	}
 
 	/**
@@ -280,7 +319,7 @@ class Request extends Application implements RequestInterface
 	 */
 	public function protocol(): string
 	{
-		return $_SERVER['SERVER_PROTOCOL'];
+		return htmlspecialchars($_SERVER['SERVER_PROTOCOL']);
 	}
 
 	/**
@@ -296,13 +335,19 @@ class Request extends Application implements RequestInterface
 
 	/**
 	 * Retrieves a parameter from the $_SERVER array.
+	 * And if no parameter is provided, it returns all the keys and values in pairs
 	 *
 	 * @param string $key The key of the server parameter.
-	 * @return string|null The server parameter value, or null if not set.
+	 * @return object|string|null The server parameter value, or null if not set.
 	 */
-	public function server(string $key): ?string
+	public function server(?string $key = null): object|string|null
 	{
-		return isset($_SERVER[$key]) ? $_SERVER[$key] : null;
+		if (!$key) {
+			return (object) array_map('htmlspecialchars', $_SERVER);
+		}
+		return isset($_SERVER[$key])
+			? htmlspecialchars($_SERVER[$key], ENT_NOQUOTES)
+			: null;
 	}
 
 	/**

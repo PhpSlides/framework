@@ -444,7 +444,7 @@ class Route extends Resources implements RouteInterface
 	 * Check out documentation for using Map method
 	 *
 	 * @link https://github.com/dconco/php_slides
-	 * @param string|array $method Can also be used as `$route` param if the `$route` param is not specified
+	 * @param string|array $method Request method
 	 * @param string|array|null $route Route parameter
 	 */
 	public static function map(string|array $method, string|array $route): self

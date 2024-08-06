@@ -15,7 +15,7 @@ class Application implements ApplicationInterface
 	/**
 	 * The version of the PhpSlides application.
 	 */
-	const PHPSLIDES_VERSION = '1.2.3';
+	const PHPSLIDES_VERSION = '1.2.5';
 
 	/**
 	 *  `$log` method prints logs in `.log` file in the root of the project each time any request has been received, when setted to true.
@@ -86,10 +86,12 @@ class Application implements ApplicationInterface
 		self::$basePath = rtrim($basePath, '/') . '/';
 
 		if (php_sapi_name() == 'cli-server') {
-			self::$request_uri = urldecode($_SERVER['REQUEST_URI']);
+			self::$request_uri = urldecode(
+				parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)
+			);
 		} else {
 			self::$request_uri = urldecode(
-				$_REQUEST['uri'] ?? $_SERVER['REQUEST_URI']
+				$_REQUEST['uri'] ?? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)
 			);
 		}
 

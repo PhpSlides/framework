@@ -8,10 +8,9 @@ class ViewLoader
 {
 	private array $result = [];
 
-	public function load ($viewFile): self
+	public function load($viewFile): self
 	{
-		if (is_file($viewFile))
-		{
+		if (is_file($viewFile)) {
 			// get and make generated file name & directory
 			$gen_file = explode('/', $viewFile);
 			$new_name = explode('.', end($gen_file), 2);
@@ -23,8 +22,7 @@ class ViewLoader
 			$file_contents = file_get_contents($viewFile);
 			$file_contents = $this->format($file_contents);
 
-			try
-			{
+			try {
 				$file = fopen($gen_file, 'w');
 				fwrite($file, $file_contents);
 				fclose($file);
@@ -33,14 +31,10 @@ class ViewLoader
 				$this->result[] = $parsedLoad->getLoad();
 
 				return $this;
-			}
-			finally
-			{
+			} finally {
 				unlink($gen_file);
 			}
-		}
-		else
-		{
+		} else {
 			throw new Exception("File not found: $viewFile");
 		}
 	}
@@ -48,40 +42,61 @@ class ViewLoader
 	/**
 	 * Get Loaded View File Result
 	 */
-	public function getLoad ()
+	public function getLoad()
 	{
-		if (count($this->result) === 1)
-		{
+		if (count($this->result) === 1) {
 			return $this->result[0];
 		}
 		return $this->result;
 	}
 
-	protected function format ($contents)
+	protected function format($contents)
 	{
-		$pattern = '/<include\s+path=["|\']([^"]+)["|\']\s*!?\s*\/>/';
+		$pattern = '/<!INCLUDE\s+path=["|\']([^"]+)["|\']\s*\/>/';
 
 		// replace <include> match elements
 		$formattedContents = preg_replace_callback(
-		 $pattern,
-		 function ($matches)
-		 {
-			 $path = trim($matches[1]);
-			 return '<' . '?' . ' slides_include(__DIR__ . \'/' . $path . '\') ?' . '>';
-		 },
-		 $contents
+			$pattern,
+			function ($matches) {
+				$path = trim($matches[1]);
+				return '<' .
+					'?' .
+					' slides_include(__DIR__ . \'/' .
+					$path .
+					'\') ?' .
+					'>';
+			},
+			$contents
 		);
+
+		// replace xml
+		$formattedContents = str_replace('<?xml', '<%xml', $formattedContents);
 
 		// replace <? elements
 		$formattedContents = preg_replace_callback(
-		 '/<' . '\?' . ' ([^?]*)\?' . '>/s',
-		 function ($matches)
-		 {
-			 $val = trim($matches[1]);
-			 $val = trim($val, ';');
-			 return '<' . '?php print_r(' . $val . ') ?>';
-		 },
-		$formattedContents
+			'/<' . '\?' . ' ([^?]*)\?' . '>/s',
+			function ($matches) {
+				$val = trim($matches[1]);
+				$val = trim($val, ';');
+				return '<' . '?php print_r(' . $val . ') ?>';
+			},
+			$formattedContents
+		);
+
+		$formattedContents = str_replace('<%xml', '<?xml', $formattedContents);
+
+		// replace {{}} elements
+		$formattedContents = preg_replace_callback(
+			'/{{+([^?]*)+}}/s',
+			function ($matches) {
+				$val = trim($matches[1]);
+				$val = trim($val, ';');
+				return '"<' .
+					'?php echo(' .
+					htmlentities((string) $val, ENT_NOQUOTES) .
+					') ?>"';
+			},
+			$formattedContents
 		);
 
 		return $formattedContents;
