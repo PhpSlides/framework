@@ -2,13 +2,33 @@
 
 namespace PhpSlides\Loader;
 
-use Exception;
+use PhpSlides\Exception;
 
 class ViewLoader
 {
-	private array $result = [];
+	private array|null $result = null;
 
+	/**
+	 * Load view file in view formatted way
+	 *
+	 * @throw An Exception if the file does not seem to be existing
+	 * @return self
+	 */
 	public function load($viewFile): self
+	{
+		if (!is_file($viewFile)) {
+			throw new Exception("File does not exist: $viewFile");
+		}
+		return self::safeLoad($viewFile);
+	}
+
+	/**
+	 * Load view file in view formatted way.
+	 * If the file does not exist then nothing will be executed.
+	 *
+	 * @return self
+	 */
+	public function safeLoad($viewFile): self
 	{
 		if (is_file($viewFile)) {
 			// get and make generated file name & directory
@@ -32,13 +52,11 @@ class ViewLoader
 
 				unlink($gen_file);
 				unset($GLOBALS['__gen_file_path']);
-				return $this;
 			} finally {
 				$GLOBALS['__gen_file_path'] = $gen_file;
 			}
-		} else {
-			throw new Exception("File not found: $viewFile");
 		}
+		return $this;
 	}
 
 	/**
@@ -46,7 +64,7 @@ class ViewLoader
 	 */
 	public function getLoad()
 	{
-		if (count($this->result) === 1) {
+		if (count($this->result ?? []) === 1) {
 			return $this->result[0];
 		}
 		return $this->result;

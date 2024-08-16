@@ -15,7 +15,7 @@ class Application implements ApplicationInterface
 	/**
 	 * The version of the PhpSlides application.
 	 */
-	const PHPSLIDES_VERSION = '1.2.3';
+	const PHPSLIDES_VERSION = '1.2.5';
 
 	/**
 	 *  `$log` method prints logs in `.log` file in the root of the project each time any request has been received, when setted to true.
@@ -32,18 +32,6 @@ class Application implements ApplicationInterface
 	 * The base path of the application.
 	 */
 	public static string $basePath;
-
-	/**
-	 * @var string $apiPath
-	 * The path for API routes.
-	 */
-	public static string $apiPath;
-
-	/**
-	 * @var string $webPath
-	 * The path for web routes.
-	 */
-	public static string $webPath;
 
 	/**
 	 * @var string $configsDir
@@ -84,6 +72,7 @@ class Application implements ApplicationInterface
 	public static function configure(string $basePath): self
 	{
 		self::$basePath = rtrim($basePath, '/') . '/';
+		call_user_func($this, 'routing');
 
 		if (php_sapi_name() == 'cli-server') {
 			self::$request_uri = urldecode(
@@ -103,19 +92,15 @@ class Application implements ApplicationInterface
 	 *
 	 * @param string $api The path for API routes.
 	 * @param string $web The path for web routes.
-	 * @return self Returns the current instance of the Application class.
+	 * @return void
 	 */
-	public function routing(string $api, string $web): self
+	private function routing(): void
 	{
-		self::$apiPath = $api;
-		self::$webPath = $web;
-
 		self::$configsDir = self::$basePath . 'src/configs/';
-		self::$stylesDir = self::$basePath . 'src/resources/styles/';
-		self::$scriptsDir = self::$basePath . 'src/resources/src/';
 		self::$viewsDir = self::$basePath . 'src/resources/views/';
-
-		return $this;
+		self::$scriptsDir = self::$basePath . 'src/resources/src/';
+		self::$stylesDir = self::$basePath . 'src/resources/styles/';
+		self::$registerRoutePath = self::$basePath . 'src/routes/register.php';
 	}
 
 	/**
@@ -125,7 +110,7 @@ class Application implements ApplicationInterface
 	 */
 	public function create(): void
 	{
-	   session_start();
+		session_start();
 		$loader = new FileLoader();
 		$loader->load(__DIR__ . '/../Config/env.config.php');
 		$loader->load(__DIR__ . '/../Config/config.php');
@@ -135,7 +120,6 @@ class Application implements ApplicationInterface
 
 		$loader
 			->load(__DIR__ . '/../Globals/Functions.php')
-			->load(self::$apiPath)
-			->load(self::$webPath);
+			->load(self::$registerRoutePath);
 	}
 }
