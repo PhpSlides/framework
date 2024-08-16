@@ -62,7 +62,7 @@ class Request extends Application implements RequestInterface
 		{
 			$p = mb_split('=', $parsed[$i]);
 			$key = $p[0];
-			$value = $p[1] ? htmlspecialchars($p[1], ENT_NOQUOTES) : null;
+			$value = $p[1] ? trim(htmlspecialchars($p[1], ENT_NOQUOTES)) : null;
 
 			$cl->$key = $value;
 			$i++;
@@ -82,7 +82,7 @@ class Request extends Application implements RequestInterface
 		$headers = getallheaders();
 		return !$name
 		 ? array_map('htmlspecialchars', $headers)
-		 : htmlspecialchars($headers[$name], ENT_NOQUOTES);
+		 : trim(htmlspecialchars($headers[$name], ENT_NOQUOTES));
 	}
 
 	/**
@@ -225,7 +225,7 @@ class Request extends Application implements RequestInterface
 			return (object) $_COOKIE;
 		}
 		return isset($_COOKIE[$key])
-		 ? htmlspecialchars($_COOKIE[$key], ENT_NOQUOTES)
+		 ? trim(htmlspecialchars($_COOKIE[$key], ENT_NOQUOTES))
 		 : null;
 	}
 
@@ -243,7 +243,7 @@ class Request extends Application implements RequestInterface
 			return (object) $_SESSION;
 		}
 		return isset($_SESSION[$key])
-		 ? htmlspecialchars($_SESSION[$key], ENT_NOQUOTES)
+		 ? trim(htmlspecialchars($_SESSION[$key], ENT_NOQUOTES))
 		 : null;
 	}
 
@@ -290,7 +290,7 @@ class Request extends Application implements RequestInterface
 	 */
 	public function ip (): string
 	{
-		return htmlspecialchars($_SERVER['REMOTE_ADDR'], ENT_NOQUOTES);
+		return trim(htmlspecialchars($_SERVER['REMOTE_ADDR'], ENT_NOQUOTES));
 	}
 
 	/**
@@ -322,7 +322,7 @@ class Request extends Application implements RequestInterface
 	public function referrer (): ?string
 	{
 		return isset($_SERVER['HTTP_REFERER'])
-		 ? htmlspecialchars($_SERVER['HTTP_REFERER'], ENT_NOQUOTES)
+		 ? trim(htmlspecialchars($_SERVER['HTTP_REFERER'], ENT_NOQUOTES))
 		 : null;
 	}
 
@@ -333,7 +333,7 @@ class Request extends Application implements RequestInterface
 	 */
 	public function protocol (): string
 	{
-		return htmlspecialchars($_SERVER['SERVER_PROTOCOL']);
+		return trim(htmlspecialchars($_SERVER['SERVER_PROTOCOL']));
 	}
 
 	/**
@@ -361,7 +361,7 @@ class Request extends Application implements RequestInterface
 			return (object) array_map('htmlspecialchars', $_SERVER);
 		}
 		return isset($_SERVER[$key])
-		 ? htmlspecialchars($_SERVER[$key], ENT_NOQUOTES)
+		 ? trim(htmlspecialchars($_SERVER[$key], ENT_NOQUOTES))
 		 : null;
 	}
 

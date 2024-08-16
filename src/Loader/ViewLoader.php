@@ -2,7 +2,7 @@
 
 namespace PhpSlides\Loader;
 
-use PhpSlides\Exception;
+use Exception;
 
 class ViewLoader
 {
@@ -30,9 +30,10 @@ class ViewLoader
 				$parsedLoad = (new FileLoader())->parseLoad($gen_file);
 				$this->result[] = $parsedLoad->getLoad();
 
+				unlink($gen_file);
 				return $this;
 			} finally {
-				unlink($gen_file);
+				$GLOBALS['__gen_file_path'] = $gen_file;
 			}
 		} else {
 			throw new Exception("File not found: $viewFile");
@@ -52,7 +53,7 @@ class ViewLoader
 
 	protected function format($contents)
 	{
-		$pattern = '/<!INCLUDE\s+path=["|\']([^"]+)["|\']\s*\/>/';
+		$pattern = '/<include\s+path=["|\']([^"]+)["|\']\s*!?\s*\/>/';
 
 		// replace <include> match elements
 		$formattedContents = preg_replace_callback(
@@ -69,32 +70,13 @@ class ViewLoader
 			$contents
 		);
 
-		// replace xml
-		$formattedContents = str_replace('<?xml', '<%xml', $formattedContents);
-
 		// replace <? elements
 		$formattedContents = preg_replace_callback(
-			'/<' . '\?' . ' ([^?]*)\?' . '>/s',
+			'/<' . '\?' . '\s+([^?]*)\?' . '>/s',
 			function ($matches) {
 				$val = trim($matches[1]);
 				$val = trim($val, ';');
 				return '<' . '?php print_r(' . $val . ') ?>';
-			},
-			$formattedContents
-		);
-
-		$formattedContents = str_replace('<%xml', '<?xml', $formattedContents);
-
-		// replace {{}} elements
-		$formattedContents = preg_replace_callback(
-			'/{{+([^?]*)+}}/s',
-			function ($matches) {
-				$val = trim($matches[1]);
-				$val = trim($val, ';');
-				return '"<' .
-					'?php echo(' .
-					htmlentities((string) $val, ENT_NOQUOTES) .
-					') ?>"';
 			},
 			$formattedContents
 		);

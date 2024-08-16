@@ -24,10 +24,25 @@ function getCodeSnippet(
 		throw new Exception("Cannot read file: $file");
 	}
 
+	/**
+	 * This is coming from view file
+	 */
+	session_start();
+	$path = $GLOBALS['__gen_file_path'];
+
+	if (isset($path) && file_exists($path)) {
+		$code = file($path);
+		$content = htmlspecialchars(file_get_contents($path));
+		unset($GLOBALS['__gen_file_path']);
+		unlink($path);
+	} else {
+		$code = file($file);
+		$content = htmlspecialchars(file_get_contents($file));
+	}
+
 	$startLine = max(1, $line - $linesBefore);
 	$endLine = $line + $linesAfter;
 
-	$code = file($file);
 	$snippet = array_slice(
 		$code,
 		$startLine - 1,
@@ -36,7 +51,7 @@ function getCodeSnippet(
 	);
 
 	return [
-		'rawCode' => htmlspecialchars(file_get_contents($file)),
+		'rawCode' => $content,
 		'parsedCode' => $snippet
 	];
 }
