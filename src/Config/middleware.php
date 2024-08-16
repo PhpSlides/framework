@@ -4,7 +4,7 @@ use PhpSlides\Loader\FileLoader;
 use PhpSlides\Foundation\Application;
 
 $middleware = (new FileLoader())
-	->load(Application::$configsDir . 'middleware.php')
-	->getLoad();
+	->safeLoad(Application::$configsDir . 'middlewares.php')
+	->getLoad() ?: [];
 
 return $middleware;
