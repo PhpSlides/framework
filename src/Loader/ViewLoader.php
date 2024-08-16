@@ -31,6 +31,7 @@ class ViewLoader
 				$this->result[] = $parsedLoad->getLoad();
 
 				unlink($gen_file);
+				unset($GLOBALS['__gen_file_path']);
 				return $this;
 			} finally {
 				$GLOBALS['__gen_file_path'] = $gen_file;
