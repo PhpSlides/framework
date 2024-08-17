@@ -132,6 +132,7 @@ function route(
  * @param string $filename The name of the file to get from public directory
  * @param string $path_type Path to start location which uses either `RELATIVE_PATH`
  * for path `../` OR `ROOT_RELATIVE_PATH` for root `/`
+ * @return string The file path ROOT_RELATIVE_PATH|RELATIVE_PATH
  */
 function asset(string $filename, $path_type = RELATIVE_PATH): string
 {
@@ -172,7 +173,33 @@ function asset(string $filename, $path_type = RELATIVE_PATH): string
 	}
 }
 
-function ExceptionHandler($exception)
+/**
+ * Generate a PayLoad array for JWT authentication.
+ * @return array The payload for JWT
+ */
+function payload(
+	array $data,
+	string $expires,
+	string $issued_at = time(),
+	string $issuer = ''
+): array {
+	$jwt = (new FileLoader())
+		->load(__DIR__ . '/../Config/jwt.config.php')
+		->getLoad();
+
+	if ($issuer === '') {
+		$issuer = $jwt['issuer'];
+	}
+
+	return [
+		'iss' => $issuer,
+		'iat' => $issued_at,
+		'exp' => $expires,
+		'data' => array_map('htmlspecialchars', $data)
+	];
+}
+
+function ExceptionHandler(Throwable $exception)
 {
 	// Check if the exception is a CustomException to use its specific methods
 	if ($exception instanceof Exception) {

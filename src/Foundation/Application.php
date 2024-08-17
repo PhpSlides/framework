@@ -64,6 +64,12 @@ class Application implements ApplicationInterface
 	public static string $request_uri;
 
 	/**
+	 * @var string $registerRoutePath
+	 * The file path for registering all routes
+	 */
+	public static string $registerRoutePath;
+
+	/**
 	 * Configure the application with the base path.
 	 *
 	 * @param string $basePath The base path of the application.

@@ -6,6 +6,7 @@ use PhpSlides\view;
 use PhpSlides\Route;
 use PhpSlides\Exception;
 use PhpSlides\Http\Request;
+use PhpSlides\Loader\FileLoader;
 use PhpSlides\Controller\Controller;
 use PhpSlides\Foundation\Application;
 use PhpSlides\Interface\MiddlewareInterface;
@@ -98,7 +99,9 @@ class Resources extends Controller
 		$request = new Request($params);
 
 		for ($i = 0; $i < count((array) $middleware); $i++) {
-			include_once Application::$configsDir . 'middleware.php';
+			$middlewares = (new FileLoader())
+				->load(__DIR__ . '/../../src/Config/middleware.php')
+				->getLoad();
 
 			if (array_key_exists($middleware[$i], $middlewares)) {
 				$middleware = $middlewares[$middleware[$i]];
