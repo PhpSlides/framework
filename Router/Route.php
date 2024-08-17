@@ -6,7 +6,7 @@
  * It also imports the necessary classes and interfaces.
  *
  * @package Router
- * @version 1.2.2
+ * @version ^1.2.2
  * @since 1.0.0
  * @link https://github.com/dconco/php_slides
  * @author Dave Conco <concodave@gmail.com>

@@ -14,7 +14,7 @@ class MapRoute extends Controller implements MapInterface
 	private static string|array $route;
 	private static string $request_uri;
 	private static string $charset;
-	private static string $method;
+	private static array $method;
 
 	/**
 	 * Validating $route methods
@@ -26,7 +26,7 @@ class MapRoute extends Controller implements MapInterface
 	{
 		$config_file = self::config_file();
 		self::$charset = $config_file['charset'];
-		self::$method = strtoupper((string) $method);
+		self::$method = explode('|', $method);
 		/**
 		 *   ----------------------------------------------
 		 *   |   Replacing first and last forward slashes
@@ -132,8 +132,8 @@ class MapRoute extends Controller implements MapInterface
 		if (preg_match("/$reqUri/", self::$route)) {
 			// checks if the requested method is of the given route
 			if (
-				strtoupper($_SERVER['REQUEST_METHOD']) !== self::$method &&
-				strtolower(self::$method) !== 'dynamic'
+				!in_array(self::$method, $_SERVER['REQUEST_METHOD']) &&
+				!in_array(self::$method, 'dynamic')
 			) {
 				http_response_code(405);
 				self::log();
@@ -175,15 +175,15 @@ class MapRoute extends Controller implements MapInterface
 			self::$request_uri === $str_route
 		) {
 			if (
-				strtoupper($_SERVER['REQUEST_METHOD']) !== self::$method &&
-				strtolower(self::$method) !== 'dynamic'
+				!in_array(self::$method, $_SERVER['REQUEST_METHOD']) &&
+				!in_array(self::$method, 'dynamic')
 			) {
 				http_response_code(405);
 				self::log();
 				exit('Method Not Allowed');
 			}
 
-			$method = self::$method;
+			$method = implode('|', self::$method);
 			$charset = self::$charset;
 
 			http_response_code(200);
