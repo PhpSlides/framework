@@ -11,7 +11,7 @@ class FileLoader
 	/**
 	 * Load File, and include it in your project
 	 *
-	 * @throw An Exception if the file does not seem to be existing
+	 * @throws An Exception if the file does not seem to be existing
 	 * @return self
 	 */
 	public function load($file): self
@@ -99,7 +99,7 @@ class FileLoader
 	 * Load Included Contents as String.
 	 * If the file does not exist then nothing will be executed.
 	 *
-	 * @throw An Exception if the file does not seem to be existing
+	 * @throws An Exception if the file does not seem to be existing
 	 * @return self Parsed File content as `string` and if no content, returns empty `string`
 	 */
 	public function parseSafeLoad(string $file): self

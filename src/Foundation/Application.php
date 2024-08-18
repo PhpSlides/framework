@@ -78,7 +78,7 @@ class Application implements ApplicationInterface
 	public static function configure(string $basePath): self
 	{
 		self::$basePath = rtrim($basePath, '/') . '/';
-		call_user_func($this, 'routing');
+		self::routing();
 
 		if (php_sapi_name() == 'cli-server') {
 			self::$request_uri = urldecode(
@@ -96,11 +96,9 @@ class Application implements ApplicationInterface
 	/**
 	 * Set up routing paths for the application.
 	 *
-	 * @param string $api The path for API routes.
-	 * @param string $web The path for web routes.
 	 * @return void
 	 */
-	private function routing(): void
+	private static function routing(): void
 	{
 		self::$configsDir = self::$basePath . 'src/configs/';
 		self::$viewsDir = self::$basePath . 'src/resources/views/';

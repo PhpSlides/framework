@@ -11,7 +11,7 @@ class ViewLoader
 	/**
 	 * Load view file in view formatted way
 	 *
-	 * @throw An Exception if the file does not seem to be existing
+	 * @throws An Exception if the file does not seem to be existing
 	 * @return self
 	 */
 	public function load($viewFile): self

@@ -179,8 +179,8 @@ function asset(string $filename, $path_type = RELATIVE_PATH): string
  */
 function payload(
 	array $data,
-	string $expires,
-	string $issued_at = time(),
+	int $expires,
+	int $issued_at = 0,
 	string $issuer = ''
 ): array {
 	$jwt = (new FileLoader())
@@ -190,13 +190,18 @@ function payload(
 	if ($issuer === '') {
 		$issuer = $jwt['issuer'];
 	}
+	if ($issued_at === 0) {
+		$issued_at = time();
+	}
 
-	return [
-		'iss' => $issuer,
-		'iat' => $issued_at,
-		'exp' => $expires,
-		'data' => array_map('htmlspecialchars', $data)
-	];
+	return array_merge(
+		[
+			'iss' => $issuer,
+			'iat' => $issued_at,
+			'exp' => $expires
+		],
+		array_map('htmlspecialchars', $data)
+	);
 }
 
 function ExceptionHandler(Throwable $exception)

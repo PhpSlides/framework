@@ -2,22 +2,23 @@
 
 namespace PhpSlides\Services;
 
-use Exception;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use PhpSlides\Loader\FileLoader;
 
 class JwtService
 {
+	private static $issuer;
 	private static $secretKey;
 	private static $algorithm;
 
-	public static function setup()
+	private static function setup()
 	{
 		$jwt = (new FileLoader())
 			->load(__DIR__ . '/../Config/jwt.config.php')
 			->getLoad();
 
+		self::$issuer = $jwt['issuer'];
 		self::$secretKey = $jwt['secret_key'];
 		self::$algorithm = $jwt['algorithm'];
 	}
@@ -28,26 +29,37 @@ class JwtService
 		return JWT::encode($payload, self::$secretKey, self::$algorithm);
 	}
 
-	public static function decode(string $token): object
+	public static function decode(string $token, bool $parsed = true): object
 	{
 		self::setup();
-		return JWT::decode($token, new Key(self::$secretKey, self::$algorithm));
+		$decodedToken = JWT::decode(
+			$token,
+			new Key(self::$secretKey, self::$algorithm)
+		);
+
+		if ($parsed === true) {
+			unset($decodedToken->iss);
+			unset($decodedToken->iat);
+			unset($decodedToken->exp);
+		}
+		return $decodedToken;
 	}
 
 	public static function verify(string $token): bool|array
 	{
 		try {
-			return self::decode($token);
-		} catch (Exception $e) {
+			$token = self::decode($token, false);
+		} catch (\Exception $e) {
 			return false;
 		}
+
+		if (
+			$token->iss !== self::$issuer ||
+			$token->iat > time() ||
+			$token->exp < time()
+		) {
+			return false;
+		}
+		return true;
 	}
 }
-
-// Example payload
-$payload = [
-	'iss' => 'http://your-domain.com', // Issuer
-	'iat' => time(), // Issued at
-	'exp' => time() + 3600, // Expiration time
-	'data' => 123 // Subject (user ID)
-];
