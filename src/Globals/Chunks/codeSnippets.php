@@ -21,23 +21,22 @@ function getCodeSnippet(
 	int $linesAfter = 5
 ): array {
 	if (!file_exists($file) || !is_readable($file)) {
-		throw new Exception("Cannot read file: $file");
-	}
+		$path = $GLOBALS['__gen_file_path'];
 
-	/**
-	 * This is coming from view file
-	 */
-	session_start();
-	$path = $GLOBALS['__gen_file_path'];
-
-	if (isset($path) && file_exists($path)) {
-		$code = file($path);
-		$content = htmlspecialchars(file_get_contents($path));
-		unset($GLOBALS['__gen_file_path']);
-		unlink($path);
+		if (isset($path) && file_exists($path)) {
+			/**
+			 * This is coming from view file
+			 */
+			$code = file($path);
+			$content = htmlspecialchars(file_get_contents($path), ENT_NOQUOTES);
+			unset($GLOBALS['__gen_file_path']);
+			unlink($path);
+		} else {
+			throw new Exception("Cannot read file: $file");
+		}
 	} else {
 		$code = file($file);
-		$content = htmlspecialchars(file_get_contents($file));
+		$content = htmlspecialchars(file_get_contents($file), ENT_NOQUOTES);
 	}
 
 	$startLine = max(1, $line - $linesBefore);

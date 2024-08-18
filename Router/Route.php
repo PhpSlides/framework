@@ -17,6 +17,7 @@ namespace PhpSlides;
 
 use PhpSlides\MapRoute;
 use PhpSlides\Traits\FileHandler;
+use PhpSlides\Controller\Controller;
 use PhpSlides\Foundation\Application;
 use PhpSlides\Interface\RouteInterface;
 
@@ -39,7 +40,7 @@ use PhpSlides\Interface\RouteInterface;
  *   -------------------------------------------------------------------------------
  */
 
-class Route implements RouteInterface
+class Route extends Controller implements RouteInterface
 {
 	use FileHandler;
 
@@ -568,8 +569,7 @@ class Route implements RouteInterface
 		}
 
 		if (self::$any !== null) {
-			$GLOBALS['__registered_routes'][$route_index]['any'] =
-				self::$any;
+			$GLOBALS['__registered_routes'][$route_index]['any'] = self::$any;
 		}
 
 		if (self::$use !== null) {

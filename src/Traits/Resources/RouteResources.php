@@ -43,7 +43,7 @@ trait RouteResources
 		$route = self::$any['route'];
 		$method = self::$any['method'];
 		$callback = self::$any['callback'];
-		
+
 		/**
 		 *   --------------------------------------------------------------
 		 *
@@ -168,8 +168,11 @@ trait RouteResources
 			}
 
 			// setting params with params names
-			$req[$paramKey[$key]] = htmlspecialchars($reqUri[$index]);
-			$req_value[] = htmlspecialchars($reqUri[$index]);
+			$req[$paramKey[$key]] = htmlspecialchars(
+				$reqUri[$index],
+				ENT_NOQUOTES
+			);
+			$req_value[] = htmlspecialchars($reqUri[$index], ENT_NOQUOTES);
 
 			// this is to create a regex for comparing route address
 			$reqUri[$index] = '{.*}';
@@ -210,12 +213,13 @@ trait RouteResources
 					self::controller(
 						$callback[0],
 						count($callback) > 1 ? $callback[1] : '',
-						$req_value
+						$req
 					)
 				);
 			} else {
+				$GLOBALS['params'] = $req;
 				print_r(
-					is_callable($callback) ? $callback(...$req_value) : $callback
+					is_callable($callback) ? $callback(new Request($req)) : $callback
 				);
 			}
 
@@ -375,6 +379,7 @@ trait RouteResources
 	protected function __use(): void
 	{
 		$controller = self::$use;
+		header('Content-Type: text/html');
 
 		if (!preg_match('/(?=.*Controller)(?=.*::)/', $controller)) {
 			self::log();
@@ -405,6 +410,7 @@ trait RouteResources
 	{
 		$action = self::$action;
 		$params = self::$map_info['params'];
+		header('Content-Type: text/html');
 
 		if (is_callable($action)) {
 			$a = $action(new Request($GLOBALS['params']));

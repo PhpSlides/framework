@@ -67,7 +67,7 @@ class Application implements ApplicationInterface
 	 * @var string $registerRoutePath
 	 * The file path for registering all routes
 	 */
-	public static string $registerRoutePath;
+	public static string $renderRoutePath;
 
 	/**
 	 * Configure the application with the base path.
@@ -104,7 +104,7 @@ class Application implements ApplicationInterface
 		self::$viewsDir = self::$basePath . 'src/resources/views/';
 		self::$scriptsDir = self::$basePath . 'src/resources/src/';
 		self::$stylesDir = self::$basePath . 'src/resources/styles/';
-		self::$registerRoutePath = self::$basePath . 'src/routes/register.php';
+		self::$renderRoutePath = self::$basePath . 'src/routes/render.php';
 	}
 
 	/**
@@ -119,11 +119,11 @@ class Application implements ApplicationInterface
 		$loader->load(__DIR__ . '/../Config/env.config.php');
 		$loader->load(__DIR__ . '/../Config/config.php');
 
-		self::$log = strtolower(getenv('APP_DEBUG')) === 'true' ? true : false;
+		self::$log = getenv('APP_DEBUG') == 'true' ? true : false;
 		Route::config();
 
 		$loader
 			->load(__DIR__ . '/../Globals/Functions.php')
-			->load(self::$registerRoutePath);
+			->load(self::$renderRoutePath);
 	}
 }

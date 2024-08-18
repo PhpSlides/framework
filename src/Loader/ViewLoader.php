@@ -80,13 +80,20 @@ class ViewLoader
 			function ($matches) {
 				$path = trim($matches[1]);
 				return '<' .
-					'?' .
-					' slides_include(__DIR__ . \'/' .
+					'? slides_include(__DIR__ . \'/' .
 					$path .
-					'\') ?' .
-					'>';
+					'\') ?>';
 			},
 			$contents
+		);
+
+		// Replace bracket interpolation {{ }}
+		$formattedContents = preg_replace_callback(
+			'/{{\s*(.*?)\s*}}/',
+			function ($matches) {
+				return '"<' . '?php print_r(' . $matches[1] . ') ?>"';
+			},
+			$formattedContents
 		);
 
 		// replace <? elements
