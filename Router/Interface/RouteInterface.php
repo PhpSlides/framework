@@ -34,7 +34,7 @@ interface RouteInterface
 	 *   |
 	 *   ------------------------------------------------------
 	 */
-	public static function file_type (string $filename): bool|string;
+	public static function file_type(string $filename): bool|string;
 
 	/**
 	 *   ---------------------------------------------------------------------------------------------------------
@@ -44,10 +44,10 @@ interface RouteInterface
 	 *
 	 *
 	 *   This config method must be called before writing any other Route method or codes.
-	 * 
+	 *
 	 *   ---------------------------------------------------------------------------------------------------------
 	 */
-	public static function config (): void;
+	public static function config(): void;
 
 	/**
 	 *   ------------------------------------------------------------------------
@@ -64,11 +64,11 @@ interface RouteInterface
 	 *
 	 *   ------------------------------------------------------------------------
 	 */
-	public static function any (
-	 array|string $route,
-	 mixed $callback,
-	 string $method = '*',
-	): void;
+	public static function any(
+		array|string $route,
+		mixed $callback,
+		string $method = '*'
+	): self;
 
 	/**
 	 * MAP method
@@ -78,7 +78,7 @@ interface RouteInterface
 	 * @param string|array $method Can also be used as `$route` param if the `$route` param is not specified
 	 * @param string|array|null $route Route parameter
 	 */
-	public static function map (string|array $method, string|array $route): self;
+	public static function map(string|array $method, string|array $route): self;
 
 	/**
 	 * name METHOD
@@ -86,7 +86,7 @@ interface RouteInterface
 	 *
 	 * @param string $name
 	 */
-	public function name (string $name): self;
+	public function name(string $name): self;
 
 	/**
 	 * Action method
@@ -94,7 +94,7 @@ interface RouteInterface
 	 *
 	 * @param mixed $callback
 	 */
-	public function action (mixed $callback): self;
+	public function action(mixed $callback): self;
 
 	/**
 	 * Controller method
@@ -111,7 +111,7 @@ interface RouteInterface
 	 *
 	 * @param string $file
 	 */
-	public function file (string $file): self;
+	public function file(string $file): self;
 
 	/**
 	 *   ---------------------------------------------------------------------------
@@ -128,7 +128,7 @@ interface RouteInterface
 	 *
 	 *   ---------------------------------------------------------------------------
 	 */
-	public static function view (array|string $route, string $view): self;
+	public static function view(array|string $route, string $view): self;
 
 	/**
 	 *   --------------------------------------------------------------
@@ -143,11 +143,11 @@ interface RouteInterface
 	 *
 	 * ---------------------------------------------------------------
 	 */
-	public static function redirect (
-	 string $route,
-	 string $new_url,
-	 int $code = 302,
-	): void;
+	public static function redirect(
+		string $route,
+		string $new_url,
+		int $code = 302
+	): self;
 
 	/**
 	 *   --------------------------------------------------------------
@@ -158,7 +158,7 @@ interface RouteInterface
 	 *
 	 *   --------------------------------------------------------------
 	 */
-	public static function get (array|string $route, $callback): self;
+	public static function get(array|string $route, $callback): self;
 
 	/**
 	 *   --------------------------------------------------------------
@@ -169,7 +169,7 @@ interface RouteInterface
 	 *
 	 *   --------------------------------------------------------------
 	 */
-	public static function post (array|string $route, $callback): self;
+	public static function post(array|string $route, $callback): self;
 
 	/**
 	 *   --------------------------------------------------------------
@@ -180,7 +180,7 @@ interface RouteInterface
 	 *
 	 *   --------------------------------------------------------------
 	 */
-	public static function put (array|string $route, $callback): self;
+	public static function put(array|string $route, $callback): self;
 
 	/**
 	 *   --------------------------------------------------------------
@@ -191,7 +191,7 @@ interface RouteInterface
 	 *
 	 *   --------------------------------------------------------------
 	 */
-	public static function patch (array|string $route, $callback): self;
+	public static function patch(array|string $route, $callback): self;
 
 	/**
 	 *   --------------------------------------------------------------
@@ -202,7 +202,7 @@ interface RouteInterface
 	 *
 	 *   --------------------------------------------------------------
 	 */
-	public static function delete (array|string $route, $callback): self;
+	public static function delete(array|string $route, $callback): self;
 
-	public function __destruct ();
+	public function __destruct();
 }

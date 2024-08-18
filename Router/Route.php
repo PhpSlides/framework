@@ -284,7 +284,7 @@ class Route implements RouteInterface
 		array|string $route,
 		mixed $callback,
 		string $method = '*'
-	): void {
+	): self {
 		self::$any = [
 			'route' => $route,
 			'method' => $method,
@@ -431,7 +431,7 @@ class Route implements RouteInterface
 		string $route,
 		string $new_url,
 		int $code = 302
-	): void {
+	): self {
 		self::$redirect = [
 			'route' => $route,
 			'new_url' => $new_url,
@@ -549,38 +549,44 @@ class Route implements RouteInterface
 
 	public function __destruct()
 	{
-		$reg_route = $GLOBALS['__registered_routes'];
-
 		$route_index = end(self::$route);
 		$route_index = is_array($route_index) ? $route_index[0] : $route_index;
 
 		if (self::$middleware !== null) {
-			$reg_route[$route_index]['middleware'] = self::$middleware;
+			$GLOBALS['__registered_routes'][$route_index]['middleware'] =
+				self::$middleware;
+		}
+
+		if (self::$redirect !== null) {
+			$GLOBALS['__registered_routes'][$route_index]['redirect'] =
+				self::$redirect;
 		}
 
 		if (self::$action !== null) {
-			$reg_route[$route_index]['action'] = self::$action;
-			self::__action();
+			$GLOBALS['__registered_routes'][$route_index]['action'] =
+				self::$action;
+		}
+
+		if (self::$any !== null) {
+			$GLOBALS['__registered_routes'][$route_index]['any'] =
+				self::$any;
 		}
 
 		if (self::$use !== null) {
-			$reg_route[$route_index]['use'] = self::$use;
-			self::__use();
+			$GLOBALS['__registered_routes'][$route_index]['use'] = self::$use;
 		}
 
 		if (self::$file !== null) {
-			$reg_route[$route_index]['file'] = self::$file;
-			self::__file();
+			$GLOBALS['__registered_routes'][$route_index]['file'] = self::$file;
 		}
 
 		if (self::$method !== null) {
-			$reg_route[$route_index]['method'] = self::$method;
-			self::__method();
+			$GLOBALS['__registered_routes'][$route_index]['method'] =
+				self::$method;
 		}
 
 		if (self::$view !== null) {
-			$reg_route[$route_index]['view'] = self::$view;
-			self::__view();
+			$GLOBALS['__registered_routes'][$route_index]['view'] = self::$view;
 		}
 	}
 }

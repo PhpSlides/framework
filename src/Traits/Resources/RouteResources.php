@@ -1,17 +1,15 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Resources;
+namespace PhpSlides\Traits\Resources;
 
 use PhpSlides\view;
 use PhpSlides\Route;
 use PhpSlides\Exception;
 use PhpSlides\Http\Request;
 use PhpSlides\Loader\FileLoader;
-use PhpSlides\Controller\Controller;
-use PhpSlides\Foundation\Application;
 use PhpSlides\Interface\MiddlewareInterface;
 
-class Resources extends Controller
+trait RouteResources
 {
 	protected static mixed $action = null;
 
@@ -45,7 +43,7 @@ class Resources extends Controller
 		$route = self::$any['route'];
 		$method = self::$any['method'];
 		$callback = self::$any['callback'];
-
+		
 		/**
 		 *   --------------------------------------------------------------
 		 *
@@ -251,11 +249,11 @@ class Resources extends Controller
 
 	protected static function __method(): void
 	{
-		$route = self::$method['route'];
-		$method = self::$method['method'];
-		$callback = self::$method['callback'];
+		self::$any['route'] = self::$method['route'];
+		self::$any['method'] = self::$method['method'];
+		self::$any['callback'] = self::$method['callback'];
 
-		Route::any($route, $callback, $method);
+		self::__any();
 	}
 
 	protected static function __view(): void

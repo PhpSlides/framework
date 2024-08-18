@@ -18,3 +18,9 @@
 -  Added safe loading to `FileLoader` and `ViewLoader` class
 -  Updated Route Map `Route::map()` to allow multiple request methods in string seperated with `|`, eg. `'POST|GET'`
 -  Added JWT web tokens management.
+
+## [Sun, 18-07-2024]
+
+-  Written manual test code for JWT web token.
+-  Added `Render` to render all registered routes.
+-  Updated `Route` to only register routes.

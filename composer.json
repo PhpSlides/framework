@@ -13,6 +13,7 @@
 		{
 			"name": "Dave Conco",
 			"email": "concodave@gmail.com",
+			"role": "Developer",
 			"homepage": "https://dconco.github.io"
 		}
 	],
@@ -21,12 +22,13 @@
 		"vlucas/phpdotenv": "^5.6",
 		"firebase/php-jwt": "^6.10"
 	},
+	"suggest": {},
 	"require-dev": {
 		"phpunit/phpunit": "^11.2"
 	},
 	"autoload": {
 		"psr-4": {
-			"PhpSlides\\": [ "src/Exception/", "src/", "Console/", "Router/" ]
+			"PhpSlides\\": ["src/Exception/", "src/", "Console/", "Router/"]
 		}
 	},
 	"autoload-dev": {

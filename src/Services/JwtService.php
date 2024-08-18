@@ -94,9 +94,7 @@ class JwtService implements JwtServiceInterface
 		}
 
 		if (
-			$token->iss !== self::$issuer ||
-			$token->iat > time() ||
-			$token->exp < time()
+			$token->iss !== self::$issuer
 		) {
 			return false;
 		}
