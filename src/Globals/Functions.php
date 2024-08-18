@@ -29,7 +29,11 @@ function slides_include($filename)
 	return $loaded->getLoad();
 }
 
-$routes = [];
+/**
+ * @var array $GLOBALS['__routes']
+ * All routes names are stored in this variable
+ */
+$GLOBALS['__routes'] = [];
 
 /**
  * Give route a name and value
@@ -40,8 +44,7 @@ $routes = [];
  */
 function add_route_name(string $name, string|array $value): void
 {
-	global $routes;
-	$routes[$name] = $value;
+	$GLOBALS['__routes'][$name] = $value;
 }
 
 /**
@@ -56,7 +59,7 @@ function route(
 	string|null $name = null,
 	array|null $param = null
 ): array|object|string {
-	global $routes;
+	$routes = $GLOBALS['__routes'];
 
 	if ($name === null) {
 		$route_class = new stdClass();

@@ -1,17 +1,38 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace PhpSlides\Services;
 
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use PhpSlides\Loader\FileLoader;
+use PhpSlides\Interface\JwtServiceInterface;
 
-class JwtService
+/**
+ * The JwtService class provides methods for encoding, decoding, and verifying JSON Web Tokens (JWT).
+ */
+class JwtService implements JwtServiceInterface
 {
+	/**
+	 * @var string $issuer The issuer of the JWT, typically the domain or application.
+	 */
 	private static $issuer;
+
+	/**
+	 * @var string $secretKey The secret key used for signing the JWT.
+	 */
 	private static $secretKey;
+
+	/**
+	 * @var string $algorithm The algorithm used to encode the JWT.
+	 */
 	private static $algorithm;
 
+	/**
+	 * Setup method to load JWT configurations from a configuration file.
+	 * This method initializes the issuer, secret key, and algorithm.
+	 *
+	 * @return void
+	 */
 	private static function setup()
 	{
 		$jwt = (new FileLoader())
@@ -23,12 +44,25 @@ class JwtService
 		self::$algorithm = $jwt['algorithm'];
 	}
 
+	/**
+	 * Encode the provided payload into a JWT string.
+	 *
+	 * @param array $payload The payload to be encoded in the JWT.
+	 * @return string The encoded JWT string.
+	 */
 	public static function encode(array $payload): string
 	{
 		self::setup();
 		return JWT::encode($payload, self::$secretKey, self::$algorithm);
 	}
 
+	/**
+	 * Decode a JWT string into a PHP object.
+	 *
+	 * @param string $token The JWT string to decode.
+	 * @param bool $parsed If true, removes standard claims like 'iss', 'iat', and 'exp' from the decoded object.
+	 * @return object The decoded JWT as a PHP object.
+	 */
 	public static function decode(string $token, bool $parsed = true): object
 	{
 		self::setup();
@@ -45,6 +79,12 @@ class JwtService
 		return $decodedToken;
 	}
 
+	/**
+	 * Verify the validity of a JWT.
+	 *
+	 * @param string $token The JWT string to verify.
+	 * @return bool|array Returns false if the token is invalid, or the decoded token array if valid.
+	 */
 	public static function verify(string $token): bool|array
 	{
 		try {

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace PhpSlides\Controller;
 
 use PhpSlides\Exception;
+use PhpSlides\Http\Request;
 use PhpSlides\Logger\Logger;
 use PhpSlides\Loader\ViewLoader;
 use PhpSlides\Foundation\Application;
@@ -131,11 +132,9 @@ class RouteController
 
 		for ($i = 0; $i < count($class_methods); $i++) {
 			if (empty($method) || $method === '__invoke') {
-				return $param != null ? $class(...$param) : $class();
+				return $class(new Request($param));
 			} elseif ($method === $class_methods[$i]) {
-				return $param != null
-					? $class->$method(...$param)
-					: $class->$method();
+				return $class->$method(new Request($param));
 			} elseif (
 				count($class_methods) - 1 === $i &&
 				$method !== $class_methods

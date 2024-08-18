@@ -17,9 +17,13 @@ class Resources extends Controller
 
 	protected static ?array $middleware = null;
 
+	protected static ?array $redirect = null;
+
 	protected static ?array $method = null;
 
 	protected static ?array $view = null;
+
+	protected static ?array $any = null;
 
 	protected static ?string $use = null;
 
@@ -35,6 +39,215 @@ class Resources extends Controller
 	 * @return string
 	 */
 	protected static string $request_uri;
+
+	protected static function __any(): void
+	{
+		$route = self::$any['route'];
+		$method = self::$any['method'];
+		$callback = self::$any['callback'];
+
+		/**
+		 *   --------------------------------------------------------------
+		 *
+		 *   Not Found Error
+		 *
+		 *   This * route serves as 404, which executes whenever there're no matching routes from the request url
+		 *   which takes a callback parameter that is rendered to the webpage
+		 *
+		 * --------------------------------------------------------------
+		 */
+
+		if ((is_array($route) && in_array('*', $route)) || $route === '*') {
+			header('HTTP/1.0 404 Not Found');
+			header('Content-Type: text/html');
+
+			print_r(is_callable($callback) ? $callback() : $callback);
+			self::log();
+			exit();
+		}
+
+		// will store all the parameters value in this array
+		$req = [];
+		$req_value = [];
+
+		// will store all the parameters names in this array
+		$paramKey = [];
+
+		// finding if there is any {?} parameter in $route
+		if (is_string($route)) {
+			preg_match_all('/(?<={).+?(?=})/', $route, $paramMatches);
+		}
+
+		// if the route does not contain any param call routing();
+		if (empty($paramMatches[0]) || is_array($route)) {
+			/**
+			 *   ------------------------------------------------------
+			 *   Check if $callback is a callable function
+			 *   or array of controller, and if not,
+			 *   it's a string of text or html document
+			 *   ------------------------------------------------------
+			 */
+			$callback = self::routing($route, $callback, $method);
+
+			if ($callback) {
+				if (
+					is_array($callback) &&
+					(preg_match('/(Controller)/', $callback[0], $matches) &&
+						count($matches) > 1)
+				) {
+					print_r(
+						self::controller(
+							$callback[0],
+							count($callback) > 1 ? $callback[1] : ''
+						)
+					);
+				} else {
+					print_r(is_callable($callback) ? $callback() : $callback);
+				}
+
+				self::log();
+				exit();
+			} else {
+				return;
+			}
+		}
+
+		// setting parameters names
+		foreach ($paramMatches[0] as $key) {
+			$paramKey[] = $key;
+		}
+
+		/**
+		 *   ----------------------------------------------
+		 *   Replacing first and last forward slashes
+		 *   $_SERVER['REQUEST_URI'] will be empty if req uri is /
+		 *   ----------------------------------------------
+		 */
+
+		if (!empty(self::$request_uri)) {
+			$route = strtolower(preg_replace("/(^\/)|(\/$)/", '', $route));
+			$reqUri = strtolower(
+				preg_replace("/(^\/)|(\/$)/", '', self::$request_uri)
+			);
+		} else {
+			$reqUri = '/';
+		}
+
+		// exploding route address
+		$uri = explode('/', $route);
+
+		// will store index number where {?} parameter is required in the $route
+		$indexNum = [];
+
+		// storing index number, where {?} parameter is required with the help of regex
+		foreach ($uri as $index => $param) {
+			if (preg_match('/{.*}/', $param)) {
+				$indexNum[] = $index;
+			}
+		}
+
+		/**
+		 *   ----------------------------------------------------------------------------------
+		 *   Exploding request uri string to array to get the exact index number value of parameter from $_SERVER['REQUEST_URI']
+		 *   ----------------------------------------------------------------------------------
+		 */
+		$reqUri = explode('/', $reqUri);
+
+		/**
+		 *   ----------------------------------------------------------------------------------
+		 *   Running for each loop to set the exact index number with reg expression this will help in matching route
+		 *   ----------------------------------------------------------------------------------
+		 */
+		foreach ($indexNum as $key => $index) {
+			/**
+			 *   --------------------------------------------------------------------------------
+			 *   In case if req uri with param index is empty then return because URL is not valid for this route
+			 *   --------------------------------------------------------------------------------
+			 */
+
+			if (empty($reqUri[$index])) {
+				return;
+			}
+
+			// setting params with params names
+			$req[$paramKey[$key]] = htmlspecialchars($reqUri[$index]);
+			$req_value[] = htmlspecialchars($reqUri[$index]);
+
+			// this is to create a regex for comparing route address
+			$reqUri[$index] = '{.*}';
+		}
+
+		// converting array to string
+		$reqUri = implode('/', $reqUri);
+
+		/**
+		 *   -----------------------------------
+		 *   replace all / with \/ for reg expression
+		 *   regex to match route is ready!
+		 *   -----------------------------------
+		 */
+		$reqUri = str_replace('/', '\\/', $reqUri);
+
+		// now matching route with regex
+		if (preg_match("/$reqUri/", $route)) {
+			// checks if the requested method is of the given route
+			if (
+				strtoupper($_SERVER['REQUEST_METHOD']) !== strtoupper($method) &&
+				$method !== '*'
+			) {
+				http_response_code(405);
+				self::log();
+				exit('Method Not Allowed');
+			}
+
+			http_response_code(200);
+			header('Content-Type: text/html');
+
+			if (
+				is_array($callback) &&
+				(preg_match('/(Controller)/', $callback[0], $matches) &&
+					count($matches) > 1)
+			) {
+				print_r(
+					self::controller(
+						$callback[0],
+						count($callback) > 1 ? $callback[1] : '',
+						$req_value
+					)
+				);
+			} else {
+				print_r(
+					is_callable($callback) ? $callback(...$req_value) : $callback
+				);
+			}
+
+			self::log();
+			exit();
+		}
+	}
+
+	protected static function __redirect(): void
+	{
+		$route = self::$redirect['route'];
+		$new_url = self::$redirect['method'];
+		$reqUri = self::$redirect['callback'];
+
+		if (!empty(self::$request_uri)) {
+			$route = preg_replace("/(^\/)|(\/$)/", '', $route);
+			$new_url = preg_replace("/(^\/)|(\/$)/", '', $new_url);
+			$reqUri = preg_replace("/(^\/)|(\/$)/", '', self::$request_uri);
+		} else {
+			$reqUri = '/';
+			$new_url = preg_replace("/(^\/)|(\/$)/", '', $new_url);
+		}
+
+		if (strtolower($reqUri) === strtolower($route)) {
+			http_response_code($code);
+			self::log();
+			header("Location: $new_url", true, $code);
+			exit();
+		}
+	}
 
 	protected static function __method(): void
 	{
@@ -154,11 +367,11 @@ class Resources extends Controller
 
 		if (array_key_exists('params', self::$map_info)) {
 			$GLOBALS['params'] = self::$map_info['params'];
-
-			print_r(view::render($file));
-			self::log();
-			exit();
 		}
+
+		print_r(view::render($file));
+		self::log();
+		exit();
 	}
 
 	protected function __use(): void
@@ -177,19 +390,13 @@ class Resources extends Controller
 		$cc = 'App\\Controllers\\' . $c_name;
 
 		if (class_exists($cc)) {
-			if (array_key_exists('params', self::$map_info)) {
-				$GLOBALS['params'] = self::$map_info['params'];
-				$params_value = self::$map_info['params_value'];
+			$params = self::$map_info['params'];
 
-				$cc = new $cc();
-				print_r($cc->$c_method(...$params_value));
-			} else {
-				$cc = new $cc();
-				print_r($cc->$c_method());
-			}
+			$cc = new $cc();
+			print_r($cc->$c_method(new Request($params)));
 		} else {
 			self::log();
-			throw new Exception("No class controller found as: `$cc`");
+			throw new Exception("No class controller found as: '$cc'");
 		}
 
 		self::log();
@@ -199,29 +406,17 @@ class Resources extends Controller
 	protected function __action(): void
 	{
 		$action = self::$action;
+		$params = self::$map_info['params'];
 
-		if (array_key_exists('params', self::$map_info)) {
-			$GLOBALS['params'] = self::$map_info['params'];
-			$params_value = self::$map_info['params_value'];
-
-			if (is_callable($action)) {
-				$a = $action(...$params_value);
-				print_r($a);
-			} elseif (preg_match('/(?=.*Controller)(?=.*::)/', $action)) {
-				self::$use = $action;
-				$this->__use();
-			} else {
-				print_r($action);
-			}
+		if (is_callable($action)) {
+			$a = $action(new Request($GLOBALS['params']));
+			print_r($a);
+		} elseif (preg_match('/(?=.*Controller)(?=.*::)/', $action)) {
+			self::$use = $action;
+			$this->__use();
 		} else {
-			if (is_callable($action)) {
-				print_r($action());
-			} elseif (preg_match('/(?=.*Controller)(?=.*::)/', $action)) {
-				self::$use = $action;
-				$this->__use();
-			} else {
-				print_r($action);
-			}
+			$GLOBALS['params'] = $params;
+			print_r($action);
 		}
 
 		self::log();
