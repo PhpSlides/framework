@@ -4,14 +4,14 @@ namespace PhpSlides\Foundation;
 
 use PhpSlides\Controller\Controller;
 use PhpSlides\Foundation\Application;
-use PhpSlides\Traits\Resources\RouteResources;
+use PhpSlides\Traits\Resources\Resources;
 
 /**
  * Render all registered routes
  */
 final class Render extends Controller
 {
-	use RouteResources;
+	use Resources;
 
 	private static function Load()
 	{
@@ -76,6 +76,10 @@ final class Render extends Controller
 	{
 		self::Load();
 		$reg_route = $GLOBALS['__registered_routes'];
+
+		foreach ($reg_route as $route) {
+			print_r($route);
+		}
 	}
 
 	public static function FormsRoute()

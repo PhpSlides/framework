@@ -1,30 +1,20 @@
 <?php
 
-namespace PhpSlides\Http\Resources;
+namespace PhpSlides\Traits\Resources;
 
 use PhpSlides\Exception;
 use PhpSlides\Http\Request;
-use PhpSlides\Logger\Logger;
 use PhpSlides\Loader\FileLoader;
-use PhpSlides\Controller\Controller;
 use PhpSlides\Http\Interface\ApiController;
 use PhpSlides\Interface\MiddlewareInterface;
 
-class ApiResources extends Controller
+trait ApiResources
 {
-	use Logger;
-
 	protected static array|bool $map_info = false;
-
-	protected static array $allRoutes;
-
-	protected static array $regRoute;
 
 	protected static ?array $route = null;
 
 	protected static ?array $define = null;
-
-	protected static ?array $middleware = null;
 
 	protected static ?array $map = null;
 
@@ -34,7 +24,7 @@ class ApiResources extends Controller
 		exit();
 	}
 
-	protected function __routeSelection(Request $request = null)
+	protected function __routeSelection(?Request $request = null)
 	{
 		$info = self::$map_info;
 		$route = self::$route ?? self::$map;
@@ -134,12 +124,14 @@ class ApiResources extends Controller
 			if (array_key_exists($middleware[$i], $middlewares)) {
 				$middleware = $middlewares[$middleware[$i]];
 			} else {
+				self::log();
 				throw new Exception(
 					'No Registered Middleware as `' . $middleware[$i] . '`'
 				);
 			}
 
 			if (!class_exists($middleware)) {
+				self::log();
 				throw new Exception(
 					"Middleware class does not exist: `{$middleware}`"
 				);
@@ -153,6 +145,7 @@ class ApiResources extends Controller
 
 				$response = $mw->handle($request, $next);
 			} else {
+				self::log();
 				throw new Exception(
 					'Middleware class must implements `MiddlewareInterface`'
 				);

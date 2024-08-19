@@ -5,4 +5,5 @@ namespace PhpSlides\Traits\Resources;
 trait Resources
 {
 	use RouteResources;
+	use ApiResources;
 }
