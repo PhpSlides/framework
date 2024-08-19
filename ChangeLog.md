@@ -24,3 +24,7 @@
 -  Written manual test code for JWT web token.
 -  Added `Render` to render all registered routes.
 -  Updated `Route` to only register routes.
+
+## [Mon, 19-07-2024]
+
+- Can now generate secret key with terminal `php slide generate:secret-30`.

@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 
 namespace PhpSlides\Http\Auth;
+namespace PhpSlides\Http\Request;
 
 trait Authentication
 {
@@ -8,10 +9,8 @@ trait Authentication
 
 	private static function getAuthorizationHeader()
 	{
-		$headers = getallheaders();
-		self::$authorizationHeader = isset($headers['Authorization'])
-			? $headers['Authorization']
-			: null;
+		self::$authorizationHeader = (new Request())->headers('Authorization');
+		
 	}
 
 	/**
@@ -29,7 +28,10 @@ trait Authentication
 			$decodedCredentials = base64_decode($base64Credentials);
 
 			[$username, $password] = explode(':', $decodedCredentials, 2);
-			return ['username' => trim(htmlspecialchars($username)), 'password' => trim(htmlspecialchars($password))];
+			return [
+				'username' => trim(htmlspecialchars($username)),
+				'password' => trim(htmlspecialchars($password))
+			];
 		}
 		return null;
 	}

@@ -184,14 +184,19 @@ function payload(
 	array $data,
 	int $expires,
 	int $issued_at = 0,
-	string $issuer = ''
+	string $issuer = '',
+	string $audience = ''
 ): array {
 	$jwt = (new FileLoader())
 		->load(__DIR__ . '/../Config/jwt.config.php')
 		->getLoad();
 
 	if ($issuer === '') {
-		$issuer = $jwt['issuer'];
+		$issuer = $jwt['issuer'][0];
+	}
+	if ($audience === '') {
+		$audience = $jwt['issuer'];
+		$audience = count($audience) > 0 ? $audience[0] : '';
 	}
 	if ($issued_at === 0) {
 		$issued_at = time();
@@ -201,7 +206,8 @@ function payload(
 		[
 			'iss' => $issuer,
 			'iat' => $issued_at,
-			'exp' => $expires
+			'exp' => $expires,
+			'aud' => $audience
 		],
 		array_map('htmlspecialchars', $data)
 	);

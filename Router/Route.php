@@ -301,10 +301,10 @@ class Route extends Controller implements RouteInterface
 	 * Check out documentation for using Map method
 	 *
 	 * @link https://github.com/dconco/php_slides
-	 * @param string|array $method Request method
+	 * @param string $method Request method
 	 * @param string|array|null $route Route parameter
 	 */
-	public static function map(string|array $method, string|array $route): self
+	public static function map(string $method, string|array $route): self
 	{
 		$match = new MapRoute();
 		self::$map_info = $match->match($method, $route);
@@ -553,6 +553,11 @@ class Route extends Controller implements RouteInterface
 		$route_index = end(self::$route);
 		$route_index = is_array($route_index) ? $route_index[0] : $route_index;
 
+		if (self::$map_info !== null) {
+			$GLOBALS['__registered_routes'][$route_index]['map_info'] =
+				self::$map_info;
+		}
+		
 		if (self::$middleware !== null) {
 			$GLOBALS['__registered_routes'][$route_index]['middleware'] =
 				self::$middleware;

@@ -132,8 +132,8 @@ class MapRoute extends Controller implements MapInterface
 		if (preg_match("/$reqUri/", self::$route)) {
 			// checks if the requested method is of the given route
 			if (
-				!in_array(self::$method, $_SERVER['REQUEST_METHOD']) &&
-				!in_array(self::$method, 'dynamic')
+				!in_array($_SERVER['REQUEST_METHOD'], self::$method) &&
+				!in_array('dynamic', self::$method)
 			) {
 				http_response_code(405);
 				self::log();
@@ -175,8 +175,8 @@ class MapRoute extends Controller implements MapInterface
 			self::$request_uri === $str_route
 		) {
 			if (
-				!in_array(self::$method, $_SERVER['REQUEST_METHOD']) &&
-				!in_array(self::$method, 'dynamic')
+				!in_array($_SERVER['REQUEST_METHOD'], self::$method) &&
+				!in_array('dynamic', self::$method)
 			) {
 				http_response_code(405);
 				self::log();

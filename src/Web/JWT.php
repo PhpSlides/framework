@@ -1,21 +1,26 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Services;
+namespace PhpSlides\Web;
 
-use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use PhpSlides\Loader\FileLoader;
-use PhpSlides\Interface\JwtServiceInterface;
+use Firebase\JWT\JWT as WebToken;
+use PhpSlides\Interface\JwtService;
 
 /**
  * The JwtService class provides methods for encoding, decoding, and verifying JSON Web Tokens (JWT).
  */
-class JwtService implements JwtServiceInterface
+class JWT implements JwtService
 {
 	/**
 	 * @var string $issuer The issuer of the JWT, typically the domain or application.
 	 */
 	private static $issuer;
+
+	/**
+	 * @var string $issuer The audience to use the JWT, typically the client side or 3rd party app.
+	 */
+	private static $audience;
 
 	/**
 	 * @var string $secretKey The secret key used for signing the JWT.
@@ -40,8 +45,9 @@ class JwtService implements JwtServiceInterface
 			->getLoad();
 
 		self::$issuer = $jwt['issuer'];
-		self::$secretKey = $jwt['secret_key'];
+		self::$audience = $jwt['audience'];
 		self::$algorithm = $jwt['algorithm'];
+		self::$secretKey = $jwt['secret_key'];
 	}
 
 	/**
@@ -53,7 +59,7 @@ class JwtService implements JwtServiceInterface
 	public static function encode(array $payload): string
 	{
 		self::setup();
-		return JWT::encode($payload, self::$secretKey, self::$algorithm);
+		return WebToken::encode($payload, self::$secretKey, self::$algorithm);
 	}
 
 	/**
@@ -66,7 +72,7 @@ class JwtService implements JwtServiceInterface
 	public static function decode(string $token, bool $parsed = true): object
 	{
 		self::setup();
-		$decodedToken = JWT::decode(
+		$decodedToken = WebToken::decode(
 			$token,
 			new Key(self::$secretKey, self::$algorithm)
 		);
@@ -83,9 +89,9 @@ class JwtService implements JwtServiceInterface
 	 * Verify the validity of a JWT.
 	 *
 	 * @param string $token The JWT string to verify.
-	 * @return bool|array Returns false if the token is invalid, or the decoded token array if valid.
+	 * @return bool Returns false if the token is invalid
 	 */
-	public static function verify(string $token): bool|array
+	public static function verify(string $token): bool
 	{
 		try {
 			$token = self::decode($token, false);
@@ -94,7 +100,8 @@ class JwtService implements JwtServiceInterface
 		}
 
 		if (
-			$token->iss !== self::$issuer
+			!in_array(self::$issuer, $token->iss) &&
+			!in_array(self::$audience, $token->aud)
 		) {
 			return false;
 		}

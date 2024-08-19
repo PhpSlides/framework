@@ -3,11 +3,11 @@
 namespace PhpSlides\Interface;
 
 /**
- * Interface JwtServiceInterface
+ * Interface JwtService
  *
  * Defines the contract for JWT operations, including encoding, decoding, and verifying tokens.
  */
-interface JwtServiceInterface
+interface JwtService
 {
 	/**
 	 * Encode the provided payload into a JWT string.
@@ -30,7 +30,7 @@ interface JwtServiceInterface
 	 * Verify the validity of a JWT.
 	 *
 	 * @param string $token The JWT string to verify.
-	 * @return bool|array Returns false if the token is invalid, or the decoded token array if valid.
+	 * @return bool Returns false if the token is invalid
 	 */
-	public static function verify(string $token): bool|array;
+	public static function verify(string $token): bool;
 }

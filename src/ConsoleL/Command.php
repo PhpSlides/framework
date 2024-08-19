@@ -210,4 +210,13 @@ class Command implements CommandInterface
 
 		exit();
 	}
+
+	public static function generateSecretKey(array $arguments): void
+	{
+		$length = $arguments[0] ?? 32;
+		$key = base64_decode(random_bytes($length));
+
+		echo Console::bold($key);
+		exit;
+	}
 }

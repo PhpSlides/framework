@@ -38,7 +38,7 @@ trait RouteResources
 	 */
 	protected static string $request_uri;
 
-	protected static function __any(): void
+	protected static function __any(?Request $request = null): void
 	{
 		$route = self::$any['route'];
 		$method = self::$any['method'];
@@ -59,7 +59,12 @@ trait RouteResources
 			header('HTTP/1.0 404 Not Found');
 			header('Content-Type: text/html');
 
-			print_r(is_callable($callback) ? $callback() : $callback);
+			$GLOBALS['request'] = $request;
+			print_r(
+				is_callable($callback)
+					? $callback($request ?? new Request())
+					: $callback
+			);
 			self::log();
 			exit();
 		}
@@ -88,6 +93,8 @@ trait RouteResources
 			$callback = self::routing($route, $callback, $method);
 
 			if ($callback) {
+				$GLOBALS['request'] = null;
+
 				if (
 					is_array($callback) &&
 					(preg_match('/(Controller)/', $callback[0], $matches) &&
@@ -100,7 +107,11 @@ trait RouteResources
 						)
 					);
 				} else {
-					print_r(is_callable($callback) ? $callback() : $callback);
+					print_r(
+						is_callable($callback)
+							? $callback($request ?? new Request())
+							: $callback
+					);
 				}
 
 				self::log();
@@ -231,8 +242,8 @@ trait RouteResources
 	protected static function __redirect(): void
 	{
 		$route = self::$redirect['route'];
-		$new_url = self::$redirect['method'];
-		$reqUri = self::$redirect['callback'];
+		$new_url = self::$redirect['new_url'];
+		$code = self::$redirect['code'];
 
 		if (!empty(self::$request_uri)) {
 			$route = preg_replace("/(^\/)|(\/$)/", '', $route);
@@ -251,16 +262,16 @@ trait RouteResources
 		}
 	}
 
-	protected static function __method(): void
+	protected static function __method(?Request $request = null): void
 	{
 		self::$any['route'] = self::$method['route'];
 		self::$any['method'] = self::$method['method'];
 		self::$any['callback'] = self::$method['callback'];
 
-		self::__any();
+		self::__any($request);
 	}
 
-	protected static function __view(): void
+	protected static function __view(?Request $request = null): void
 	{
 		$route = self::$view['route'];
 		$view = self::$view['view'];
@@ -294,6 +305,7 @@ trait RouteResources
 			}
 
 			// render view page to browser
+			$GLOBALS['request'] = $request;
 			print_r(view::render($view));
 			self::log();
 			exit();
@@ -303,9 +315,10 @@ trait RouteResources
 	protected function __middleware(): void
 	{
 		$use = self::$use;
-		$file = self::$use;
+		$file = self::$file;
 		$action = self::$action;
 
+		$any = self::$any;
 		$view = self::$view;
 		$method = self::$method;
 		$middleware = self::$middleware ?? [];
@@ -315,7 +328,7 @@ trait RouteResources
 
 		for ($i = 0; $i < count((array) $middleware); $i++) {
 			$middlewares = (new FileLoader())
-				->load(__DIR__ . '/../../src/Config/middleware.php')
+				->load(__DIR__ . '/../../Config/middleware.php')
 				->getLoad();
 
 			if (array_key_exists($middleware[$i], $middlewares)) {
@@ -333,27 +346,35 @@ trait RouteResources
 					"Middleware class does not exist: `{$middleware}`"
 				);
 			}
-			$mw = new $middleware();
 
+			$mw = new $middleware();
 			if ($mw instanceof MiddlewareInterface) {
-				$next = function () use ($use, $file, $action, $view, $method) {
+				$next = function (Request $req) use (
+					$any,
+					$use,
+					$file,
+					$action,
+					$view,
+					$method
+				) {
 					if ($use !== null) {
-						self::__use();
+						self::__use($req);
+					} elseif ($any !== null) {
+						self::__any($req);
 					} elseif ($file !== null) {
-						self::__file();
+						self::__file($req);
 					} elseif ($action !== null) {
-						self::__action();
+						self::__action($req);
 					} elseif ($view !== null) {
-						self::__view();
+						self::__view($req);
 					} elseif ($method !== null) {
-						self::__method();
+						self::__method($req);
 					} else {
 						self::log();
 						throw new Exception('Cannot use middleware with this method');
 					}
 				};
-
-				$mw->handle($request, $next);
+				$response = $mw->handle($request, $next);
 			} else {
 				self::log();
 				throw new Exception(
@@ -361,14 +382,22 @@ trait RouteResources
 				);
 			}
 		}
+		if (!empty($response)) {
+			print_r($response);
+			self::log();
+			exit();
+		}
 	}
 
-	protected function __file(): void
+	protected function __file(?Request $request = null): void
 	{
 		$file = self::$file;
 
 		if (array_key_exists('params', self::$map_info)) {
 			$GLOBALS['params'] = self::$map_info['params'];
+		}
+		if ($request) {
+			$GLOBALS['request'] = $request;
 		}
 
 		print_r(view::render($file));
@@ -376,7 +405,7 @@ trait RouteResources
 		exit();
 	}
 
-	protected function __use(): void
+	protected function __use(?Request $request = null): void
 	{
 		$controller = self::$use;
 		header('Content-Type: text/html');
@@ -396,7 +425,7 @@ trait RouteResources
 			$params = self::$map_info['params'];
 
 			$cc = new $cc();
-			print_r($cc->$c_method(new Request($params)));
+			print_r($cc->$c_method($request ?? new Request($params)));
 		} else {
 			self::log();
 			throw new Exception("No class controller found as: '$cc'");
@@ -406,20 +435,21 @@ trait RouteResources
 		exit();
 	}
 
-	protected function __action(): void
+	protected function __action(?Request $request = null): void
 	{
 		$action = self::$action;
 		$params = self::$map_info['params'];
 		header('Content-Type: text/html');
 
 		if (is_callable($action)) {
-			$a = $action(new Request($GLOBALS['params']));
+			$a = $action($request ?? new Request($params));
 			print_r($a);
 		} elseif (preg_match('/(?=.*Controller)(?=.*::)/', $action)) {
 			self::$use = $action;
-			$this->__use();
+			$this->__use($request);
 		} else {
 			$GLOBALS['params'] = $params;
+			$GLOBALS['request'] = $request;
 			print_r($action);
 		}
 
