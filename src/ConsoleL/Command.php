@@ -214,9 +214,9 @@ class Command implements CommandInterface
 	public static function generateSecretKey(array $arguments): void
 	{
 		$length = $arguments[0] ?? 32;
-		$key = base64_decode(random_bytes($length));
+		$key = base64_encode(random_bytes($length));
 
-		echo Console::bold($key);
-		exit;
+		echo Console::bold("\n$key\n");
+		exit();
 	}
 }

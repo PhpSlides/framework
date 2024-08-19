@@ -114,7 +114,7 @@ class Console extends Command implements CommandInterface, ConsoleInterface
 				case 'middleware':
 					self::makeMiddleware(self::$commands[1], self::$resolve);
 					break;
-				case 'generate:secret-key':
+				case 'secret-key':
 					self::generateSecretKey(self::$commands[1]);
 					break;
 				default:
