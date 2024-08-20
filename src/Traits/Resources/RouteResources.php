@@ -4,6 +4,7 @@ namespace PhpSlides\Traits\Resources;
 
 use PhpSlides\view;
 use PhpSlides\Route;
+use PhpSlides\MapRoute;
 use PhpSlides\Exception;
 use PhpSlides\Http\Request;
 use PhpSlides\Loader\FileLoader;
@@ -23,6 +24,8 @@ trait RouteResources
 
 	protected static ?array $any = null;
 
+	protected static ?array $map = null;
+
 	protected static ?string $use = null;
 
 	protected static ?string $file = null;
@@ -37,6 +40,34 @@ trait RouteResources
 	 * @return string
 	 */
 	protected static string $request_uri;
+
+	protected static function __map(): void
+	{
+		$route = self::$map['route'];
+		$method = self::$map['method'];
+		$static = new static();
+
+		$match = new MapRoute();
+		self::$map_info = $match->match($method, $route);
+
+		if (self::$map_info) {
+			if (self::$middleware !== null) {
+				$static->__middleware();
+			}
+
+			if (self::$use !== null) {
+				$static->__use();
+			}
+
+			if (self::$file !== null) {
+				$static->__file();
+			}
+
+			if (self::$action !== null) {
+				$static->__action();
+			}
+		}
+	}
 
 	protected static function __any(?Request $request = null): void
 	{
@@ -212,6 +243,10 @@ trait RouteResources
 				exit('Method Not Allowed');
 			}
 
+			if (self::$middleware !== null) {
+				(new static())->__middleware();
+			}
+
 			http_response_code(200);
 			header('Content-Type: text/html');
 
@@ -304,6 +339,10 @@ trait RouteResources
 				exit('Method Not Allowed');
 			}
 
+			if (self::$middleware !== null) {
+				(new static())->__middleware();
+			}
+
 			// render view page to browser
 			$GLOBALS['request'] = $request;
 			print_r(view::render($view));
@@ -322,6 +361,7 @@ trait RouteResources
 		$view = self::$view;
 		$method = self::$method;
 		$middleware = self::$middleware ?? [];
+		self::$middleware = null;
 
 		$params = self::$map_info['params'] ?? null;
 		$request = new Request($params);
@@ -419,7 +459,7 @@ trait RouteResources
 
 		[$c_name, $c_method] = explode('::', $controller);
 
-		$cc = 'App\\Controllers\\' . $c_name;
+		$cc = 'App\\Controller\\' . $c_name;
 
 		if (class_exists($cc)) {
 			$params = self::$map_info['params'];

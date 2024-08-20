@@ -40,6 +40,7 @@ class MapRoute extends Controller implements MapInterface
 		} else {
 			self::$request_uri = '/';
 		}
+
 		self::$route = is_array($route)
 			? $route
 			: strtolower(preg_replace("/(^\/)|(\/$)/", '', $route));
@@ -91,7 +92,7 @@ class MapRoute extends Controller implements MapInterface
 		 *   |   Exploding request uri string to array to get the exact index number value of parameter from $_REQUEST['uri']
 		 *   ----------------------------------------------------------------------------------
 		 */
-		$reqUri = explode('/', Application::$request_uri);
+		$reqUri = explode('/', self::$request_uri);
 
 		/**
 		 *   ----------------------------------------------------------------------------------
@@ -145,12 +146,13 @@ class MapRoute extends Controller implements MapInterface
 			http_response_code(200);
 			header("Content-Type: text/html; charset=$charset");
 
-			return [
-				'method' => $method,
+			$s = [
+				'method' => $_SERVER['REQUEST_METHOD'],
 				'route' => self::$route,
 				'params_value' => $req_value,
 				'params' => $req
 			];
+			return $s;
 		}
 
 		return false;
@@ -190,7 +192,7 @@ class MapRoute extends Controller implements MapInterface
 			header("Content-Type: text/html; charset=$charset");
 
 			return [
-				'method' => $method,
+				'method' => $_SERVER['REQUEST_METHOD'],
 				'route' => self::$route
 			];
 		} else {

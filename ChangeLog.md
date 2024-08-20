@@ -19,12 +19,15 @@
 -  Updated Route Map `Route::map()` to allow multiple request methods in string seperated with `|`, eg. `'POST|GET'`
 -  Added JWT web tokens management.
 
-## [Sun, 18-07-2024]
+## [Sun, 18-08-2024]
 
 -  Written manual test code for JWT web token.
 -  Added `Render` to render all registered routes.
 -  Updated `Route` to only register routes.
 
-## [Mon, 19-07-2024]
+## [Mon, 19-08-2024]
 
-- Can now generate secret key with terminal `php slide generate:secret-30`.
+-  Can now generate secret key with terminal `php slide generate:secret-30`.
+
+## [Tue, 20-08-2024]
+-  Updated `Api` to only register api routes.

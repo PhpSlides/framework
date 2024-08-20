@@ -15,7 +15,6 @@
 
 namespace PhpSlides;
 
-use PhpSlides\MapRoute;
 use PhpSlides\Traits\FileHandler;
 use PhpSlides\Controller\Controller;
 use PhpSlides\Foundation\Application;
@@ -83,7 +82,7 @@ class Route extends Controller implements RouteInterface
 
 	private static ?string $file = null;
 
-	private static array|bool $map_info = false;
+	private static ?array $map = null;
 
 	/**
 	 * Get's all full request URL
@@ -139,8 +138,8 @@ class Route extends Controller implements RouteInterface
 		$file = is_file($dir . '/public/' . $req)
 			? file_get_contents($dir . '/public/' . $req)
 			: null;
-		$file_type = $file ? self::file_type($dir . '/public/' . $req) : null;
 
+		$file_type = $file ? self::file_type($dir . '/public/' . $req) : null;
 		$config_file = self::config_file();
 
 		$charset = $config_file['charset'];
@@ -306,9 +305,10 @@ class Route extends Controller implements RouteInterface
 	 */
 	public static function map(string $method, string|array $route): self
 	{
-		$match = new MapRoute();
-		self::$map_info = $match->match($method, $route);
-
+		self::$map = [
+			'method' => $method,
+			'route' => $route
+		];
 		self::$route[] = $route;
 		return new self();
 	}
@@ -342,7 +342,7 @@ class Route extends Controller implements RouteInterface
 	 */
 	public function action(mixed $callback): self
 	{
-		if (self::$map_info) {
+		if (self::$map) {
 			self::$action = $callback;
 		}
 		return $this;
@@ -357,7 +357,7 @@ class Route extends Controller implements RouteInterface
 	 */
 	public function use(string $controller): self
 	{
-		if (self::$map_info) {
+		if (self::$map) {
 			self::$use = $controller;
 		}
 		return $this;
@@ -371,7 +371,7 @@ class Route extends Controller implements RouteInterface
 	 */
 	public function file(string $file): self
 	{
-		if (self::$map_info) {
+		if (self::$map) {
 			self::$file = $file;
 		}
 		return $this;
@@ -383,7 +383,7 @@ class Route extends Controller implements RouteInterface
 	 */
 	public function middleware(array $middleware): self
 	{
-		if (self::$map_info || self::$method || self::$view) {
+		if (self::$map || self::$method || self::$view) {
 			self::$middleware = $middleware;
 		}
 		return $this;
@@ -553,11 +553,10 @@ class Route extends Controller implements RouteInterface
 		$route_index = end(self::$route);
 		$route_index = is_array($route_index) ? $route_index[0] : $route_index;
 
-		if (self::$map_info !== null) {
-			$GLOBALS['__registered_routes'][$route_index]['map_info'] =
-				self::$map_info;
+		if (self::$map !== null) {
+			$GLOBALS['__registered_routes'][$route_index]['map'] = self::$map;
 		}
-		
+
 		if (self::$middleware !== null) {
 			$GLOBALS['__registered_routes'][$route_index]['middleware'] =
 				self::$middleware;

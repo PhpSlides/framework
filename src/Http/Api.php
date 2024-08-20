@@ -9,7 +9,7 @@ use PhpSlides\Http\Interface\ApiInterface;
 
 /**
  * The Api class provides a fluent interface to define API routes,
- * apply middlewares, and manage route mapping.
+ * apply middleware, and manage route mapping.
  *
  * @category API
  * @license MIT
@@ -29,21 +29,19 @@ class Api extends Controller implements ApiInterface
 	 * The API version. Default is 'v1'
 	 * @var string
 	 */
+	private ?array $define = null;
+
 	private static string $version = 'v1';
 
-	protected static array $allRoutes;
+	private static array $allRoutes;
 
-	protected static array $regRoute;
+	private static array $regRoute = [];
 
-	protected static array|bool $map_info = false;
+	private static ?array $middleware = null;
 
-	protected static ?array $middleware = null;
+	private static ?array $route = null;
 
-	protected static ?array $route = null;
-
-	protected static ?array $define = null;
-
-	protected static ?array $map = null;
+	private static ?array $map = null;
 
 	/**
 	 * Handles static method calls to set the API version dynamically.
@@ -51,8 +49,8 @@ class Api extends Controller implements ApiInterface
 	 * @param string $method The method name which starts with 'v' followed by the version number. Use `_` in place of `.`
 	 * @param mixed $args The arguments for the method (not used).
 	 *
-	 * @throws \PhpSlides\Exception
-	 * @return \PhpSlides\Http\Api
+	 * @throws \Exception
+	 * @return self
 	 */
 	public static function __callStatic($method, $args): self
 	{
@@ -70,7 +68,7 @@ class Api extends Controller implements ApiInterface
 	 * Assigns a name to the last registered route for easier reference.
 	 *
 	 * @param string $name The name to assign to the route.
-	 * @return \PhpSlides\Http\Api
+	 * @return self
 	 */
 	public function name(string $name): self
 	{
@@ -91,56 +89,45 @@ class Api extends Controller implements ApiInterface
 	 *
 	 * @param string $url The Base URL of the route.
 	 * @param string $controller The controller handling the route.
-	 * @return \PhpSlides\Http\Api
+	 * @return self
 	 */
-	public function route(string $url, string $controller): self
+	public function route(string $url, string $controller = ''): self
 	{
-		$define = self::$define;
+		$define = $this->define;
 
 		// checks if $define is set, then assign $define methods to $url & $controller parameters
 		$url =
 			$define !== null
-				? (empty($url)
-					? $define['url']
-					: $define['url'] . '/' . trim($url, '/'))
-				: $url;
+				? rtrim($define['url'], '/') . '/' . trim($url, '/')
+				: trim($url, '/');
+		$url = trim($url, '/');
 
-		$uri = strtolower(
-			self::$BASE_URL . self::$version . '/' . trim($url, '/')
-		);
-
+		$uri = strtolower(self::$BASE_URL . self::$version . '/' . $url);
 		self::$regRoute[] = $uri;
 
-		$match = new MapRoute();
-		self::$map_info = $match->match('dynamic', $uri);
+		self::$route = [
+			'url' => $uri,
+			'controller' => $define['controller'] ?? $controller
+		];
 
-		if (self::$map_info) {
-			self::$map_info['method'] = $_SERVER['REQUEST_METHOD'];
-
-			self::$route = [
-				'url' => $uri,
-				'controller' => $define['controller'] ?? $controller
-			];
-
-			if ($define !== null && !empty($controller)) {
-				self::$route['c_method'] = trim($controller, '@');
-			}
+		if ($define !== null && !empty($controller)) {
+			self::$route['c_method'] = trim($controller, '@');
 		}
-		return $this;
+
+		$newInstance = new self();
+		$newInstance->define = $define;
+		return $newInstance;
 	}
 
 	/**
 	 * Applies middleware to the current route.
 	 *
 	 * @param array $middleware An array of middleware classes.
-	 * @return \PhpSlides\Http\Api
+	 * @return self
 	 */
 	public function middleware(array $middleware): self
 	{
-		if (self::$map_info) {
-			self::$middleware = $middleware;
-		}
-
+		self::$middleware = $middleware;
 		return $this;
 	}
 
@@ -149,11 +136,11 @@ class Api extends Controller implements ApiInterface
 	 *
 	 * @param string $url The base URL for the routes.
 	 * @param string $controller The controller handling the routes.
-	 * @return \PhpSlides\Http\Api
+	 * @return self
 	 */
 	public function define(string $url, string $controller): self
 	{
-		self::$define = [
+		$this->define = [
 			'url' => $url,
 			'controller' => $controller
 		];
@@ -164,57 +151,43 @@ class Api extends Controller implements ApiInterface
 	/**
 	 * Maps multiple HTTP methods to a URL with their corresponding controller methods.
 	 *
-	 * @param array $rest_url An associative array where the key is the route and the value is an array with the HTTP method and controller method.
-	 * @return \PhpSlides\Http\Api
+	 * @param array An associative array where the key is the route and the value is an array with the HTTP method and controller method.
+	 * @return self
 	 */
 	public function map(array $rest_url): self
 	{
-		$define = self::$define;
+		$define = $this->define;
 
 		if ($define !== null) {
-			$url = $define['url'];
-			$controller = $define['controller'];
+			/**
+			 * Get the map value, keys as the route url
+			 */
+			$routes = array_keys($rest_url);
+			$base = strtolower(
+				self::$BASE_URL .
+					self::$version .
+					'/' .
+					trim($define['url'], '/') .
+					'/'
+			);
 
-			$method = [];
-			$regUrl = [];
+			/**
+			 * Map route url array to the full base url
+			 */
+			$full_url = array_map(function ($route) use ($base) {
+				return $base . ltrim($route, '/');
+			}, $routes);
 
-			foreach ($rest_url as $route => $c_method) {
-				$method[] = $c_method[0];
-				$full_url = $url . $route;
+			self::$regRoute[] = $full_url;
 
-				$uri = strtolower(
-					rtrim(self::$BASE_URL, '/') .
-						'/' .
-						self::$version .
-						'/' .
-						trim($full_url, '/')
-				);
-
-				$regUrl[] = $uri;
-
-				$match = new MapRoute();
-				self::$map_info = $match->match($c_method[0], $uri);
-
-				if (self::$map_info) {
-					self::$map = [
-						'url' => $uri,
-						'c_method' => ltrim($c_method[1], '@'),
-						'controller' => $controller
-					];
-
-					break;
-				}
-			}
-
-			self::$regRoute[] = $regUrl;
-
-			if (!in_array($_SERVER['REQUEST_METHOD'], $method)) {
-				http_response_code(405);
-				self::log();
-				exit('Method Not Allowed');
-			}
+			$rest_url['base_url'] = $base;
+			$rest_url['controller'] = $define['controller'];
+			self::$map = $rest_url;
 		}
-		return $this;
+
+		$newInstance = new self();
+		$newInstance->define = $define;
+		return $newInstance;
 	}
 
 	/**
@@ -226,16 +199,17 @@ class Api extends Controller implements ApiInterface
 		$route_index = is_array($route_index) ? $route_index[0] : $route_index;
 
 		if (self::$middleware !== null) {
-			$GLOBALS['__registered_routes'][$route_index]['middleware'] =
+			$GLOBALS['__registered_api_routes'][$route_index]['middleware'] =
 				self::$middleware;
 		}
 
 		if (self::$route !== null) {
-			$GLOBALS['__registered_routes'][$route_index]['route'] = self::$route;
+			$GLOBALS['__registered_api_routes'][$route_index]['route'] =
+				self::$route;
 		}
 
 		if (self::$map !== null) {
-			$GLOBALS['__registered_routes'][$route_index]['map'] = self::$map;
+			$GLOBALS['__registered_api_routes'][$route_index]['map'] = self::$map;
 		}
 	}
 

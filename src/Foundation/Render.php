@@ -29,7 +29,6 @@ final class Render extends Controller
 
 		foreach ($reg_route as $route) {
 			self::$middleware = $route['middleware'];
-			self::$map_info = $route['map_info'];
 			self::$redirect = $route['redirect'];
 			self::$method = $route['method'];
 			self::$action = $route['action'];
@@ -37,9 +36,10 @@ final class Render extends Controller
 			self::$file = $route['file'];
 			self::$any = $route['any'];
 			self::$use = $route['use'];
+			self::$map = $route['map'];
 
-			if ($route['middleware']) {
-				$static->__middleware();
+			if ($route['map']) {
+				self::__map();
 			}
 
 			if ($route['redirect']) {
@@ -57,34 +57,33 @@ final class Render extends Controller
 			if ($route['any']) {
 				self::__any();
 			}
-
-			if ($route['use']) {
-				$static->__use();
-			}
-
-			if ($route['file']) {
-				$static->__file();
-			}
-
-			if ($route['action']) {
-				$static->__action();
-			}
 		}
 	}
 
 	public static function ApiRoute()
 	{
 		self::Load();
-		$reg_route = $GLOBALS['__registered_routes'];
+		$static = new static();
+		$reg_route = $GLOBALS['__registered_api_routes'];
 
 		foreach ($reg_route as $route) {
-			print_r($route);
+			self::$apiMap = $route['map'] ?? null;
+			self::$route = $route['route'] ?? null;
+			self::$apiMiddleware = $route['middleware'] ?? null;
+
+			if ($route['route']) {
+				$static->__route();
+			}
+
+			if ($route['map']) {
+				$static->__api_map();
+			}
 		}
 	}
 
 	public static function FormsRoute()
 	{
 		self::Load();
-		$reg_route = $GLOBALS['__registered_routes'];
+		$reg_route = $GLOBALS['__registered_forms_routes'];
 	}
 }

@@ -2,6 +2,7 @@
 
 namespace PhpSlides\Traits\Resources;
 
+use PhpSlides\MapRoute;
 use PhpSlides\Exception;
 use PhpSlides\Http\Request;
 use PhpSlides\Loader\FileLoader;
@@ -14,31 +15,38 @@ trait ApiResources
 
 	protected static ?array $route = null;
 
-	protected static ?array $define = null;
+	protected static ?array $apiMap = null;
 
-	protected static ?array $map = null;
+	protected static ?array $apiMiddleware = null;
 
 	protected function __route(): void
 	{
-		print_r(self::__routeSelection());
-		exit();
+		$match = new MapRoute();
+		self::$map_info = $match->match('dynamic', self::$route['url']);
+
+		if (self::$map_info) {
+			if (self::$apiMiddleware !== null) {
+				$this->__api_middleware();
+			}
+
+			print_r(self::__routeSelection());
+			exit();
+		}
 	}
 
 	protected function __routeSelection(?Request $request = null)
 	{
 		$info = self::$map_info;
-		$route = self::$route ?? self::$map;
+		$route = self::$route ?? self::$apiMap;
 
 		$method = $_SERVER['REQUEST_METHOD'];
 		$controller = $route['controller'];
 
 		if (!class_exists($controller)) {
-			http_response_code(405);
 			throw new Exception(
 				"Api controller class `$controller` does not exist."
 			);
 		}
-
 		$params = $info['params'] ?? null;
 
 		if (!class_exists($controller)) {
@@ -59,7 +67,7 @@ trait ApiResources
 		switch ($method) {
 			case 'GET':
 				global $r_method;
-				$r_method = $params !== null ? 'show' : 'index';
+				$r_method = $params === null ? 'index' : 'show';
 				break;
 
 			case 'POST':
@@ -110,10 +118,10 @@ trait ApiResources
 
 	protected function __api_middleware(): void
 	{
-		$middleware = self::$middleware ?? [];
+		$middleware = self::$apiMiddleware ?? [];
 		$response = '';
 
-		$params = self::$map_info['params'] ?? null;
+		$params = self::$map_info['params'];
 		$request = new Request($params);
 
 		for ($i = 0; $i < count((array) $middleware); $i++) {
@@ -140,7 +148,7 @@ trait ApiResources
 
 			if ($mw instanceof MiddlewareInterface) {
 				$next = function (Request $request) {
-					return self::__routeSelection($request);
+					return $this->__routeSelection($request);
 				};
 
 				$response = $mw->handle($request, $next);
@@ -157,9 +165,34 @@ trait ApiResources
 		exit();
 	}
 
-	protected function __map(Request $request = null): void
+	protected function __api_map(?Request $request = null): void
 	{
-		print_r(self::__routeSelection($request));
-		exit();
+		$map = self::$apiMap;
+		$base_url = $map['base_url'];
+		$controller = $map['controller'];
+
+		foreach ($map as $route => $method) {
+			$r_method = $method[0];
+			$c_method = $method[1];
+			$url = $base_url . trim($route, '/');
+
+			self::$apiMap = [
+				'controller' => $controller,
+				'c_method' => $c_method,
+				'url' => $base_url
+			];
+
+			$match = new MapRoute();
+			self::$map_info = $match->match($r_method, $url);
+
+			if (self::$map_info) {
+				if (self::$apiMiddleware !== null) {
+					$this->__api_middleware();
+				}
+
+				print_r(self::__routeSelection());
+				exit();
+			}
+		}
 	}
 }

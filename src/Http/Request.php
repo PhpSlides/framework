@@ -68,7 +68,7 @@ class Request extends Application implements RequestInterface
 
 		return $cl;
 	}
-
+	
 	/**
 	 * Retrieves headers from the request.
 	 *
