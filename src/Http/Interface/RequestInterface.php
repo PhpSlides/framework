@@ -43,11 +43,13 @@ interface RequestInterface
 	public function auth(): stdClass;
 
 	/**
+	 * Get the request body and if no parameter is specified,
 	 * Parses and returns the body of the request as an associative array.
 	 *
-	 * @return ?array The request body data, or null if parsing fails.
+	 * @param ?string $name The particular request body to get
+	 * @return array|string|null The request body data, or null if parsing fails.
 	 */
-	public function body(): ?array;
+	public function body(?string $name = null): array|string|null;
 
 	/**
 	 * Retrieves a GET parameter by key.

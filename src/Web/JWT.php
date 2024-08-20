@@ -18,11 +18,6 @@ class JWT implements JwtService
 	private static $issuer;
 
 	/**
-	 * @var string $issuer The audience to use the JWT, typically the client side or 3rd party app.
-	 */
-	private static $audience;
-
-	/**
 	 * @var string $secretKey The secret key used for signing the JWT.
 	 */
 	private static $secretKey;
@@ -45,7 +40,6 @@ class JWT implements JwtService
 			->getLoad();
 
 		self::$issuer = $jwt['issuer'];
-		self::$audience = $jwt['audience'];
 		self::$algorithm = $jwt['algorithm'];
 		self::$secretKey = $jwt['secret_key'];
 	}
@@ -99,10 +93,7 @@ class JWT implements JwtService
 			return false;
 		}
 
-		if (
-			!in_array(self::$issuer, $token->iss) &&
-			!in_array(self::$audience, $token->aud)
-		) {
+		if (self::$issuer !== $token->iss) {
 			return false;
 		}
 		return true;
