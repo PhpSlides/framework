@@ -20,4 +20,7 @@ interface CommandInterface
 		array $arguments,
 		string $baseDir
 	): void;
+	
+	
+	public static function generateSecretKey(array $arguments): void;
 }

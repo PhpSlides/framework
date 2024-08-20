@@ -34,27 +34,20 @@ interface RouteInterface
 	 *   |
 	 *   ------------------------------------------------------
 	 */
-	public static function file_type (string $filename): bool|string;
+	public static function file_type(string $filename): bool|string;
 
 	/**
 	 *   ---------------------------------------------------------------------------------------------------------
-	 *
-	 *   If `$request_log` is set to true, it prints logs in `.log` file in the root of the project each time any request has been received.
-	 *   It's been setted to true by default
-	 *
 	 *
 	 *   This function handles getting files request and describe the type of request to handle according to `phpslides.config.json` file in the root of the project,
 	 *   for more security, it disallow users in navigating to wrong paths or files of the project.
 	 *
 	 *
 	 *   This config method must be called before writing any other Route method or codes.
-	 *   |
-	 *
-	 *   @param bool $request_log The parameter indicates request logger to prints out logs output on each received request
 	 *
 	 *   ---------------------------------------------------------------------------------------------------------
 	 */
-	public static function config (bool $request_log): void;
+	public static function config(): void;
 
 	/**
 	 *   ------------------------------------------------------------------------
@@ -71,21 +64,21 @@ interface RouteInterface
 	 *
 	 *   ------------------------------------------------------------------------
 	 */
-	public static function any (
-	 array|string $route,
-	 mixed $callback,
-	 string $method = '*',
-	): void;
+	public static function any(
+		array|string $route,
+		mixed $callback,
+		string $method = '*'
+	): self;
 
 	/**
 	 * MAP method
 	 * Check out documentation for using Map method
 	 *
 	 * @link https://github.com/dconco/php_slides
-	 * @param string|array $method Can also be used as `$route` param if the `$route` param is not specified
+	 * @param string $method Can also be used as `$route` param if the `$route` param is not specified
 	 * @param string|array|null $route Route parameter
 	 */
-	public static function map (string|array $method, string|array $route): self;
+	public static function map(string $method, string|array $route): self;
 
 	/**
 	 * name METHOD
@@ -93,7 +86,7 @@ interface RouteInterface
 	 *
 	 * @param string $name
 	 */
-	public function name (string $name): self;
+	public function name(string $name): self;
 
 	/**
 	 * Action method
@@ -101,7 +94,7 @@ interface RouteInterface
 	 *
 	 * @param mixed $callback
 	 */
-	public function action (mixed $callback): self;
+	public function action(mixed $callback): self;
 
 	/**
 	 * Controller method
@@ -118,7 +111,7 @@ interface RouteInterface
 	 *
 	 * @param string $file
 	 */
-	public function file (string $file): self;
+	public function file(string $file): self;
 
 	/**
 	 *   ---------------------------------------------------------------------------
@@ -135,7 +128,7 @@ interface RouteInterface
 	 *
 	 *   ---------------------------------------------------------------------------
 	 */
-	public static function view (array|string $route, string $view): self;
+	public static function view(array|string $route, string $view): self;
 
 	/**
 	 *   --------------------------------------------------------------
@@ -150,11 +143,11 @@ interface RouteInterface
 	 *
 	 * ---------------------------------------------------------------
 	 */
-	public static function redirect (
-	 string $route,
-	 string $new_url,
-	 int $code = 302,
-	): void;
+	public static function redirect(
+		string $route,
+		string $new_url,
+		int $code = 302
+	): self;
 
 	/**
 	 *   --------------------------------------------------------------
@@ -165,7 +158,7 @@ interface RouteInterface
 	 *
 	 *   --------------------------------------------------------------
 	 */
-	public static function get (array|string $route, $callback): self;
+	public static function get(array|string $route, $callback): self;
 
 	/**
 	 *   --------------------------------------------------------------
@@ -176,7 +169,7 @@ interface RouteInterface
 	 *
 	 *   --------------------------------------------------------------
 	 */
-	public static function post (array|string $route, $callback): self;
+	public static function post(array|string $route, $callback): self;
 
 	/**
 	 *   --------------------------------------------------------------
@@ -187,7 +180,7 @@ interface RouteInterface
 	 *
 	 *   --------------------------------------------------------------
 	 */
-	public static function put (array|string $route, $callback): self;
+	public static function put(array|string $route, $callback): self;
 
 	/**
 	 *   --------------------------------------------------------------
@@ -198,7 +191,7 @@ interface RouteInterface
 	 *
 	 *   --------------------------------------------------------------
 	 */
-	public static function patch (array|string $route, $callback): self;
+	public static function patch(array|string $route, $callback): self;
 
 	/**
 	 *   --------------------------------------------------------------
@@ -209,7 +202,7 @@ interface RouteInterface
 	 *
 	 *   --------------------------------------------------------------
 	 */
-	public static function delete (array|string $route, $callback): self;
+	public static function delete(array|string $route, $callback): self;
 
-	public function __destruct ();
+	public function __destruct();
 }

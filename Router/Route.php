@@ -6,7 +6,7 @@
  * It also imports the necessary classes and interfaces.
  *
  * @package Router
- * @version 1.2.2
+ * @version ^1.2.2
  * @since 1.0.0
  * @link https://github.com/dconco/php_slides
  * @author Dave Conco <concodave@gmail.com>
@@ -15,9 +15,8 @@
 
 namespace PhpSlides;
 
-use PhpSlides\MapRoute;
 use PhpSlides\Traits\FileHandler;
-use PhpSlides\Resources\Resources;
+use PhpSlides\Controller\Controller;
 use PhpSlides\Foundation\Application;
 use PhpSlides\Interface\RouteInterface;
 
@@ -40,7 +39,7 @@ use PhpSlides\Interface\RouteInterface;
  *   -------------------------------------------------------------------------------
  */
 
-class Route extends Resources implements RouteInterface
+class Route extends Controller implements RouteInterface
 {
 	use FileHandler;
 
@@ -67,11 +66,38 @@ class Route extends Resources implements RouteInterface
 
 	private static array $route;
 
+	private static mixed $action = null;
+
+	private static ?array $middleware = null;
+
+	private static ?array $redirect = null;
+
+	private static ?array $method = null;
+
+	private static ?array $any = null;
+
+	private static ?array $view = null;
+
+	private static ?string $use = null;
+
+	private static ?string $file = null;
+
+	private static ?array $map = null;
+
+	/**
+	 * Get's all full request URL
+	 *
+	 * @static $request_uri
+	 * @var string $request_uri
+	 * @return string
+	 */
+	protected static string $request_uri;
+
 	/**
 	 * Call all static methods
 	 * and initialize them
 	 */
-	public static function __callStatic ($method, $args)
+	public static function __callStatic($method, $args)
 	{
 		//
 	}
@@ -80,7 +106,7 @@ class Route extends Resources implements RouteInterface
 	 * Call all non static methods
 	 * and initialize them
 	 */
-	public function __call ($method, $args)
+	public function __call($method, $args)
 	{
 		//
 	}
@@ -88,29 +114,19 @@ class Route extends Resources implements RouteInterface
 	/**
 	 *   ---------------------------------------------------------------------------------------------------------
 	 *
-	 *   If `$request_log` is set to true, it prints logs in `.log` file in the root of the project each time any request has been received.
-	 *   It's been setted to true by default
-	 *
-	 *
 	 *   This function handles getting files request and describe the type of request to handle according to `phpslides.config.json` file in the root of the project,
 	 *   for more security, it disallow users in navigating to wrong paths or files of the project.
 	 *
 	 *
 	 *   This config method must be called before writing any other Route method or codes.
-	 *   |
-	 *
-	 *   @param bool $request_log The parameter indicates request logger to prints out logs output on each received request
 	 *
 	 *   ---------------------------------------------------------------------------------------------------------
 	 */
-	public static function config (bool $request_log): void
+	public static function config(): void
 	{
-		self::$log = $request_log;
+		self::$log = Application::$log;
 		self::$root_dir = Application::$basePath;
-		self::$request_uri = parse_url(
-		 Application::$request_uri,
-		 PHP_URL_PATH
-		);
+		self::$request_uri = Application::$request_uri;
 
 		$dir = self::$root_dir;
 		$req = preg_replace("/(^\/)|(\/$)/", '', self::$request_uri);
@@ -120,10 +136,10 @@ class Route extends Resources implements RouteInterface
 		$req_ext = strtolower(end($req_ext));
 
 		$file = is_file($dir . '/public/' . $req)
-		 ? file_get_contents($dir . '/public/' . $req)
-		 : null;
-		$file_type = $file ? self::file_type($dir . '/public/' . $req) : null;
+			? file_get_contents($dir . '/public/' . $req)
+			: null;
 
+		$file_type = $file ? self::file_type($dir . '/public/' . $req) : null;
 		$config_file = self::config_file();
 
 		$charset = $config_file['charset'];
@@ -133,23 +149,19 @@ class Route extends Resources implements RouteInterface
 		 *   Config File & Request Router configurations
 		 *   ----------------------------------------------
 		 */
-		if (!empty($config_file) && $file_type != null)
-		{
+		if (!empty($config_file) && $file_type != null) {
 			$config = $config_file['public'];
 			$accept = true;
 
 			// loop over the requested URL folders
-			foreach ($url as $index => $value)
-			{
+			foreach ($url as $index => $value) {
 				/**
 				 *   -----------------------------------------------
 				 *   Checks if array key from URL exists in the config file
 				 *   -----------------------------------------------
 				 */
-				if (array_key_exists($value, $config))
-				{
-					if (in_array($req_ext, $config[$value]) && $accept != false)
-					{
+				if (array_key_exists($value, $config)) {
+					if (in_array($req_ext, $config[$value]) && $accept != false) {
 						$accept = $req_ext;
 
 						/**
@@ -157,16 +169,13 @@ class Route extends Resources implements RouteInterface
 						 *   Checks if the next array key from URL exists in the config file
 						 *   -----------------------------------------------
 						 */
-						if (array_key_exists($url[$index + 1], $config))
-						{
+						if (array_key_exists($url[$index + 1], $config)) {
 							continue;
 						} /**
-						  *   -----------------------------------------------
-						  *   Performs the logic for accepting current file
-						  *   -----------------------------------------------
-						  */
-						else
-						{
+						 *   -----------------------------------------------
+						 *   Performs the logic for accepting current file
+						 *   -----------------------------------------------
+						 */ else {
 							http_response_code(200);
 							header("Content-Type: $file_type; charset=$charset");
 
@@ -176,34 +185,29 @@ class Route extends Resources implements RouteInterface
 							exit();
 						}
 					} /**
-					  *   -----------------------------------------------------------
-					  *   Checks if * or image exists in the config file of the $value
-					  *   Then it accept all types of files or all types of image in the childrens folder
-					  *   -----------------------------------------------------------
-					  */
-					elseif (
-					in_array('*', $config[$value]) ||
-					(in_array('image', $config[$value]) &&
-					preg_match('/(image\/*)/', $file_type)) ||
-					(in_array('video', $config[$value]) &&
-					preg_match('/(video\/*)/', $file_type)) ||
-					(in_array('audio', $config[$value]) &&
-					preg_match('/(audio\/*)/', $file_type) &&
-					$accept != false)
-					)
-					{
+					 *   -----------------------------------------------------------
+					 *   Checks if * or image exists in the config file of the $value
+					 *   Then it accept all types of files or all types of image in the childrens folder
+					 *   -----------------------------------------------------------
+					 */ elseif (
+						in_array('*', $config[$value]) ||
+						(in_array('image', $config[$value]) &&
+							preg_match('/(image\/*)/', $file_type)) ||
+						(in_array('video', $config[$value]) &&
+							preg_match('/(video\/*)/', $file_type)) ||
+						(in_array('audio', $config[$value]) &&
+							preg_match('/(audio\/*)/', $file_type) &&
+							$accept != false)
+					) {
 						$accept = '*';
 
-						if (array_key_exists($url[$index + 1], $config))
-						{
+						if (array_key_exists($url[$index + 1], $config)) {
 							continue;
 						} /**
-						  *  -----------------------------------------------
-						  *    Performs the logic for accepting current file
-						  *  -----------------------------------------------
-						  */
-						else
-						{
+						 *  -----------------------------------------------
+						 *    Performs the logic for accepting current file
+						 *  -----------------------------------------------
+						 */ else {
 							http_response_code(200);
 							header("Content-Type: $file_type; charset=$charset");
 
@@ -212,9 +216,7 @@ class Route extends Resources implements RouteInterface
 
 							exit();
 						}
-					}
-					else
-					{
+					} else {
 						$accept = false;
 					}
 				}
@@ -226,11 +228,10 @@ class Route extends Resources implements RouteInterface
 			 *   ------------------------------------------------------------------------
 			 */
 			if (
-			array_key_exists('/', $config) &&
-			count($url) === 1 &&
-			is_file($dir . '/public/' . $url[0])
-			)
-			{
+				array_key_exists('/', $config) &&
+				count($url) === 1 &&
+				is_file($dir . '/public/' . $url[0])
+			) {
 				$req_ext = explode('.', $url[0]);
 				$req_ext = strtolower(end($req_ext));
 				$root = $config['/'];
@@ -240,21 +241,18 @@ class Route extends Resources implements RouteInterface
 				 *   checks if the requested file extension is available in the config files or * which signifies all types of extension
 				 *   ---------------------------------------------------------------------------------------------
 				 */
-				for ($i = 0; $i < count($root); $i++)
-				{
+				for ($i = 0; $i < count($root); $i++) {
 					$root1 = strtolower($root[$i]);
 
 					if (
-					$root1 === $req_ext ||
-					$root1 === '*' ||
-					($root1 === 'image' &&
-					preg_match('/(image\/*)/', $req_ext)) ||
-					($root1 === 'video' &&
-					preg_match('/(video\/*)/', $req_ext)) ||
-					($root1 === 'audio' &&
-					preg_match('/(audio\/*)/', $req_ext))
-					)
-					{
+						$root1 === $req_ext ||
+						$root1 === '*' ||
+						($root1 === 'image' &&
+							preg_match('/(image\/*)/', $req_ext)) ||
+						($root1 === 'video' &&
+							preg_match('/(video\/*)/', $req_ext)) ||
+						($root1 === 'audio' && preg_match('/(audio\/*)/', $req_ext))
+					) {
 						http_response_code(200);
 						header("Content-Type: $file_type; charset=$charset");
 
@@ -265,8 +263,6 @@ class Route extends Resources implements RouteInterface
 				}
 			}
 		}
-
-		$request_log == true ? (self::$log = true) : (self::$log = false);
 	}
 
 	/**
@@ -284,227 +280,36 @@ class Route extends Resources implements RouteInterface
 	 *
 	 *   ------------------------------------------------------------------------
 	 */
-	public static function any (
-	 array|string $route,
-	 mixed $callback,
-	 string $method = '*',
-	): void {
-		/**
-		 *   --------------------------------------------------------------
-		 *
-		 *   Not Found Error
-		 *
-		 *   This * route serves as 404, which executes whenever there're no matching routes from the request url
-		 *   which takes a callback parameter that is rendered to the webpage
-		 *
-		 * --------------------------------------------------------------
-		 */
+	public static function any(
+		array|string $route,
+		mixed $callback,
+		string $method = '*'
+	): self {
+		self::$any = [
+			'route' => $route,
+			'method' => $method,
+			'callback' => $callback
+		];
 
-		if ((is_array($route) && in_array('*', $route)) || $route === '*')
-		{
-			header('HTTP/1.0 404 Not Found');
-			header('Content-Type: */*');
-
-			print_r(is_callable($callback) ? $callback() : $callback);
-			self::log();
-			exit();
-		}
-
-		// will store all the parameters value in this array
-		$req = [];
-		$req_value = [];
-
-		// will store all the parameters names in this array
-		$paramKey = [];
-
-		// finding if there is any {?} parameter in $route
-		if (is_string($route))
-		{
-			preg_match_all('/(?<={).+?(?=})/', $route, $paramMatches);
-		}
-
-		// if the route does not contain any param call routing();
-		if (empty($paramMatches[0]) || is_array($route))
-		{
-			/**
-			 *   ------------------------------------------------------
-			 *   Check if $callback is a callable function
-			 *   or array of controller, and if not,
-			 *   it's a string of text or html document
-			 *   ------------------------------------------------------
-			 */
-			$callback = self::routing($route, $callback, $method);
-
-			if ($callback)
-			{
-				if (
-				is_array($callback) &&
-				(preg_match('/(Controller)/', $callback[0], $matches) &&
-				count($matches) > 1)
-				)
-				{
-					print_r(
-					 self::controller(
-					  $callback[0],
-					  count($callback) > 1 ? $callback[1] : ''
-					 )
-					);
-				}
-				else
-				{
-					print_r(is_callable($callback) ? $callback() : $callback);
-				}
-
-				self::log();
-				exit();
-			}
-			else
-			{
-				return;
-			}
-		}
-
-		// setting parameters names
-		foreach ($paramMatches[0] as $key)
-		{
-			$paramKey[] = $key;
-		}
-
-		/**
-		 *   ----------------------------------------------
-		 *   Replacing first and last forward slashes
-		 *   $_SERVER['REQUEST_URI'] will be empty if req uri is /
-		 *   ----------------------------------------------
-		 */
-
-		if (!empty(self::$request_uri))
-		{
-			$route = strtolower(preg_replace("/(^\/)|(\/$)/", '', $route));
-			$reqUri = strtolower(
-			 preg_replace("/(^\/)|(\/$)/", '', self::$request_uri)
-			);
-		}
-		else
-		{
-			$reqUri = '/';
-		}
-
-		// exploding route address
-		$uri = explode('/', $route);
-
-		// will store index number where {?} parameter is required in the $route
-		$indexNum = [];
-
-		// storing index number, where {?} parameter is required with the help of regex
-		foreach ($uri as $index => $param)
-		{
-			if (preg_match('/{.*}/', $param))
-			{
-				$indexNum[] = $index;
-			}
-		}
-
-		/**
-		 *   ----------------------------------------------------------------------------------
-		 *   Exploding request uri string to array to get the exact index number value of parameter from $_SERVER['REQUEST_URI']
-		 *   ----------------------------------------------------------------------------------
-		 */
-		$reqUri = explode('/', $reqUri);
-
-		/**
-		 *   ----------------------------------------------------------------------------------
-		 *   Running for each loop to set the exact index number with reg expression this will help in matching route
-		 *   ----------------------------------------------------------------------------------
-		 */
-		foreach ($indexNum as $key => $index)
-		{
-			/**
-			 *   --------------------------------------------------------------------------------
-			 *   In case if req uri with param index is empty then return because URL is not valid for this route
-			 *   --------------------------------------------------------------------------------
-			 */
-
-			if (empty($reqUri[$index]))
-			{
-				return;
-			}
-
-			// setting params with params names
-			$req[$paramKey[$key]] = htmlspecialchars($reqUri[$index]);
-			$req_value[] = htmlspecialchars($reqUri[$index]);
-
-			// this is to create a regex for comparing route address
-			$reqUri[$index] = '{.*}';
-		}
-
-		// converting array to string
-		$reqUri = implode('/', $reqUri);
-
-		/**
-		 *   -----------------------------------
-		 *   replace all / with \/ for reg expression
-		 *   regex to match route is ready!
-		 *   -----------------------------------
-		 */
-		$reqUri = str_replace('/', '\\/', $reqUri);
-
-		// now matching route with regex
-		if (preg_match("/$reqUri/", $route))
-		{
-			// checks if the requested method is of the given route
-			if (
-			strtoupper($_SERVER['REQUEST_METHOD']) !== strtoupper($method) &&
-			$method !== '*'
-			)
-			{
-				http_response_code(405);
-				self::log();
-				exit('Method Not Allowed');
-			}
-
-			http_response_code(200);
-			header('Content-Type: */*');
-
-			if (
-			is_array($callback) &&
-			(preg_match('/(Controller)/', $callback[0], $matches) &&
-			count($matches) > 1)
-			)
-			{
-				print_r(
-				 self::controller(
-				  $callback[0],
-				  count($callback) > 1 ? $callback[1] : '',
-				  $req_value
-				 )
-				);
-			}
-			else
-			{
-				print_r(
-				 is_callable($callback) ? $callback(...$req_value) : $callback
-				);
-			}
-
-			self::log();
-			exit();
-		}
+		self::$route[] = $route;
+		return new self();
 	}
 
 	/**
-	 * MAP method
+	 * Route Mapping method
 	 * Check out documentation for using Map method
 	 *
 	 * @link https://github.com/dconco/php_slides
-	 * @param string|array $method Can also be used as `$route` param if the `$route` param is not specified
+	 * @param string $method Request method
 	 * @param string|array|null $route Route parameter
 	 */
-	public static function map (string|array $method, string|array $route): self
+	public static function map(string $method, string|array $route): self
 	{
-		$match = new MapRoute();
-		self::$map_info = $match->match($method, $route);
+		self::$map = [
+			'method' => $method,
+			'route' => $route
+		];
 		self::$route[] = $route;
-
 		return new self();
 	}
 
@@ -514,10 +319,17 @@ class Route extends Resources implements RouteInterface
 	 *
 	 * @param string $name Set the name of the route
 	 */
-	public function name (string $name): self
+	public function name(string $name): self
 	{
-		add_route_name($name, end(self::$route));
-		self::$routes[$name] = end(self::$route);
+		if (is_array(end(self::$route))) {
+			for ($i = 0; $i < count(end(self::$route)); $i++) {
+				add_route_name($name . '::' . $i, end(self::$route)[$i]);
+				self::$routes[$name . '::' . $i] = end(self::$route)[$i];
+			}
+		} else {
+			add_route_name($name, end(self::$route));
+			self::$routes[$name] = end(self::$route);
+		}
 
 		return $this;
 	}
@@ -528,10 +340,9 @@ class Route extends Resources implements RouteInterface
 	 *
 	 * @param mixed $callback
 	 */
-	public function action (mixed $callback): self
+	public function action(mixed $callback): self
 	{
-		if (self::$map_info)
-		{
+		if (self::$map) {
 			self::$action = $callback;
 		}
 		return $this;
@@ -546,8 +357,7 @@ class Route extends Resources implements RouteInterface
 	 */
 	public function use(string $controller): self
 	{
-		if (self::$map_info)
-		{
+		if (self::$map) {
 			self::$use = $controller;
 		}
 		return $this;
@@ -559,10 +369,9 @@ class Route extends Resources implements RouteInterface
 	 *
 	 * @param string $file
 	 */
-	public function file (string $file): self
+	public function file(string $file): self
 	{
-		if (self::$map_info)
-		{
+		if (self::$map) {
 			self::$file = $file;
 		}
 		return $this;
@@ -572,10 +381,9 @@ class Route extends Resources implements RouteInterface
 	 * Add Middlewares.
 	 * Middleware must be verified before redirecting to the specific Controller.
 	 */
-	public function middleware (array $middleware): self
+	public function middleware(array $middleware): self
 	{
-		if (self::$map_info || self::$method || self::$view)
-		{
+		if (self::$map || self::$method || self::$view) {
 			self::$middleware = $middleware;
 		}
 		return $this;
@@ -596,11 +404,11 @@ class Route extends Resources implements RouteInterface
 	 *
 	 *   ---------------------------------------------------------------------------
 	 */
-	public static function view (array|string $route, string $view): self
+	public static function view(array|string $route, string $view): self
 	{
 		self::$view = [
-		 'route' => $route,
-		 'view' => $view
+			'route' => $route,
+			'view' => $view
 		];
 
 		self::$route[] = $route;
@@ -620,30 +428,19 @@ class Route extends Resources implements RouteInterface
 	 *
 	 * ---------------------------------------------------------------
 	 */
-	public static function redirect (
-	 string $route,
-	 string $new_url,
-	 int $code = 302,
-	): void {
-		if (!empty(self::$request_uri))
-		{
-			$route = preg_replace("/(^\/)|(\/$)/", '', $route);
-			$new_url = preg_replace("/(^\/)|(\/$)/", '', $new_url);
-			$reqUri = preg_replace("/(^\/)|(\/$)/", '', self::$request_uri);
-		}
-		else
-		{
-			$reqUri = '/';
-			$new_url = preg_replace("/(^\/)|(\/$)/", '', $new_url);
-		}
+	public static function redirect(
+		string $route,
+		string $new_url,
+		int $code = 302
+	): self {
+		self::$redirect = [
+			'route' => $route,
+			'new_url' => $new_url,
+			'code' => $code
+		];
 
-		if (strtolower($reqUri) === strtolower($route))
-		{
-			http_response_code($code);
-			self::log();
-			header("Location: $new_url", true, $code);
-			exit();
-		}
+		self::$route[] = $route;
+		return new self();
 	}
 
 	/**
@@ -655,12 +452,12 @@ class Route extends Resources implements RouteInterface
 	 *
 	 *   --------------------------------------------------------------
 	 */
-	public static function get (array|string $route, $callback): self
+	public static function get(array|string $route, $callback): self
 	{
 		self::$method = [
-		 'route' => $route,
-		 'method' => 'GET',
-		 'callback' => $callback
+			'route' => $route,
+			'method' => 'GET',
+			'callback' => $callback
 		];
 
 		self::$route[] = $route;
@@ -676,12 +473,12 @@ class Route extends Resources implements RouteInterface
 	 *
 	 *   --------------------------------------------------------------
 	 */
-	public static function post (array|string $route, $callback): self
+	public static function post(array|string $route, $callback): self
 	{
 		self::$method = [
-		 'route' => $route,
-		 'method' => 'POST',
-		 'callback' => $callback
+			'route' => $route,
+			'method' => 'POST',
+			'callback' => $callback
 		];
 
 		self::$route[] = $route;
@@ -697,12 +494,12 @@ class Route extends Resources implements RouteInterface
 	 *
 	 *   --------------------------------------------------------------
 	 */
-	public static function put (array|string $route, $callback): self
+	public static function put(array|string $route, $callback): self
 	{
 		self::$method = [
-		 'route' => $route,
-		 'method' => 'PUT',
-		 'callback' => $callback
+			'route' => $route,
+			'method' => 'PUT',
+			'callback' => $callback
 		];
 
 		self::$route[] = $route;
@@ -718,12 +515,12 @@ class Route extends Resources implements RouteInterface
 	 *
 	 *   --------------------------------------------------------------
 	 */
-	public static function patch (array|string $route, $callback): self
+	public static function patch(array|string $route, $callback): self
 	{
 		self::$method = [
-		 'route' => $route,
-		 'method' => 'PATCH',
-		 'callback' => $callback
+			'route' => $route,
+			'method' => 'PATCH',
+			'callback' => $callback
 		];
 
 		self::$route[] = $route;
@@ -739,48 +536,61 @@ class Route extends Resources implements RouteInterface
 	 *
 	 *   --------------------------------------------------------------
 	 */
-	public static function delete (array|string $route, $callback): self
+	public static function delete(array|string $route, $callback): self
 	{
 		self::$method = [
-		 'route' => $route,
-		 'method' => 'DELETE',
-		 'callback' => $callback
+			'route' => $route,
+			'method' => 'DELETE',
+			'callback' => $callback
 		];
 
 		self::$route[] = $route;
 		return new self();
 	}
 
-	public function __destruct ()
+	public function __destruct()
 	{
-		if (self::$middleware !== null)
-		{
-			self::__middleware();
+		$route_index = end(self::$route);
+		$route_index = is_array($route_index) ? $route_index[0] : $route_index;
+
+		if (self::$map !== null) {
+			$GLOBALS['__registered_routes'][$route_index]['map'] = self::$map;
 		}
 
-		if (self::$action !== null)
-		{
-			self::__action();
+		if (self::$middleware !== null) {
+			$GLOBALS['__registered_routes'][$route_index]['middleware'] =
+				self::$middleware;
 		}
 
-		if (self::$use !== null)
-		{
-			self::__use();
+		if (self::$redirect !== null) {
+			$GLOBALS['__registered_routes'][$route_index]['redirect'] =
+				self::$redirect;
 		}
 
-		if (self::$file !== null)
-		{
-			self::__file();
+		if (self::$action !== null) {
+			$GLOBALS['__registered_routes'][$route_index]['action'] =
+				self::$action;
 		}
 
-		if (self::$method !== null)
-		{
-			self::__method();
+		if (self::$any !== null) {
+			$GLOBALS['__registered_routes'][$route_index]['any'] = self::$any;
 		}
 
-		if (self::$view !== null)
-		{
-			self::__view();
+		if (self::$use !== null) {
+			$GLOBALS['__registered_routes'][$route_index]['use'] = self::$use;
+		}
+
+		if (self::$file !== null) {
+			$GLOBALS['__registered_routes'][$route_index]['file'] = self::$file;
+		}
+
+		if (self::$method !== null) {
+			$GLOBALS['__registered_routes'][$route_index]['method'] =
+				self::$method;
+		}
+
+		if (self::$view !== null) {
+			$GLOBALS['__registered_routes'][$route_index]['view'] = self::$view;
 		}
 	}
 }

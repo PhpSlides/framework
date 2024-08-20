@@ -22,7 +22,7 @@ class Console extends Command implements CommandInterface, ConsoleInterface
 	private static bool $serve = false;
 	private static bool $is_debug = false;
 	private static string $resolve = 'src/bootstrap';
-	private static ?array $make = null;
+	private static ?array $commands = null;
 
 	/**
 	 * Console constructor.
@@ -54,7 +54,7 @@ class Console extends Command implements CommandInterface, ConsoleInterface
 						"<name> argument is required! Type --help for list of commands\n"
 					);
 				}
-				self::$make = ['controller', $arguments];
+				self::$commands = ['controller', $arguments];
 				break;
 
 			case 'make:api-controller':
@@ -63,7 +63,7 @@ class Console extends Command implements CommandInterface, ConsoleInterface
 						"<name> argument is required! Type --help for list of commands\n"
 					);
 				}
-				self::$make = ['api-controller', $arguments];
+				self::$commands = ['api-controller', $arguments];
 				break;
 
 			case 'make:middleware':
@@ -72,14 +72,18 @@ class Console extends Command implements CommandInterface, ConsoleInterface
 						"<name> argument is required! Type --help for list of commands\n"
 					);
 				}
-				self::$make = ['middleware', $arguments];
+				self::$commands = ['middleware', $arguments];
+				break;
+
+			case 'generate:secret-key':
+				self::$commands = ['secret-key', $arguments];
 				break;
 
 			default:
 				$styles = [ColorCode::WHITE, ColorCode::BG_RED];
 
 				echo StyleConsole::text(
-					'Command not Recognized! See \'php slides --help\'',
+					'Command not Recognized! See \'php slide --help\'',
 					...$styles
 				);
 				break;
@@ -99,16 +103,19 @@ class Console extends Command implements CommandInterface, ConsoleInterface
 			);
 		}
 
-		if (self::$make) {
-			switch (self::$make[0]) {
+		if (self::$commands) {
+			switch (self::$commands[0]) {
 				case 'controller':
-					self::makeController(self::$make[1], self::$resolve);
+					self::makeController(self::$commands[1], self::$resolve);
 					break;
 				case 'api-controller':
-					self::makeApiController(self::$make[1], self::$resolve);
+					self::makeApiController(self::$commands[1], self::$resolve);
 					break;
 				case 'middleware':
-					self::makeMiddleware(self::$make[1], self::$resolve);
+					self::makeMiddleware(self::$commands[1], self::$resolve);
+					break;
+				case 'secret-key':
+					self::generateSecretKey(self::$commands[1]);
 					break;
 				default:
 					exit('Error.');

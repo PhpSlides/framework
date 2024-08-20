@@ -34,7 +34,7 @@ class Command implements CommandInterface
 		$cn = str_ends_with($cn, 'Controller') ? $cn : $cn . 'Controller';
 
 		// create class name and namespace
-		$namespace = 'App\\Controllers';
+		$namespace = 'App\\Controller';
 		$classname = $namespace . '\\' . $cn;
 
 		$content = file_get_contents(
@@ -57,17 +57,15 @@ class Command implements CommandInterface
 		if (class_exists($classname)) {
 			echo Console::bgRed('Error: ');
 			echo Console::bold(
-				" File name already exists at app/Controllers/$cn.php\n"
+				" File name already exists at app/Controller/$cn.php\n"
 			);
 			// checks if controller file already exists
-		} elseif (file_exists("$baseDir/app/Controllers/$cn.php")) {
+		} elseif (file_exists("$baseDir/app/Controller/$cn.php")) {
 			echo Console::bgRed('Error: ');
 			echo Console::bold(" Controller class already exists: $cn\n");
 		}
 		// if cannot add contents to the file
-		elseif (
-			!file_put_contents("$baseDir/app/Controllers/$cn.php", $content)
-		) {
+		elseif (!file_put_contents("$baseDir/app/Controller/$cn.php", $content)) {
 			echo Console::bgRed('Error: ');
 			echo Console::bold(" Unable to create controller: $cn\n");
 		}
@@ -75,7 +73,7 @@ class Command implements CommandInterface
 		else {
 			shell_exec('composer dump-autoload');
 			echo Console::bold(
-				"$cn created successfully at app/Controllers/$cn.php\n"
+				"$cn created successfully at app/Controller/$cn.php\n"
 			);
 		}
 
@@ -97,7 +95,7 @@ class Command implements CommandInterface
 		$cn = str_ends_with($cn, 'Controller') ? $cn : $cn . 'Controller';
 
 		// create class name and namespace
-		$namespace = 'App\\Controllers';
+		$namespace = 'App\\Controller';
 		$classname = $namespace . '\\' . $cn;
 
 		$content = file_get_contents(
@@ -122,15 +120,15 @@ class Command implements CommandInterface
 			echo Console::bold(" Controller class already exists: $cn\n");
 		}
 		// checks if controller file already exists
-		elseif (file_exists("$baseDir/app/Controllers/api/$cn.php")) {
+		elseif (file_exists("$baseDir/app/Controller/api/$cn.php")) {
 			echo Console::bgRed('Error: ');
 			echo Console::bold(
-				" File name already exists at app/Controllers/api/$cn.php\n"
+				" File name already exists at app/Controller/api/$cn.php\n"
 			);
 		}
 		// if cannot add contents to the file
 		elseif (
-			!file_put_contents("$baseDir/app/Controllers/api/$cn.php", $content)
+			!file_put_contents("$baseDir/app/Controller/api/$cn.php", $content)
 		) {
 			echo Console::bgRed('Error: ');
 			echo Console::bold(" Unable to create api controller: $cn\n");
@@ -139,7 +137,7 @@ class Command implements CommandInterface
 		else {
 			shell_exec('composer dump-autoload');
 			echo Console::bold(
-				"$cn created successfully at app/Controllers/api/$cn.php\n"
+				"$cn created successfully at app/Controller/api/$cn.php\n"
 			);
 		}
 
@@ -161,7 +159,7 @@ class Command implements CommandInterface
 		$cn = str_ends_with($cn, 'Middleware') ? $cn : $cn . 'Middleware';
 
 		// create class name and namespace
-		$namespace = 'App\\Middlewares';
+		$namespace = 'App\\Middleware';
 		$classname = $namespace . '\\' . $cn;
 
 		$content = file_get_contents(
@@ -187,15 +185,15 @@ class Command implements CommandInterface
 			echo Console::bold(" Middleware class already exists: $cn\n");
 		}
 		// checks if middleware file already exists
-		elseif (file_exists("$baseDir/app/Middlewares/$cn.php")) {
+		elseif (file_exists("$baseDir/app/Middleware/$cn.php")) {
 			echo Console::bgRed('Error: ');
 			echo Console::bold(
-				" File name already exists at app/Middlewares/$cn.php\n"
+				" File name already exists at app/Middleware/$cn.php\n"
 			);
 		}
 		// if cannot add contents to the file
 		elseif (
-			!file_put_contents("$baseDir/app/Middlewares/$cn.php", $content)
+			!file_put_contents("$baseDir/app/Middleware/$cn.php", $content)
 		) {
 			echo Console::bgRed('Error: ');
 			echo Console::bold(" Unable to create middleware: $cn\n");
@@ -204,10 +202,19 @@ class Command implements CommandInterface
 		else {
 			shell_exec('composer dump-autoload');
 			echo Console::bold(
-				"$cn created successfully at app/Middlewares/$cn.php\n"
+				"$cn created successfully at app/Middleware/$cn.php\n"
 			);
 		}
 
+		exit();
+	}
+
+	public static function generateSecretKey(array $arguments): void
+	{
+		$length = $arguments[0] ?? 32;
+		$key = base64_encode(random_bytes((int) $length));
+
+		echo Console::bold("\n$key\n");
 		exit();
 	}
 }

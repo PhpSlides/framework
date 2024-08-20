@@ -29,7 +29,11 @@ function slides_include($filename)
 	return $loaded->getLoad();
 }
 
-$routes = [];
+/**
+ * @var array $GLOBALS['__routes']
+ * All routes names are stored in this variable
+ */
+$GLOBALS['__routes'] = [];
 
 /**
  * Give route a name and value
@@ -40,8 +44,7 @@ $routes = [];
  */
 function add_route_name(string $name, string|array $value): void
 {
-	global $routes;
-	$routes[$name] = $value;
+	$GLOBALS['__routes'][$name] = $value;
 }
 
 /**
@@ -56,7 +59,7 @@ function route(
 	string|null $name = null,
 	array|null $param = null
 ): array|object|string {
-	global $routes;
+	$routes = $GLOBALS['__routes'];
 
 	if ($name === null) {
 		$route_class = new stdClass();
@@ -132,6 +135,7 @@ function route(
  * @param string $filename The name of the file to get from public directory
  * @param string $path_type Path to start location which uses either `RELATIVE_PATH`
  * for path `../` OR `ROOT_RELATIVE_PATH` for root `/`
+ * @return string The file path ROOT_RELATIVE_PATH|RELATIVE_PATH
  */
 function asset(string $filename, $path_type = RELATIVE_PATH): string
 {
@@ -172,7 +176,44 @@ function asset(string $filename, $path_type = RELATIVE_PATH): string
 	}
 }
 
-function ExceptionHandler($exception)
+/**
+ * Generate a PayLoad array for JWT authentication.
+ * @return array The payload for JWT
+ */
+function payload(
+	array $data,
+	int $expires,
+	int $issued_at = 0,
+	string $issuer = '',
+	string $audience = ''
+): array {
+	$jwt = (new FileLoader())
+		->load(__DIR__ . '/../Config/jwt.config.php')
+		->getLoad();
+
+	if ($issuer === '') {
+		$issuer = $jwt['issuer'][0];
+	}
+	if ($audience === '') {
+		$audience = $jwt['issuer'];
+		$audience = count($audience) > 0 ? $audience[0] : '';
+	}
+	if ($issued_at === 0) {
+		$issued_at = time();
+	}
+
+	return array_merge(
+		[
+			'iss' => $issuer,
+			'iat' => $issued_at,
+			'exp' => $expires,
+			'aud' => $audience
+		],
+		array_map('htmlspecialchars', $data)
+	);
+}
+
+function ExceptionHandler(Throwable $exception)
 {
 	// Check if the exception is a CustomException to use its specific methods
 	if ($exception instanceof Exception) {
