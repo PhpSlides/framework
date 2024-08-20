@@ -178,7 +178,7 @@ trait ApiResources
 
 			self::$apiMap = [
 				'controller' => $controller,
-				'c_method' => $c_method,
+				'c_method' => trim($c_method, '@'),
 				'url' => $base_url
 			];
 

@@ -1,33 +1,6 @@
-# Change Logs [v1.2.5]
-
-## [Sun, 04-08-2024]
-
--  Updated Route & view to default Content-Type as text/html
--  Updated request log according the APP_DEBUG in .env file.
-
-## [Tue, 06-08-2024]
-
--  Added the use of `{{ }}` for writing php in an html attributes
--  Added `session` method to `PhpSlides\Http\Request` class
--  Updated `Application::$request_uri` to contain only path
--  Updated all requests function in the `Request` methods parameters to be optional.
-
-## [Sat, 17-08-2024]
-
--  Updated env configuration to load the minor env configuration files
--  Added safe loading to `FileLoader` and `ViewLoader` class
--  Updated Route Map `Route::map()` to allow multiple request methods in string seperated with `|`, eg. `'POST|GET'`
--  Added JWT web tokens management.
-
-## [Sun, 18-08-2024]
-
--  Written manual test code for JWT web token.
--  Added `Render` to render all registered routes.
--  Updated `Route` to only register routes.
-
-## [Mon, 19-08-2024]
-
--  Can now generate secret key with terminal `php slide generate:secret-30`.
+# Change Logs [v1.2.6]
 
 ## [Tue, 20-08-2024]
--  Updated `Api` to only register api routes.
+
+-  Fixes bugs on `Request`
+-  Fixes bugs on `JWT` and `payload()` function.
