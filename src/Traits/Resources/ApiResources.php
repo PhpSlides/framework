@@ -22,7 +22,10 @@ trait ApiResources
 	protected function __route(): void
 	{
 		$match = new MapRoute();
-		self::$map_info = $match->match('dynamic', self::$route['url']);
+		self::$map_info = $match->match(
+			self::$route['r_method'] ?? 'dynamic',
+			self::$route['url']
+		);
 
 		if (self::$map_info) {
 			if (self::$apiMiddleware !== null) {
@@ -103,7 +106,10 @@ trait ApiResources
 				$request = new Request($params);
 			}
 
-			$response = $cc->$r_method($request);
+			if (method_exists($cc, $r_method)) {
+				$response = $cc->$r_method($request);
+			}
+
 			$r_method = 'error';
 			$response = !$response ? $cc->$r_method($request) : $response;
 

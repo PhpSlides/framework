@@ -88,11 +88,16 @@ class Api extends Controller implements ApiInterface
 	 * Defines a new route with a URL and a controller.
 	 *
 	 * @param string $url The Base URL of the route.
-	 * @param string $controller The controller handling the route.
+	 * @param string|array|null $controller The controller handling the route.
+	 * @param ?string $controller The request method the route is going to accept,
+	 * if null is given, then it's consider dynamic, accepts all methods.
 	 * @return self
 	 */
-	public function route(string $url, string $controller = ''): self
-	{
+	public function route(
+		string $url,
+		string|array|null $controller = null,
+		?string $req_method = null
+	): self {
 		$define = $this->define;
 
 		// checks if $define is set, then assign $define methods to $url & $controller parameters
@@ -107,11 +112,17 @@ class Api extends Controller implements ApiInterface
 
 		self::$route = [
 			'url' => $uri,
-			'controller' => $define['controller'] ?? $controller
+			'r_method' => $req_method,
+			'controller' =>
+				$define['controller'] ??
+				(is_array($controller) ? $controller[0] : $controller)
 		];
 
-		if ($define !== null && !empty($controller)) {
+		if ($define !== null && $controller !== null) {
 			self::$route['c_method'] = trim($controller, '@');
+		}
+		if (is_array($controller)) {
+			self::$route['c_method'] = $controller[1];
 		}
 
 		$newInstance = new self();
