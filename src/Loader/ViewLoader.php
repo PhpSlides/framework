@@ -11,12 +11,13 @@ class ViewLoader
 	/**
 	 * Load view file in view formatted way
 	 *
-	 * @throws An Exception if the file does not seem to be existing
+	 * @throws Exception if the file does not seem to be existing
 	 * @return self
 	 */
-	public function load($viewFile): self
+	public function load ($viewFile): self
 	{
-		if (!is_file($viewFile)) {
+		if (!is_file($viewFile))
+		{
 			throw new Exception("File does not exist: $viewFile");
 		}
 		return self::safeLoad($viewFile);
@@ -28,9 +29,10 @@ class ViewLoader
 	 *
 	 * @return self
 	 */
-	public function safeLoad($viewFile): self
+	public function safeLoad ($viewFile): self
 	{
-		if (is_file($viewFile)) {
+		if (is_file($viewFile))
+		{
 			// get and make generated file name & directory
 			$gen_file = explode('/', $viewFile);
 			$new_name = explode('.', end($gen_file), 2);
@@ -42,7 +44,8 @@ class ViewLoader
 			$file_contents = file_get_contents($viewFile);
 			$file_contents = $this->format($file_contents);
 
-			try {
+			try
+			{
 				$file = fopen($gen_file, 'w');
 				fwrite($file, $file_contents);
 				fclose($file);
@@ -52,7 +55,9 @@ class ViewLoader
 
 				unlink($gen_file);
 				unset($GLOBALS['__gen_file_path']);
-			} finally {
+			}
+			finally
+			{
 				$GLOBALS['__gen_file_path'] = $gen_file;
 			}
 		}
@@ -62,50 +67,53 @@ class ViewLoader
 	/**
 	 * Get Loaded View File Result
 	 */
-	public function getLoad()
+	public function getLoad ()
 	{
-		if (count($this->result ?? []) === 1) {
+		if (count($this->result ?? []) === 1)
+		{
 			return $this->result[0];
 		}
 		return $this->result;
 	}
 
-	protected function format($contents)
+	protected function format ($contents)
 	{
 		$pattern = '/<include\s+path=["|\']([^"]+)["|\']\s*!?\s*\/>/';
 
 		// replace <include> match elements
 		$formattedContents = preg_replace_callback(
-			$pattern,
-			function ($matches) {
-				$path = trim($matches[1]);
-				return '<' .
-					'? slides_include(__DIR__ . \'/' .
-					$path .
-					'\') ?>';
-			},
-			$contents
+		 $pattern,
+		 function ($matches)
+		 {
+			 $path = trim($matches[1]);
+			 return '<' .
+			  '? slides_include(__DIR__ . \'/' .
+			  $path .
+			  '\') ?' . '>';
+		 },
+		$contents
 		);
 
 		// Replace bracket interpolation {{ }}
 		$formattedContents = preg_replace_callback(
-			'/{{\s*(.*?)\s*}}/',
-			function ($matches) {
-				return '"<' . '?php print_r(' . $matches[1] . ') ?>"';
-			},
-			$formattedContents
-		);
+		'/{{\s*(.*?)\s*}}/',
+		function ($matches)
+		{
+			return '"<' . '?php print_r(' . $matches[1] . ') ?' . '>"';
+		},
+		 $formattedContents
+		 );
 
 		// replace <? elements
-		$formattedContents = preg_replace_callback(
-			'/<' . '\?' . '\s+([^?]*)\?' . '>/s',
-			function ($matches) {
-				$val = trim($matches[1]);
-				$val = trim($val, ';');
-				return '<' . '?php print_r(' . $val . ') ?>';
-			},
-			$formattedContents
-		);
+		$formattedContents = preg_replace_callback('/<' . '\?' . '\s+([^?]*)\?' . '>/s',
+		function ($matches)
+		{
+			$val = trim($matches[1]);
+			$val = trim($val, ';');
+			return '<' . '?php print_r(' . $val . ') ?' . '>';
+		},
+		$formattedContents
+		  );
 
 		return $formattedContents;
 	}

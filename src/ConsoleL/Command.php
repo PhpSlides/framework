@@ -11,17 +11,17 @@ use PhpSlides\ConsoleL\Interface\CommandInterface;
 
 class Command implements CommandInterface
 {
-	public static function showHelp(): void
+	public static function showHelp (): void
 	{
 		echo file_get_contents(
-			dirname(__DIR__) . '/Foundation/template/commands/Commands.md.dist'
+		 dirname(__DIR__) . '/Foundation/template/commands/Commands.md.dist'
 		);
 		exit();
 	}
 
-	public static function makeController(
-		array $arguments,
-		string $baseDir
+	public static function makeController (
+	 array $arguments,
+	 string $baseDir,
 	): void {
 		$cn = $arguments[0];
 		$ct = $arguments[1] ?? null;
@@ -38,8 +38,8 @@ class Command implements CommandInterface
 		$classname = $namespace . '\\' . $cn;
 
 		$content = file_get_contents(
-			dirname(__DIR__) .
-				'/Foundation/template/controller/Controller.php.dist'
+		 dirname(__DIR__) .
+		  '/Foundation/template/controller/Controller.php.dist'
 		);
 		$strict = $ct === '--strict' ? 'declare(strict_types=1);' : '';
 
@@ -48,41 +48,46 @@ class Command implements CommandInterface
 
 		$content = str_replace('{{name}}', $cn, $content);
 		$content = str_replace(
-			'<?php',
-			"<?php $strict\n\nnamespace $namespace;\n\n$use",
-			$content
+		 '<?php',
+		 "<?php $strict\n\nnamespace $namespace;\n\n$use",
+		 $content
 		);
 
 		// checks if class already exists
-		if (class_exists($classname)) {
+		if (class_exists($classname))
+		{
 			echo Console::bgRed('Error: ');
 			echo Console::bold(
-				" File name already exists at app/Controller/$cn.php\n"
+			 " File name already exists at app/Controller/$cn.php\n"
 			);
 			// checks if controller file already exists
-		} elseif (file_exists("$baseDir/app/Controller/$cn.php")) {
+		}
+		elseif (file_exists("$baseDir/app/Controller/$cn.php"))
+		{
 			echo Console::bgRed('Error: ');
 			echo Console::bold(" Controller class already exists: $cn\n");
 		}
 		// if cannot add contents to the file
-		elseif (!file_put_contents("$baseDir/app/Controller/$cn.php", $content)) {
+		elseif (!file_put_contents("$baseDir/app/Controller/$cn.php", $content))
+		{
 			echo Console::bgRed('Error: ');
 			echo Console::bold(" Unable to create controller: $cn\n");
 		}
 		// if controller is added successfully
-		else {
+		else
+		{
 			shell_exec('composer dump-autoload');
 			echo Console::bold(
-				"$cn created successfully at app/Controller/$cn.php\n"
+			 "$cn created successfully at app/Controller/$cn.php\n"
 			);
 		}
 
 		exit();
 	}
 
-	public static function makeApiController(
-		array $arguments,
-		string $baseDir
+	public static function makeApiController (
+	 array $arguments,
+	 string $baseDir,
 	): void {
 		$cn = $arguments[0];
 		$ct = $arguments[1] ?? null;
@@ -95,11 +100,11 @@ class Command implements CommandInterface
 		$cn = str_ends_with($cn, 'Controller') ? $cn : $cn . 'Controller';
 
 		// create class name and namespace
-		$namespace = 'App\\Controller';
+		$namespace = 'App\\Controller\\Api';
 		$classname = $namespace . '\\' . $cn;
 
 		$content = file_get_contents(
-			dirname(__DIR__) . '/Foundation/template/api/ApiController.php.dist'
+		 dirname(__DIR__) . '/Foundation/template/api/ApiController.php.dist'
 		);
 		$strict = $ct === '--strict' ? 'declare(strict_types=1);' : '';
 
@@ -109,44 +114,48 @@ class Command implements CommandInterface
 
 		$content = str_replace('{{name}}', $cn, $content);
 		$content = str_replace(
-			'<?php',
-			"<?php $strict\n\nnamespace $namespace;\n\n$use",
-			$content
+		 '<?php',
+		 "<?php $strict\n\nnamespace $namespace;\n\n$use",
+		 $content
 		);
 
 		// checks if class already exists
-		if (class_exists($classname)) {
+		if (class_exists($classname))
+		{
 			echo Console::bgRed('Error: ');
 			echo Console::bold(" Controller class already exists: $cn\n");
 		}
 		// checks if controller file already exists
-		elseif (file_exists("$baseDir/app/Controller/api/$cn.php")) {
+		elseif (file_exists("$baseDir/app/Controller/Api/$cn.php"))
+		{
 			echo Console::bgRed('Error: ');
 			echo Console::bold(
-				" File name already exists at app/Controller/api/$cn.php\n"
+			 " File name already exists at app/Controller/Api/$cn.php\n"
 			);
 		}
 		// if cannot add contents to the file
 		elseif (
-			!file_put_contents("$baseDir/app/Controller/api/$cn.php", $content)
-		) {
+		!file_put_contents("$baseDir/app/Controller/Api/$cn.php", $content)
+		)
+		{
 			echo Console::bgRed('Error: ');
-			echo Console::bold(" Unable to create api controller: $cn\n");
+			echo Console::bold(" Unable to create Api controller: $cn\n");
 		}
 		// if api controller is added successfully
-		else {
+		else
+		{
 			shell_exec('composer dump-autoload');
 			echo Console::bold(
-				"$cn created successfully at app/Controller/api/$cn.php\n"
+			 "$cn created successfully at app/Controller/Api/$cn.php\n"
 			);
 		}
 
 		exit();
 	}
 
-	public static function makeMiddleware(
-		array $arguments,
-		string $baseDir
+	public static function makeMiddleware (
+	 array $arguments,
+	 string $baseDir,
 	): void {
 		$cn = $arguments[0];
 		$ct = $arguments[1] ?? null;
@@ -163,8 +172,8 @@ class Command implements CommandInterface
 		$classname = $namespace . '\\' . $cn;
 
 		$content = file_get_contents(
-			dirname(__DIR__) .
-				'/Foundation/template/middleware/Middleware.php.dist'
+		 dirname(__DIR__) .
+		  '/Foundation/template/middleware/Middleware.php.dist'
 		);
 		$strict = $ct === '--strict' ? 'declare(strict_types=1);' : '';
 
@@ -174,42 +183,46 @@ class Command implements CommandInterface
 
 		$content = str_replace('{{name}}', $cn, $content);
 		$content = str_replace(
-			'<?php',
-			"<?php $strict\n\nnamespace $namespace;\n\n$use",
-			$content
+		 '<?php',
+		 "<?php $strict\n\nnamespace $namespace;\n\n$use",
+		 $content
 		);
 
 		// checks if class already exists
-		if (class_exists($classname)) {
+		if (class_exists($classname))
+		{
 			echo Console::bgRed('Error: ');
 			echo Console::bold(" Middleware class already exists: $cn\n");
 		}
 		// checks if middleware file already exists
-		elseif (file_exists("$baseDir/app/Middleware/$cn.php")) {
+		elseif (file_exists("$baseDir/app/Middleware/$cn.php"))
+		{
 			echo Console::bgRed('Error: ');
 			echo Console::bold(
-				" File name already exists at app/Middleware/$cn.php\n"
+			 " File name already exists at app/Middleware/$cn.php\n"
 			);
 		}
 		// if cannot add contents to the file
 		elseif (
-			!file_put_contents("$baseDir/app/Middleware/$cn.php", $content)
-		) {
+		!file_put_contents("$baseDir/app/Middleware/$cn.php", $content)
+		)
+		{
 			echo Console::bgRed('Error: ');
 			echo Console::bold(" Unable to create middleware: $cn\n");
 		}
 		// if middleware is added successfully
-		else {
+		else
+		{
 			shell_exec('composer dump-autoload');
 			echo Console::bold(
-				"$cn created successfully at app/Middleware/$cn.php\n"
+			 "$cn created successfully at app/Middleware/$cn.php\n"
 			);
 		}
 
 		exit();
 	}
 
-	public static function generateSecretKey(array $arguments): void
+	public static function generateSecretKey (array $arguments): void
 	{
 		$length = $arguments[0] ?? 32;
 		$key = base64_encode(random_bytes((int) $length));

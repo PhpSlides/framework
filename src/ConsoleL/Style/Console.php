@@ -9,8 +9,8 @@ use PhpSlides\ConsoleL\Interface\StyleConsoleInterface;
  * Console class provides methods to style console output with various text and background colors.
  */
 class Console extends ColorCode implements
-	ColorCodeInterface,
-	StyleConsoleInterface
+ ColorCodeInterface,
+ StyleConsoleInterface
 {
 	/**
 	 * Applies one or more color codes to a given message.
@@ -19,7 +19,7 @@ class Console extends ColorCode implements
 	 * @param int ...$codes One or more color codes to be applied.
 	 * @return string The styled message.
 	 */
-	public static function text(string $message, int ...$codes): string
+	public static function text (string $message, int ...$codes): string
 	{
 		$code = implode(';', $codes);
 		return parent::START . $code . 'm' . $message . parent::RESET;
@@ -31,7 +31,7 @@ class Console extends ColorCode implements
 	 * @param string $message The message to be bolded.
 	 * @return string The bolded message.
 	 */
-	public static function bold(string $message): string
+	public static function bold (string $message): string
 	{
 		return self::text($message, parent::BOLD);
 	}
@@ -42,7 +42,7 @@ class Console extends ColorCode implements
 	 * @param string $message The message to be underlined.
 	 * @return string The underlined message.
 	 */
-	public static function underline(string $message): string
+	public static function underline (string $message): string
 	{
 		return self::text($message, parent::UNDERLINE);
 	}
@@ -53,7 +53,7 @@ class Console extends ColorCode implements
 	 * @param string $message The message to be colored.
 	 * @return string The colored message.
 	 */
-	public static function black(string $message): string
+	public static function black (string $message): string
 	{
 		return self::text($message, parent::BLACK);
 	}
@@ -64,7 +64,7 @@ class Console extends ColorCode implements
 	 * @param string $message The message to be colored.
 	 * @return string The colored message.
 	 */
-	public static function red(string $message): string
+	public static function red (string $message): string
 	{
 		return self::text($message, parent::RED);
 	}
@@ -75,7 +75,7 @@ class Console extends ColorCode implements
 	 * @param string $message The message to be colored.
 	 * @return string The colored message.
 	 */
-	public static function green(string $message): string
+	public static function green (string $message): string
 	{
 		return self::text($message, parent::GREEN);
 	}
@@ -86,7 +86,7 @@ class Console extends ColorCode implements
 	 * @param string $message The message to be colored.
 	 * @return string The colored message.
 	 */
-	public static function yellow(string $message): string
+	public static function yellow (string $message): string
 	{
 		return self::text($message, parent::YELLOW);
 	}
@@ -97,7 +97,7 @@ class Console extends ColorCode implements
 	 * @param string $message The message to be colored.
 	 * @return string The colored message.
 	 */
-	public static function blue(string $message): string
+	public static function blue (string $message): string
 	{
 		return self::text($message, parent::BLUE);
 	}
@@ -108,7 +108,7 @@ class Console extends ColorCode implements
 	 * @param string $message The message to be colored.
 	 * @return string The colored message.
 	 */
-	public static function magenta(string $message): string
+	public static function magenta (string $message): string
 	{
 		return self::text($message, parent::MAGENTA);
 	}
@@ -119,7 +119,7 @@ class Console extends ColorCode implements
 	 * @param string $message The message to be colored.
 	 * @return string The colored message.
 	 */
-	public static function cyan(string $message): string
+	public static function cyan (string $message): string
 	{
 		return self::text($message, parent::CYAN);
 	}
@@ -130,7 +130,7 @@ class Console extends ColorCode implements
 	 * @param string $message The message to be colored.
 	 * @return string The colored message.
 	 */
-	public static function white(string $message): string
+	public static function white (string $message): string
 	{
 		return self::text($message, parent::WHITE);
 	}
@@ -141,7 +141,7 @@ class Console extends ColorCode implements
 	 * @param string $message The message to be styled.
 	 * @return string The styled message.
 	 */
-	public static function bgBlack(string $message): string
+	public static function bgBlack (string $message): string
 	{
 		return self::text($message, parent::BG_BLACK);
 	}
@@ -152,7 +152,7 @@ class Console extends ColorCode implements
 	 * @param string $message The message to be styled.
 	 * @return string The styled message.
 	 */
-	public static function bgRed(string $message): string
+	public static function bgRed (string $message): string
 	{
 		return self::text($message, parent::BG_RED);
 	}
@@ -163,7 +163,7 @@ class Console extends ColorCode implements
 	 * @param string $message The message to be styled.
 	 * @return string The styled message.
 	 */
-	public static function bgGreen(string $message): string
+	public static function bgGreen (string $message): string
 	{
 		return self::text($message, parent::BG_GREEN);
 	}
@@ -174,7 +174,7 @@ class Console extends ColorCode implements
 	 * @param string $message The message to be styled.
 	 * @return string The styled message.
 	 */
-	public static function bgYellow(string $message): string
+	public static function bgYellow (string $message): string
 	{
 		return self::text($message, parent::BG_YELLOW);
 	}
@@ -185,7 +185,7 @@ class Console extends ColorCode implements
 	 * @param string $message The message to be styled.
 	 * @return string The styled message.
 	 */
-	public static function bgBlue(string $message): string
+	public static function bgBlue (string $message): string
 	{
 		return self::text($message, parent::BG_BLUE);
 	}
@@ -196,7 +196,7 @@ class Console extends ColorCode implements
 	 * @param string $message The message to be styled.
 	 * @return string The styled message.
 	 */
-	public static function bgMagenta(string $message): string
+	public static function bgMagenta (string $message): string
 	{
 		return self::text($message, parent::BG_MAGENTA);
 	}
@@ -207,7 +207,7 @@ class Console extends ColorCode implements
 	 * @param string $message The message to be styled.
 	 * @return string The styled message.
 	 */
-	public static function bgCyan(string $message): string
+	public static function bgCyan (string $message): string
 	{
 		return self::text($message, parent::BG_CYAN);
 	}
@@ -218,7 +218,7 @@ class Console extends ColorCode implements
 	 * @param string $message The message to be styled.
 	 * @return string The styled message.
 	 */
-	public static function bgWhite(string $message): string
+	public static function bgWhite (string $message): string
 	{
 		return self::text($message, parent::BG_WHITE);
 	}
