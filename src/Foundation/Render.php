@@ -25,36 +25,36 @@ final class Render extends Controller
 	{
 		self::Load();
 		$static = new static();
-		$reg_route = $GLOBALS['__registered_routes'];
+		$reg_route = $GLOBALS['__registered_routes'] ?? null;
 
 		foreach ($reg_route as $route) {
-			self::$middleware = $route['middleware'];
-			self::$redirect = $route['redirect'];
-			self::$method = $route['method'];
-			self::$action = $route['action'];
-			self::$view = $route['view'];
-			self::$file = $route['file'];
-			self::$any = $route['any'];
-			self::$use = $route['use'];
-			self::$map = $route['map'];
+			self::$middleware = $route['middleware'] ?? null;
+			self::$redirect = $route['redirect'] ?? null;
+			self::$method = $route['method'] ?? null;
+			self::$action = $route['action'] ?? null;
+			self::$view = $route['view'] ?? null;
+			self::$file = $route['file'] ?? null;
+			self::$any = $route['any'] ?? null;
+			self::$use = $route['use'] ?? null;
+			self::$map = $route['map'] ?? null;
 
-			if ($route['map']) {
+			if (self::$map) {
 				self::__map();
 			}
 
-			if ($route['redirect']) {
+			if (self::$redirect) {
 				self::__redirect();
 			}
 
-			if ($route['method']) {
+			if (self::$method) {
 				self::__method();
 			}
 
-			if ($route['view']) {
+			if (self::$view) {
 				self::__view();
 			}
 
-			if ($route['any']) {
+			if (self::$any) {
 				self::__any();
 			}
 		}
@@ -64,18 +64,18 @@ final class Render extends Controller
 	{
 		self::Load();
 		$static = new static();
-		$reg_route = $GLOBALS['__registered_api_routes'];
+		$reg_route = $GLOBALS['__registered_api_routes'] ?? null;
 
 		foreach ($reg_route as $route) {
 			self::$apiMap = $route['map'] ?? null;
 			self::$route = $route['route'] ?? null;
 			self::$apiMiddleware = $route['middleware'] ?? null;
 
-			if ($route['route']) {
+			if (self::$route) {
 				$static->__route();
 			}
 
-			if ($route['map']) {
+			if (self::$apiMap) {
 				$static->__api_map();
 			}
 		}
@@ -84,6 +84,6 @@ final class Render extends Controller
 	public static function FormsRoute()
 	{
 		self::Load();
-		$reg_route = $GLOBALS['__registered_forms_routes'];
+		$reg_route = $GLOBALS['__registered_forms_routes'] ?? null;
 	}
 }
