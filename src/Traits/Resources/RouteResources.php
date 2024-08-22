@@ -3,7 +3,6 @@
 namespace PhpSlides\Traits\Resources;
 
 use PhpSlides\view;
-use PhpSlides\Route;
 use PhpSlides\MapRoute;
 use PhpSlides\Exception;
 use PhpSlides\Http\Request;
@@ -41,7 +40,7 @@ trait RouteResources
 	 */
 	protected static string $request_uri;
 
-	protected static function __map(): void
+	protected static function __map (): void
 	{
 		$route = self::$map['route'];
 		$method = self::$map['method'];
@@ -50,26 +49,31 @@ trait RouteResources
 		$match = new MapRoute();
 		self::$map_info = $match->match($method, $route);
 
-		if (self::$map_info) {
-			if (self::$middleware !== null) {
+		if (self::$map_info)
+		{
+			if (self::$middleware !== null)
+			{
 				$static->__middleware();
 			}
 
-			if (self::$use !== null) {
+			if (self::$use !== null)
+			{
 				$static->__use();
 			}
 
-			if (self::$file !== null) {
+			if (self::$file !== null)
+			{
 				$static->__file();
 			}
 
-			if (self::$action !== null) {
+			if (self::$action !== null)
+			{
 				$static->__action();
 			}
 		}
 	}
 
-	protected static function __any(?Request $request = null): void
+	protected static function __any (?Request $request = null): void
 	{
 		$route = self::$any['route'];
 		$method = self::$any['method'];
@@ -86,15 +90,16 @@ trait RouteResources
 		 * --------------------------------------------------------------
 		 */
 
-		if ((is_array($route) && in_array('*', $route)) || $route === '*') {
+		if ((is_array($route) && in_array('*', $route)) || $route === '*')
+		{
 			header('HTTP/1.0 404 Not Found');
 			header('Content-Type: text/html');
 
 			$GLOBALS['request'] = $request;
 			print_r(
-				is_callable($callback)
-					? $callback($request ?? new Request())
-					: $callback
+			 is_callable($callback)
+			  ? $callback($request ?? new Request())
+			  : $callback
 			);
 			self::log();
 			exit();
@@ -108,12 +113,14 @@ trait RouteResources
 		$paramKey = [];
 
 		// finding if there is any {?} parameter in $route
-		if (is_string($route)) {
+		if (is_string($route))
+		{
 			preg_match_all('/(?<={).+?(?=})/', $route, $paramMatches);
 		}
 
 		// if the route does not contain any param call routing();
-		if (empty($paramMatches[0]) || is_array($route)) {
+		if (empty($paramMatches[0]) || is_array($route))
+		{
 			/**
 			 *   ------------------------------------------------------
 			 *   Check if $callback is a callable function
@@ -123,37 +130,44 @@ trait RouteResources
 			 */
 			$callback = self::routing($route, $callback, $method);
 
-			if ($callback) {
+			if ($callback)
+			{
 				$GLOBALS['request'] = null;
 
 				if (
-					is_array($callback) &&
-					(preg_match('/(Controller)/', $callback[0], $matches) &&
-						count($matches) > 1)
-				) {
+				is_array($callback) &&
+				(preg_match('/(Controller)/', $callback[0], $matches) &&
+				count($matches) > 1)
+				)
+				{
 					print_r(
-						self::controller(
-							$callback[0],
-							count($callback) > 1 ? $callback[1] : ''
-						)
+					 self::controller(
+					  $callback[0],
+					  count($callback) > 1 ? $callback[1] : ''
+					 )
 					);
-				} else {
+				}
+				else
+				{
 					print_r(
-						is_callable($callback)
-							? $callback($request ?? new Request())
-							: $callback
+					 is_callable($callback)
+					  ? $callback($request ?? new Request())
+					  : $callback
 					);
 				}
 
 				self::log();
 				exit();
-			} else {
+			}
+			else
+			{
 				return;
 			}
 		}
 
 		// setting parameters names
-		foreach ($paramMatches[0] as $key) {
+		foreach ($paramMatches[0] as $key)
+		{
 			$paramKey[] = $key;
 		}
 
@@ -164,12 +178,15 @@ trait RouteResources
 		 *   ----------------------------------------------
 		 */
 
-		if (!empty(self::$request_uri)) {
+		if (!empty(self::$request_uri))
+		{
 			$route = strtolower(preg_replace("/(^\/)|(\/$)/", '', $route));
 			$reqUri = strtolower(
-				preg_replace("/(^\/)|(\/$)/", '', self::$request_uri)
+			 preg_replace("/(^\/)|(\/$)/", '', self::$request_uri)
 			);
-		} else {
+		}
+		else
+		{
 			$reqUri = '/';
 		}
 
@@ -180,8 +197,10 @@ trait RouteResources
 		$indexNum = [];
 
 		// storing index number, where {?} parameter is required with the help of regex
-		foreach ($uri as $index => $param) {
-			if (preg_match('/{.*}/', $param)) {
+		foreach ($uri as $index => $param)
+		{
+			if (preg_match('/{.*}/', $param))
+			{
 				$indexNum[] = $index;
 			}
 		}
@@ -198,21 +217,23 @@ trait RouteResources
 		 *   Running for each loop to set the exact index number with reg expression this will help in matching route
 		 *   ----------------------------------------------------------------------------------
 		 */
-		foreach ($indexNum as $key => $index) {
+		foreach ($indexNum as $key => $index)
+		{
 			/**
 			 *   --------------------------------------------------------------------------------
 			 *   In case if req uri with param index is empty then return because URL is not valid for this route
 			 *   --------------------------------------------------------------------------------
 			 */
 
-			if (empty($reqUri[$index])) {
+			if (empty($reqUri[$index]))
+			{
 				return;
 			}
 
 			// setting params with params names
 			$req[$paramKey[$key]] = htmlspecialchars(
-				$reqUri[$index],
-				ENT_NOQUOTES
+			 $reqUri[$index],
+			 ENT_NOQUOTES
 			);
 			$req_value[] = htmlspecialchars($reqUri[$index], ENT_NOQUOTES);
 
@@ -232,18 +253,21 @@ trait RouteResources
 		$reqUri = str_replace('/', '\\/', $reqUri);
 
 		// now matching route with regex
-		if (preg_match("/$reqUri/", $route)) {
+		if (preg_match("/$reqUri/", $route))
+		{
 			// checks if the requested method is of the given route
 			if (
-				strtoupper($_SERVER['REQUEST_METHOD']) !== strtoupper($method) &&
-				$method !== '*'
-			) {
+			strtoupper($_SERVER['REQUEST_METHOD']) !== strtoupper($method) &&
+			$method !== '*'
+			)
+			{
 				http_response_code(405);
 				self::log();
 				exit('Method Not Allowed');
 			}
 
-			if (self::$middleware !== null) {
+			if (self::$middleware !== null)
+			{
 				(new static())->__middleware();
 			}
 
@@ -251,21 +275,24 @@ trait RouteResources
 			header('Content-Type: text/html');
 
 			if (
-				is_array($callback) &&
-				(preg_match('/(Controller)/', $callback[0], $matches) &&
-					count($matches) > 1)
-			) {
+			is_array($callback) &&
+			(preg_match('/(Controller)/', $callback[0], $matches) &&
+			count($matches) > 1)
+			)
+			{
 				print_r(
-					self::controller(
-						$callback[0],
-						count($callback) > 1 ? $callback[1] : '',
-						$req
-					)
+				 self::controller(
+				  $callback[0],
+				  count($callback) > 1 ? $callback[1] : '',
+				  $req
+				 )
 				);
-			} else {
+			}
+			else
+			{
 				$GLOBALS['params'] = $req;
 				print_r(
-					is_callable($callback) ? $callback(new Request($req)) : $callback
+				 is_callable($callback) ? $callback(new Request($req)) : $callback
 				);
 			}
 
@@ -274,22 +301,26 @@ trait RouteResources
 		}
 	}
 
-	protected static function __redirect(): void
+	protected static function __redirect (): void
 	{
 		$route = self::$redirect['route'];
 		$new_url = self::$redirect['new_url'];
 		$code = self::$redirect['code'];
 
-		if (!empty(self::$request_uri)) {
+		if (!empty(self::$request_uri))
+		{
 			$route = preg_replace("/(^\/)|(\/$)/", '', $route);
 			$new_url = preg_replace("/(^\/)|(\/$)/", '', $new_url);
 			$reqUri = preg_replace("/(^\/)|(\/$)/", '', self::$request_uri);
-		} else {
+		}
+		else
+		{
 			$reqUri = '/';
 			$new_url = preg_replace("/(^\/)|(\/$)/", '', $new_url);
 		}
 
-		if (strtolower($reqUri) === strtolower($route)) {
+		if (strtolower($reqUri) === strtolower($route))
+		{
 			http_response_code($code);
 			self::log();
 			header("Location: $new_url", true, $code);
@@ -297,7 +328,7 @@ trait RouteResources
 		}
 	}
 
-	protected static function __method(?Request $request = null): void
+	protected static function __method (?Request $request = null): void
 	{
 		self::$any['route'] = self::$method['route'];
 		self::$any['method'] = self::$method['method'];
@@ -306,7 +337,7 @@ trait RouteResources
 		self::__any($request);
 	}
 
-	protected static function __view(?Request $request = null): void
+	protected static function __view (?Request $request = null): void
 	{
 		$route = self::$view['route'];
 		$view = self::$view['view'];
@@ -320,26 +351,33 @@ trait RouteResources
 		$uri = [];
 		$str_route = '';
 		$reqUri = strtolower(
-			preg_replace("/(^\/)|(\/$)/", '', self::$request_uri)
+		 preg_replace("/(^\/)|(\/$)/", '', self::$request_uri)
 		);
 
-		if (is_array($route)) {
-			for ($i = 0; $i < count($route); $i++) {
+		if (is_array($route))
+		{
+			for ($i = 0; $i < count($route); $i++)
+			{
 				$each_route = preg_replace("/(^\/)|(\/$)/", '', $route[$i]);
 				array_push($uri, strtolower($each_route));
 			}
-		} else {
+		}
+		else
+		{
 			$str_route = strtolower(preg_replace("/(^\/)|(\/$)/", '', $route));
 		}
 
-		if (in_array($reqUri, $uri) || $reqUri === $str_route) {
-			if (strtoupper($_SERVER['REQUEST_METHOD']) !== 'GET') {
+		if (in_array($reqUri, $uri) || $reqUri === $str_route)
+		{
+			if (strtoupper($_SERVER['REQUEST_METHOD']) !== 'GET')
+			{
 				http_response_code(405);
 				self::log();
 				exit('Method Not Allowed');
 			}
 
-			if (self::$middleware !== null) {
+			if (self::$middleware !== null)
+			{
 				(new static())->__middleware();
 			}
 
@@ -351,7 +389,7 @@ trait RouteResources
 		}
 	}
 
-	protected function __middleware(): void
+	protected function __middleware (): void
 	{
 		$use = self::$use;
 		$file = self::$file;
@@ -366,77 +404,95 @@ trait RouteResources
 		$params = self::$map_info['params'] ?? null;
 		$request = new Request($params);
 
-		for ($i = 0; $i < count((array) $middleware); $i++) {
+		for ($i = 0; $i < count((array) $middleware); $i++)
+		{
 			$middlewares = (new FileLoader())
-				->load(__DIR__ . '/../../Config/middleware.php')
-				->getLoad();
+			 ->load(__DIR__ . '/../../Config/middleware.php')
+			 ->getLoad();
 
-			if (array_key_exists($middleware[$i], $middlewares)) {
+			if (array_key_exists($middleware[$i], $middlewares))
+			{
 				$middleware = $middlewares[$middleware[$i]];
-			} else {
+			}
+			else
+			{
 				self::log();
 				throw new Exception(
-					'No Registered Middleware as `' . $middleware[$i] . '`'
+				 'No Registered Middleware as `' . $middleware[$i] . '`'
 				);
 			}
 
-			if (!class_exists($middleware)) {
+			if (!class_exists($middleware))
+			{
 				self::log();
 				throw new Exception(
-					"Middleware class does not exist: `{$middleware}`"
+				 "Middleware class does not exist: `{$middleware}`"
 				);
 			}
 
 			$mw = new $middleware();
-			if ($mw instanceof MiddlewareInterface) {
-				$next = function (Request $req) use (
-					$any,
-					$use,
-					$file,
-					$action,
-					$view,
-					$method
-				) {
-					if ($use !== null) {
+			if ($mw instanceof MiddlewareInterface)
+			{
+				$next = function (Request $req) use ($any, $use, $file, $action, $view, $method)
+				{
+					if ($use !== null)
+					{
 						self::__use($req);
-					} elseif ($any !== null) {
+					}
+					elseif ($any !== null)
+					{
 						self::__any($req);
-					} elseif ($file !== null) {
+					}
+					elseif ($file !== null)
+					{
 						self::__file($req);
-					} elseif ($action !== null) {
+					}
+					elseif ($action !== null)
+					{
 						self::__action($req);
-					} elseif ($view !== null) {
+					}
+					elseif ($view !== null)
+					{
 						self::__view($req);
-					} elseif ($method !== null) {
+					}
+					elseif ($method !== null)
+					{
 						self::__method($req);
-					} else {
+					}
+					else
+					{
 						self::log();
 						throw new Exception('Cannot use middleware with this method');
 					}
 				};
 				$response = $mw->handle($request, $next);
-			} else {
+			}
+			else
+			{
 				self::log();
 				throw new Exception(
-					'Middleware class must implements `MiddlewareInterface`'
+				 'Middleware class must implements `MiddlewareInterface`'
 				);
 			}
 		}
-		if (!empty($response)) {
+		if (!empty($response))
+		{
 			print_r($response);
 			self::log();
 			exit();
 		}
 	}
 
-	protected function __file(?Request $request = null): void
+	protected function __file (?Request $request = null): void
 	{
 		$file = self::$file;
 
-		if (array_key_exists('params', self::$map_info)) {
+		if (array_key_exists('params', self::$map_info))
+		{
 			$GLOBALS['params'] = self::$map_info['params'];
 		}
-		if ($request) {
+		if ($request)
+		{
 			$GLOBALS['request'] = $request;
 		}
 
@@ -445,28 +501,32 @@ trait RouteResources
 		exit();
 	}
 
-	protected function __use(?Request $request = null): void
+	protected function __use (?Request $request = null): void
 	{
 		$controller = self::$use;
 		header('Content-Type: text/html');
 
-		if (!preg_match('/(?=.*Controller)(?=.*::)/', $controller)) {
+		if (!preg_match('/(?=.*Controller)(?=.*::)/', $controller))
+		{
 			self::log();
 			throw new Exception(
-				'Parameter $controller must match Controller named rule.'
+			 'Parameter $controller must match Controller named rule.'
 			);
 		}
 
-		[$c_name, $c_method] = explode('::', $controller);
+		[ $c_name, $c_method ] = explode('::', $controller);
 
 		$cc = 'App\\Controller\\' . $c_name;
 
-		if (class_exists($cc)) {
+		if (class_exists($cc))
+		{
 			$params = self::$map_info['params'];
 
 			$cc = new $cc();
 			print_r($cc->$c_method($request ?? new Request($params)));
-		} else {
+		}
+		else
+		{
 			self::log();
 			throw new Exception("No class controller found as: '$cc'");
 		}
@@ -475,19 +535,24 @@ trait RouteResources
 		exit();
 	}
 
-	protected function __action(?Request $request = null): void
+	protected function __action (?Request $request = null): void
 	{
 		$action = self::$action;
 		$params = self::$map_info['params'];
 		header('Content-Type: text/html');
 
-		if (is_callable($action)) {
+		if (is_callable($action))
+		{
 			$a = $action($request ?? new Request($params));
 			print_r($a);
-		} elseif (preg_match('/(?=.*Controller)(?=.*::)/', $action)) {
+		}
+		elseif (preg_match('/(?=.*Controller)(?=.*::)/', $action))
+		{
 			self::$use = $action;
 			$this->__use($request);
-		} else {
+		}
+		else
+		{
 			$GLOBALS['params'] = $params;
 			$GLOBALS['request'] = $request;
 			print_r($action);

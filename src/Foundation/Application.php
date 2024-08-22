@@ -75,18 +75,21 @@ class Application implements ApplicationInterface
 	 * @param string $basePath The base path of the application.
 	 * @return self Returns an instance of the Application class.
 	 */
-	public static function configure(string $basePath): self
+	public static function configure (string $basePath): self
 	{
 		self::$basePath = rtrim($basePath, '/') . '/';
 		self::routing();
 
-		if (php_sapi_name() == 'cli-server') {
+		if (php_sapi_name() == 'cli-server')
+		{
 			self::$request_uri = urldecode(
-				parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)
+			 parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)
 			);
-		} else {
+		}
+		else
+		{
 			self::$request_uri = urldecode(
-				$_REQUEST['uri'] ?? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)
+			 $_REQUEST['uri'] ?? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)
 			);
 		}
 
@@ -98,7 +101,7 @@ class Application implements ApplicationInterface
 	 *
 	 * @return void
 	 */
-	private static function routing(): void
+	private static function routing (): void
 	{
 		self::$configsDir = self::$basePath . 'src/configs/';
 		self::$viewsDir = self::$basePath . 'src/resources/views/';
@@ -112,7 +115,7 @@ class Application implements ApplicationInterface
 	 *
 	 * @return void
 	 */
-	public function create(): void
+	public function create (): void
 	{
 		session_start();
 		$loader = new FileLoader();
@@ -123,7 +126,7 @@ class Application implements ApplicationInterface
 		Route::config();
 
 		$loader
-			->load(__DIR__ . '/../Globals/Functions.php')
-			->load(self::$renderRoutePath);
+		 ->load(__DIR__ . '/../Globals/Functions.php')
+		 ->load(self::$renderRoutePath);
 	}
 }
