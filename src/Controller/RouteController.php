@@ -122,8 +122,10 @@ class RouteController
 	 *    |    --------------------
 	 *    ==============================
 	 */
-	protected static function class_info(array $class_info, array|null $param)
-	{
+	protected static function class_info(
+		array $class_info,
+		array|null $param
+	) {
 		$method = $class_info['method'];
 		$class_name = $class_info['class_name'];
 		$class_methods = $class_info['class_methods'];
