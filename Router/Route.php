@@ -142,7 +142,7 @@ class Route extends Controller implements RouteInterface
 		$file_type = $file ? self::file_type($dir . '/public/' . $req) : null;
 		$config_file = self::config_file();
 
-		$charset = $config_file['charset'];
+		$charset = $config_file['charset'] ?? 'UTF-8';
 
 		/**
 		 *   ----------------------------------------------
@@ -150,7 +150,7 @@ class Route extends Controller implements RouteInterface
 		 *   ----------------------------------------------
 		 */
 		if (!empty($config_file) && $file_type != null) {
-			$config = $config_file['public'];
+			$config = $config_file['public'] ?? [];
 			$accept = true;
 
 			// loop over the requested URL folders

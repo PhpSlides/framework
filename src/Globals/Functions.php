@@ -59,7 +59,7 @@ function route(
 	string|null $name = null,
 	array|null $param = null
 ): array|object|string {
-	$routes = $GLOBALS['__routes'];
+	$routes = $GLOBALS['__routes'] ?? [];
 
 	if ($name === null) {
 		$route_class = new stdClass();
