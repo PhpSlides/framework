@@ -25,7 +25,7 @@ class MapRoute extends Controller implements MapInterface
 	public function match(string $method, string|array $route): bool|array
 	{
 		$config_file = self::config_file();
-		self::$charset = $config_file['charset'];
+		self::$charset = $config_file['charset'] ?? 'UTF-8';
 		self::$method = explode('|', $method);
 		/**
 		 *   ----------------------------------------------
