@@ -25,7 +25,7 @@ final class Render extends Controller
 	public static function WebRoute ()
 	{
 		self::Load();
-		$reg_route = $GLOBALS['__registered_routes'] ?? null;
+		$reg_route = $GLOBALS['__registered_routes'] ?? [];
 
 		foreach ($reg_route as $route)
 		{
@@ -70,7 +70,7 @@ final class Render extends Controller
 	{
 		self::Load();
 		$static = new static();
-		$reg_route = $GLOBALS['__registered_api_routes'] ?? null;
+		$reg_route = $GLOBALS['__registered_api_routes'] ?? [];
 
 		foreach ($reg_route as $route)
 		{
