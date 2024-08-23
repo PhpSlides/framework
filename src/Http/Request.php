@@ -3,6 +3,7 @@
 namespace PhpSlides\Http;
 
 use stdClass;
+use PhpSlides\Formatter\Validate;
 use PhpSlides\Foundation\Application;
 use PhpSlides\Http\Auth\Authentication;
 use PhpSlides\Http\Interface\RequestInterface;
@@ -15,6 +16,7 @@ use PhpSlides\Http\Interface\RequestInterface;
 class Request extends Application implements RequestInterface
 {
 	use Authentication;
+	use Validate;
 
 	/**
 	 * @var ?array The URL parameters.
@@ -30,6 +32,7 @@ class Request extends Application implements RequestInterface
 	{
 		$this->param = $urlParam;
 	}
+
 
 	/**
 	 * Returns URL parameters as an object.
@@ -62,7 +65,7 @@ class Request extends Application implements RequestInterface
 		{
 			$p = mb_split('=', $parsed[$i]);
 			$key = $p[0];
-			$value = $p[1] ? trim(htmlspecialchars($p[1], ENT_NOQUOTES)) : null;
+			$value = $p[1] ? $this->validate($p[1]) : null;
 
 			$cl->$key = $value;
 			$i++;
@@ -83,11 +86,11 @@ class Request extends Application implements RequestInterface
 
 		if (!$name)
 		{
-			return array_map('htmlspecialchars', $headers);
+			return array_map([ $this, 'validate' ], $headers);
 		}
 		if (isset($headers[$name]))
 		{
-			return trim(htmlspecialchars($headers[$name], ENT_NOQUOTES));
+			return $this->validate($headers[$name]);
 		}
 		else
 		{
@@ -127,14 +130,14 @@ class Request extends Application implements RequestInterface
 
 		if ($name !== null)
 		{
-			return trim(htmlspecialchars($data[$name], ENT_NOQUOTES));
+			return $this->validate($data[$name]);
 		}
 
 		$res = [];
 		foreach ($data as $key => $value)
 		{
-			$key = trim(htmlspecialchars($key, ENT_NOQUOTES));
-			$value = trim(htmlspecialchars($value, ENT_NOQUOTES));
+			$key = $this->validate($key);
+			$value = $this->validate($value);
 
 			$res[$key] = $value;
 		}
@@ -152,14 +155,14 @@ class Request extends Application implements RequestInterface
 	{
 		if (!$key)
 		{
-			return array_map('htmlspecialchars', $_GET);
+			return array_map([ $this, 'validate' ], $_GET);
 		}
 		if (!isset($_GET[$key]))
 		{
 			return null;
 		}
 
-		$data = trim(htmlspecialchars($_GET[$key], ENT_NOQUOTES));
+		$data = $this->validate($_GET[$key]);
 		return $data;
 	}
 
@@ -174,14 +177,14 @@ class Request extends Application implements RequestInterface
 	{
 		if (!$key)
 		{
-			return array_map('htmlspecialchars', $_POST);
+			return array_map([ $this, 'validate' ], $_POST);
 		}
 		if (!isset($_POST[$key]))
 		{
 			return null;
 		}
 
-		$data = trim(htmlspecialchars($_POST[$key], ENT_NOQUOTES));
+		$data = $this->validate($_POST[$key]);
 		return $data;
 	}
 
@@ -196,14 +199,14 @@ class Request extends Application implements RequestInterface
 	{
 		if (!$key)
 		{
-			return array_map('htmlspecialchars', $_REQUEST);
+			return array_map([ $this, 'validate' ], $_REQUEST);
 		}
 		if (!isset($_REQUEST[$key]))
 		{
 			return null;
 		}
 
-		$data = trim(htmlspecialchars($_REQUEST[$key], ENT_NOQUOTES));
+		$data = $this->validate($_REQUEST[$key]);
 		return $data;
 	}
 
@@ -241,9 +244,7 @@ class Request extends Application implements RequestInterface
 		{
 			return (object) $_COOKIE;
 		}
-		return isset($_COOKIE[$key])
-		 ? trim(htmlspecialchars($_COOKIE[$key], ENT_NOQUOTES))
-		 : null;
+		return isset($_COOKIE[$key]) ? $this->validate($_COOKIE[$key]) : null;
 	}
 
 	/**
@@ -259,9 +260,7 @@ class Request extends Application implements RequestInterface
 		{
 			return (object) $_SESSION;
 		}
-		return isset($_SESSION[$key])
-		 ? trim(htmlspecialchars($_SESSION[$key], ENT_NOQUOTES))
-		 : null;
+		return isset($_SESSION[$key]) ? $this->validate($_SESSION[$key]) : null;
 	}
 
 	/**
@@ -307,7 +306,7 @@ class Request extends Application implements RequestInterface
 	 */
 	public function ip (): string
 	{
-		return trim(htmlspecialchars($_SERVER['REMOTE_ADDR'], ENT_NOQUOTES));
+		return $this->validate($_SERVER['REMOTE_ADDR']);
 	}
 
 	/**
@@ -317,7 +316,7 @@ class Request extends Application implements RequestInterface
 	 */
 	public function userAgent (): string
 	{
-		return htmlspecialchars($_SERVER['HTTP_USER_AGENT'], ENT_NOQUOTES);
+		return $this->validate($_SERVER['HTTP_USER_AGENT']);
 	}
 
 	/**
@@ -339,7 +338,7 @@ class Request extends Application implements RequestInterface
 	public function referrer (): ?string
 	{
 		return isset($_SERVER['HTTP_REFERER'])
-		 ? trim(htmlspecialchars($_SERVER['HTTP_REFERER'], ENT_NOQUOTES))
+		 ? $this->validate($_SERVER['HTTP_REFERER'])
 		 : null;
 	}
 
@@ -350,7 +349,7 @@ class Request extends Application implements RequestInterface
 	 */
 	public function protocol (): string
 	{
-		return trim(htmlspecialchars($_SERVER['SERVER_PROTOCOL']));
+		return $this->validate($_SERVER['SERVER_PROTOCOL']);
 	}
 
 	/**
@@ -361,7 +360,7 @@ class Request extends Application implements RequestInterface
 	public function all (): array
 	{
 		$data = array_merge($_GET, $_POST, $this->body() ?? []);
-		return array_map('htmlspecialchars', $data);
+		return array_map([ $this, 'validate' ], $data);
 	}
 
 	/**
@@ -375,11 +374,9 @@ class Request extends Application implements RequestInterface
 	{
 		if (!$key)
 		{
-			return (object) array_map('htmlspecialchars', $_SERVER);
+			return (object) array_map([ $this, 'validate' ], $_SERVER);
 		}
-		return isset($_SERVER[$key])
-		 ? trim(htmlspecialchars($_SERVER[$key], ENT_NOQUOTES))
-		 : null;
+		return isset($_SERVER[$key]) ? $this->validate($_SERVER[$key]) : null;
 	}
 
 	/**
