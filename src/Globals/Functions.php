@@ -226,8 +226,8 @@ function ExceptionHandler(Throwable $exception)
 		(new FileLoader())->load(__DIR__ . '/Chunks/trace.php');
 
 		$trace = filterTrace($exception->getTrace());
-		$file = $trace[0]['file'];
-		$line = $trace[0]['line'];
+		$file = $trace[0]['file'] ?? '';
+		$line = $trace[0]['line'] ?? 0;
 
 		$codeSnippet = getCodeSnippet($file, $line, 10, 10);
 		$detailedMessage = sprintf(

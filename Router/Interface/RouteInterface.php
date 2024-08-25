@@ -114,6 +114,14 @@ interface RouteInterface
 	public function file(string $file): self;
 
 	/**
+	 * Applies Authentication Guard to the current route.
+	 *
+	 * @param string ...$guards String parameters of registered guards.
+	 * @return self
+	 */
+	public function withGuard(string ...$guards): self;
+
+	/**
 	 *   ---------------------------------------------------------------------------
 	 *
 	 *   VIEW ROUTE METHOD

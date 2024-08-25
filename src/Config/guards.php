@@ -4,5 +4,5 @@ use PhpSlides\Loader\FileLoader;
 use PhpSlides\Foundation\Application;
 
 return (new FileLoader())
-	->safeLoad(Application::$configsDir . 'middleware.php')
+	->safeLoad(Application::$configsDir . 'guards.php')
 	->getLoad() ?: [];

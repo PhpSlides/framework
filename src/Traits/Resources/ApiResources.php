@@ -6,8 +6,6 @@ use PhpSlides\MapRoute;
 use PhpSlides\Exception;
 use PhpSlides\Http\Request;
 use PhpSlides\Loader\FileLoader;
-use PhpSlides\Http\Interface\ApiController;
-use PhpSlides\Interface\MiddlewareInterface;
 
 trait ApiResources
 {
@@ -16,8 +14,6 @@ trait ApiResources
 	protected static ?array $route = null;
 
 	protected static ?array $apiMap = null;
-
-	protected static ?array $apiMiddleware = null;
 
 	protected function __route(): void
 	{
@@ -28,9 +24,7 @@ trait ApiResources
 		);
 
 		if (self::$map_info) {
-			if (self::$apiMiddleware !== null) {
-				$this->__api_middleware();
-			}
+			self::__api_guards(self::$route['guards'] ?? null);
 
 			print_r(self::__routeSelection());
 			exit();
@@ -101,74 +95,56 @@ trait ApiResources
 		}
 
 		EXECUTE:
-		if ($cc instanceof ApiController) {
-			if ($request === null) {
-				$request = new Request($params);
-			}
-
-			if (method_exists($cc, $r_method)) {
-				$response = $cc->$r_method($request);
-			}
-
-			$r_method = 'error';
-			$response = !$response ? $cc->$r_method($request) : $response;
-
-			self::log();
-			return $response;
-		} else {
-			throw new Exception(
-				'Api controller class must implements `ApiController`'
-			);
+		if ($request === null) {
+			$request = new Request($params);
 		}
+
+		if (method_exists($cc, $r_method)) {
+			$response = $cc->$r_method($request);
+		}
+
+		$r_method = 'error';
+		$response = !$response ? $cc->$r_method($request) : $response;
+
+		self::log();
+		return $response;
 	}
 
-	protected function __api_middleware(): void
+	protected function __api_guards(?array $guards): bool
 	{
-		$middleware = self::$apiMiddleware ?? [];
-		$response = '';
+		if (!$guards) {
+			return true;
+		}
 
 		$params = self::$map_info['params'] ?? null;
 		$request = new Request($params);
 
-		for ($i = 0; $i < count((array) $middleware); $i++) {
-			$middlewares = (new FileLoader())
-				->load(__DIR__ . '/../../Config/middleware.php')
+		for ($i = 0; $i < count((array) $guards); $i++) {
+			$registered_guards = (new FileLoader())
+				->load(__DIR__ . '/../../Config/guards.php')
 				->getLoad();
 
-			if (array_key_exists($middleware[$i], $middlewares)) {
-				$middleware = $middlewares[$middleware[$i]];
+			if (array_key_exists($guards[$i], $registered_guards)) {
+				$guard = $registered_guards[$guards[$i]];
 			} else {
 				self::log();
 				throw new Exception(
-					'No Registered Middleware as `' . $middleware[$i] . '`'
+					'No Registered AuthGuard as `' . $guards[$i] . '`'
 				);
 			}
 
-			if (!class_exists($middleware)) {
+			if (!class_exists($guard)) {
 				self::log();
-				throw new Exception(
-					"Middleware class does not exist: `{$middleware}`"
-				);
+				throw new Exception("AuthGuard class does not exist: `{$guard}`");
 			}
-			$mw = new $middleware();
+			$cl = new $guard($request);
 
-			if ($mw instanceof MiddlewareInterface) {
-				$next = function (Request $request) {
-					return $this->__routeSelection($request);
-				};
-
-				$response = $mw->handle($request, $next);
-			} else {
+			if ($cl->authorize() !== true) {
 				self::log();
-				throw new Exception(
-					'Middleware class must implements `MiddlewareInterface`'
-				);
+				exit();
 			}
 		}
-
-		print_r($response);
-		self::log();
-		exit();
+			return true;
 	}
 
 	protected function __api_map(?Request $request = null): void
@@ -178,8 +154,9 @@ trait ApiResources
 		$controller = $map['controller'] ?? '';
 
 		foreach ($map as $route => $method) {
-			$r_method = $method[0];
-			$c_method = $method[1];
+			$r_method = $method[0] ?? 'GET';
+			$c_method = $method[1] ?? '';
+			$guards = $method[2] ?? null;
 			$url = $base_url . trim($route, '/');
 
 			self::$apiMap = [
@@ -192,9 +169,7 @@ trait ApiResources
 			self::$map_info = $match->match($r_method, $url);
 
 			if (self::$map_info) {
-				if (self::$apiMiddleware !== null) {
-					$this->__api_middleware();
-				}
+				$this->__api_guards($guards);
 
 				print_r(self::__routeSelection());
 				exit();

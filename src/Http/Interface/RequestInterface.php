@@ -31,9 +31,9 @@ interface RequestInterface
 	 * Retrieves headers from the request.
 	 *
 	 * @param ?string $name Optional header name to retrieve a specific header.
-	 * @return array|string|false The headers, or a specific header value if $name is provided.
+	 * @return mixed The headers, or a specific header value if $name is provided.
 	 */
-	public function headers(?string $name = null): array|string|false;
+	public function headers(?string $name = null): mixed;
 
 	/**
 	 * Retrieves authentication credentials from the request.
@@ -47,36 +47,36 @@ interface RequestInterface
 	 * Parses and returns the body of the request as an associative array.
 	 *
 	 * @param ?string $name The particular request body to get
-	 * @return array|string|null The request body data, or null if parsing fails.
+	 * @return mixed The request body data, or null if parsing fails.
 	 */
-	public function body(?string $name = null): array|string|null;
+	public function body(?string $name = null): mixed;
 
 	/**
 	 * Retrieves a GET parameter by key.
 	 * And if no parameter is provided, returns all key and values in pairs
 	 *
 	 * @param ?string $key The key of the GET parameter.
-	 * @return string|array|null The parameter value, or null if not set.
+	 * @return mixed The parameter value, or null if not set.
 	 */
-	public function get(?string $key = null): string|array|null;
+	public function get(?string $key = null): mixed;
 
 	/**
 	 * Retrieves a POST parameter by key.
 	 * And if no parameter is provided, returns all key and values in pairs
 	 *
 	 * @param string $key The key of the POST parameter.
-	 * @return string|array|null The parameter values, or null if not set.
+	 * @return mixed The parameter values, or null if not set.
 	 */
-	public function post(?string $key = null): string|array|null;
+	public function post(?string $key = null): mixed;
 
 	/**
 	 * Retrieves a request parameter by key from all input sources.
 	 * And if no parameter is provided, returns all key and values in pairs
 	 *
 	 * @param ?string $key The key of the request parameter.
-	 * @return string|array|null The parameter value, or null if not set.
+	 * @return mixed The parameter value, or null if not set.
 	 */
-	public function request(?string $key = null): string|array|null;
+	public function request(?string $key = null): mixed;
 
 	/**
 	 * Retrieves file data from the request by name.
@@ -90,17 +90,17 @@ interface RequestInterface
 	 * Retrieves a cookie value by key, or all cookies if no key is provided.
 	 *
 	 * @param ?string $key Optional cookie key.
-	 * @return string|object|null The cookie value, all cookies as an object, or null if key is provided but not found.
+	 * @return mixed The cookie value, all cookies as an object, or null if key is provided but not found.
 	 */
-	public function cookie(?string $key = null): string|object|null;
+	public function cookie(?string $key = null): mixed;
 
 	/**
 	 * Retrieves a session value by key, or all session if no key is provided.
 	 *
 	 * @param ?string $key Optional cookie key.
-	 * @return string|object|null The cookie value, all cookies as an object, or null if key is provided but not found.
+	 * @return mixed The cookie value, all cookies as an object, or null if key is provided but not found.
 	 */
-	public function session(?string $key = null): string|object|null;
+	public function session(?string $key = null): mixed;
 
 	/**
 	 * Retrieves the HTTP method used for the request.
@@ -170,9 +170,9 @@ interface RequestInterface
 	 * And if no parameter is provided, it returns all the keys and values in pairs
 	 *
 	 * @param string $key The key of the server parameter.
-	 * @return object|string|null The server parameter value, or null if not set.
+	 * @return mixed The server parameter value, or null if not set.
 	 */
-	public function server(?string $key = null): object|string|null;
+	public function server(?string $key = null): mixed;
 
 	/**
 	 * Checks if the request method matches a given method.

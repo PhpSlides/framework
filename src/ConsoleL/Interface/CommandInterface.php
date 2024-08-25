@@ -16,11 +16,10 @@ interface CommandInterface
 		string $baseDir
 	): void;
 
-	public static function makeMiddleware(
+	public static function makeAuthGuard(
 		array $arguments,
 		string $baseDir
 	): void;
-	
-	
+
 	public static function generateSecretKey(array $arguments): void;
 }
