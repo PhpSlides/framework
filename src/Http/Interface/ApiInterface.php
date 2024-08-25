@@ -5,25 +5,12 @@ namespace PhpSlides\Http\Interface;
 interface ApiInterface
 {
 	/**
-	 * Handles static method calls to set the API version dynamically.
-	 * 
-	 * @param string $method The method name which starts with 'v' followed by the version number. Use `_` in place of `.`
-	 * @param mixed $args The arguments for the method (not used).
-	 * 
-	 * @throws \Exception
-	 * @return self
-	 */
-	public static function __callStatic($method, $args): self;
-
-
-	/**
 	 * Assigns a name to the last registered route for easier reference.
-	 * 
+	 *
 	 * @param string $name The name to assign to the route.
 	 * @return self
 	 */
 	public function name(string $name): self;
-
 
 	/**
 	 * Defines a new route with a URL and a controller.
@@ -40,41 +27,31 @@ interface ApiInterface
 		?string $req_method = null
 	): self;
 
-
 	/**
-	 * Applies middleware to the current route.
-	 * 
-	 * @param array $middleware An array of middleware classes.
+	 * Applies Authentication Guard to the current route.
+	 *
+	 * @param ?string ...$guards String parameters of registered guards.
 	 * @return self
 	 */
-	public function middleware(array $middleware): self;
-
+	public function withGuard(?string ...$guards): self;
 
 	/**
 	 * Defines a base URL and controller for subsequent route mappings.
-	 * 
+	 *
 	 * @param string $url The base URL for the routes.
 	 * @param string $controller The controller handling the routes.
 	 * @return self
 	 */
 	public function define(string $url, string $controller): self;
 
-
 	/**
 	 * Maps multiple HTTP methods to a URL with their corresponding controller methods.
-	 * 
+	 *
 	 * @param array An associative array where the key is the route and the value is an array with the HTTP method and controller method.
 	 * @return self
 	 */
 	public function map(array $rest_url): self;
 
-
-	/**
-	 * Automatically handles middleware, route, and map finalization when the object is destroyed.
-	 */
-	public function __destruct();
-
-	 
 	public static function v1(): self;
 	public static function v1_0(): self;
 	public static function v1_1(): self;

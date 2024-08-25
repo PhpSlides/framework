@@ -1,10 +1,10 @@
 Usage: php slide [command] [options] [...args]
 
 Commands:
-  serve                       Run and serve the PhpSlides project in development mode.
+  serve                                 Run and serve the PhpSlides project in development mode.
   make:controller [name] <options>      Create a route controller class.
   make:api-controller [name] <options>  Create an API controller class.
-  make:middleware [name] <options>      Create a middleware class.
+  make:auth-guard [name] <options>      Create an AuthGuard class.
   generate:secret-key <length>          Generate a random bytes of string used for JWT secret keys for generating tokens.
   -h, --help                            Show this help message and exit.
 
@@ -18,8 +18,8 @@ Examples:
   php slide make:api-controller Product
      Creates an API controller class named `ProductController`.
 
-  php slide make:middleware Auth
-     Creates a middleware class named `AuthMiddleware`.
+  php slide make:auth-guard Token
+     Creates an AuthGuard class named `TokenGuard`.
 
   php slide generate:secret-key 20
      It creates 20 random characters for secret keys.

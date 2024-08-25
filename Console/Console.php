@@ -66,13 +66,13 @@ class Console extends Command implements CommandInterface, ConsoleInterface
 				self::$commands = ['api-controller', $arguments];
 				break;
 
-			case 'make:middleware':
+			case 'make:auth-guard':
 				if (count($arguments) < 1) {
 					exit(
 						"<name> argument is required! Type --help for list of commands\n"
 					);
 				}
-				self::$commands = ['middleware', $arguments];
+				self::$commands = ['auth-guard', $arguments];
 				break;
 
 			case 'generate:secret-key':
@@ -111,8 +111,8 @@ class Console extends Command implements CommandInterface, ConsoleInterface
 				case 'api-controller':
 					self::makeApiController(self::$commands[1], self::$resolve);
 					break;
-				case 'middleware':
-					self::makeMiddleware(self::$commands[1], self::$resolve);
+				case 'auth-guard':
+					self::makeAuthGuard(self::$commands[1], self::$resolve);
 					break;
 				case 'secret-key':
 					self::generateSecretKey(self::$commands[1]);

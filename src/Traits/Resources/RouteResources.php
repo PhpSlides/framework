@@ -7,13 +7,12 @@ use PhpSlides\MapRoute;
 use PhpSlides\Exception;
 use PhpSlides\Http\Request;
 use PhpSlides\Loader\FileLoader;
-use PhpSlides\Interface\MiddlewareInterface;
 
 trait RouteResources
 {
 	protected static mixed $action = null;
 
-	protected static ?array $middleware = null;
+	protected static ?array $guards = null;
 
 	protected static ?array $redirect = null;
 
@@ -50,9 +49,7 @@ trait RouteResources
 		self::$map_info = $match->match($method, $route);
 
 		if (self::$map_info) {
-			if (self::$middleware !== null) {
-				$static->__middleware();
-			}
+			$static->__guards(self::$guards ?? null);
 
 			if (self::$use !== null) {
 				$static->__use();
@@ -242,8 +239,8 @@ trait RouteResources
 				exit('Method Not Allowed');
 			}
 
-			if (self::$middleware !== null) {
-				(new static())->__middleware();
+			if (self::$guards !== null) {
+				(new static())->__guards(self::$guards ?? null);
 			}
 
 			http_response_code(200);
@@ -338,9 +335,7 @@ trait RouteResources
 				exit('Method Not Allowed');
 			}
 
-			if (self::$middleware !== null) {
-				(new static())->__middleware();
-			}
+			(new static())->__guards(self::$guards ?? null);
 
 			// render view page to browser
 			$GLOBALS['request'] = $request;
@@ -350,82 +345,40 @@ trait RouteResources
 		}
 	}
 
-	protected function __middleware(): void
+	protected function __guards(?array $guards): bool
 	{
-		$use = self::$use;
-		$file = self::$file;
-		$action = self::$action;
-
-		$any = self::$any;
-		$view = self::$view;
-		$method = self::$method;
-		$middleware = self::$middleware ?? [];
-		self::$middleware = null;
-
+		if (!$guards) {
+			return true;
+		}
 		$params = self::$map_info['params'] ?? null;
 		$request = new Request($params);
 
-		for ($i = 0; $i < count((array) $middleware); $i++) {
-			$middlewares = (new FileLoader())
-				->load(__DIR__ . '/../../Config/middleware.php')
+		for ($i = 0; $i < count((array) $guards); $i++) {
+			$registered_guards = (new FileLoader())
+				->load(__DIR__ . '/../../Config/guards.php')
 				->getLoad();
 
-			if (array_key_exists($middleware[$i], $middlewares)) {
-				$middleware = $middlewares[$middleware[$i]];
+			if (array_key_exists($guards[$i], $registered_guards)) {
+				$guard = $registered_guards[$guards[$i]];
 			} else {
 				self::log();
 				throw new Exception(
-					'No Registered Middleware as `' . $middleware[$i] . '`'
+					'No Registered AuthGuard as `' . $guards[$i] . '`'
 				);
 			}
 
-			if (!class_exists($middleware)) {
+			if (!class_exists($guard)) {
 				self::log();
-				throw new Exception(
-					"Middleware class does not exist: `{$middleware}`"
-				);
+				throw new Exception("AuthGuard class does not exist: `{$guard}`");
 			}
+			$cl = new $guard($request);
 
-			$mw = new $middleware();
-			if ($mw instanceof MiddlewareInterface) {
-				$next = function (Request $req) use (
-					$any,
-					$use,
-					$file,
-					$action,
-					$view,
-					$method
-				) {
-					if ($use !== null) {
-						self::__use($req);
-					} elseif ($any !== null) {
-						self::__any($req);
-					} elseif ($file !== null) {
-						self::__file($req);
-					} elseif ($action !== null) {
-						self::__action($req);
-					} elseif ($view !== null) {
-						self::__view($req);
-					} elseif ($method !== null) {
-						self::__method($req);
-					} else {
-						self::log();
-						throw new Exception('Cannot use middleware with this method');
-					}
-				};
-				$response = $mw->handle($request, $next);
-			} else {
+			if ($cl->authorize() !== true) {
 				self::log();
-				throw new Exception(
-					'Middleware class must implements `MiddlewareInterface`'
-				);
+				exit();
 			}
 		}
-		if (!empty($response)) {
-			print_r($response);
-			self::log();
-			exit();
-		}
+			return true;
 	}
 
 	protected function __file(?Request $request = null): void

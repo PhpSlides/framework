@@ -62,13 +62,17 @@ class Route extends Controller implements RouteInterface
 	 */
 	public static string $root_dir;
 
+	private ?array $guards = null;
+
+	private mixed $action = null;
+
+	private ?string $use = null;
+
+	private ?string $file = null;
+
 	private static array $routes;
 
 	private static array $route;
-
-	private static mixed $action = null;
-
-	private static ?array $middleware = null;
 
 	private static ?array $redirect = null;
 
@@ -77,10 +81,6 @@ class Route extends Controller implements RouteInterface
 	private static ?array $any = null;
 
 	private static ?array $view = null;
-
-	private static ?string $use = null;
-
-	private static ?string $file = null;
 
 	private static ?array $map = null;
 
@@ -343,7 +343,7 @@ class Route extends Controller implements RouteInterface
 	public function action(mixed $callback): self
 	{
 		if (self::$map) {
-			self::$action = $callback;
+			$this->action = $callback;
 		}
 		return $this;
 	}
@@ -358,7 +358,7 @@ class Route extends Controller implements RouteInterface
 	public function use(string $controller): self
 	{
 		if (self::$map) {
-			self::$use = $controller;
+			$this->use = $controller;
 		}
 		return $this;
 	}
@@ -372,19 +372,21 @@ class Route extends Controller implements RouteInterface
 	public function file(string $file): self
 	{
 		if (self::$map) {
-			self::$file = $file;
+			$this->file = $file;
 		}
 		return $this;
 	}
 
 	/**
-	 * Add Middlewares.
-	 * Middleware must be verified before redirecting to the specific Controller.
+	 * Applies Authentication Guard to the current route.
+	 *
+	 * @param string ...$guards String parameters of registered guards.
+	 * @return self
 	 */
-	public function middleware(array $middleware): self
+	public function withGuard(string ...$guards): self
 	{
 		if (self::$map || self::$method || self::$view) {
-			self::$middleware = $middleware;
+			$this->guards = $guards;
 		}
 		return $this;
 	}
@@ -557,9 +559,9 @@ class Route extends Controller implements RouteInterface
 			$GLOBALS['__registered_routes'][$route_index]['map'] = self::$map;
 		}
 
-		if (self::$middleware !== null) {
-			$GLOBALS['__registered_routes'][$route_index]['middleware'] =
-				self::$middleware;
+		if ($this->guards !== null) {
+			$GLOBALS['__registered_routes'][$route_index]['guards'] =
+				$this->guards;
 		}
 
 		if (self::$redirect !== null) {
@@ -567,21 +569,21 @@ class Route extends Controller implements RouteInterface
 				self::$redirect;
 		}
 
-		if (self::$action !== null) {
+		if ($this->action !== null) {
 			$GLOBALS['__registered_routes'][$route_index]['action'] =
-				self::$action;
+				$this->action;
 		}
 
 		if (self::$any !== null) {
 			$GLOBALS['__registered_routes'][$route_index]['any'] = self::$any;
 		}
 
-		if (self::$use !== null) {
-			$GLOBALS['__registered_routes'][$route_index]['use'] = self::$use;
+		if ($this->use !== null) {
+			$GLOBALS['__registered_routes'][$route_index]['use'] = $this->use;
 		}
 
-		if (self::$file !== null) {
-			$GLOBALS['__registered_routes'][$route_index]['file'] = self::$file;
+		if ($this->file !== null) {
+			$GLOBALS['__registered_routes'][$route_index]['file'] = $this->file;
 		}
 
 		if (self::$method !== null) {

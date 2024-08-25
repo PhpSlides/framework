@@ -11,8 +11,8 @@ function filterTrace(array $trace)
 	 * This Filter and removes all file path that is coming from the vendor folders
 	 */
 	$majorFilter = array_filter($trace, function ($item) {
-		$ss = strpos($item['file'], '/vendor/') === false;
-		$sss = strpos($item['file'], '\vendor\\') === false;
+		$ss = strpos($item['file'] ?? '', '/vendor/') === false;
+		$sss = strpos($item['file'] ?? '', '\vendor\\') === false;
 
 		return $ss && $sss === true;
 	});
@@ -21,8 +21,8 @@ function filterTrace(array $trace)
 	 * This filters and add only file path from the vendor folders
 	 */
 	$minorFilter = array_filter($trace, function ($item) {
-		$ss = strpos($item['file'], '/vendor/') !== false;
-		$sss = strpos($item['file'], '\vendor\\') !== false;
+		$ss = strpos($item['file'] ?? '', '/vendor/') !== false;
+		$sss = strpos($item['file'] ?? '', '\vendor\\') !== false;
 
 		return $ss || $sss === true;
 	});
