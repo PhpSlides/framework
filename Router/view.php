@@ -38,12 +38,11 @@ final class view extends Controller
 		$file = preg_replace('/(::)|::/', '/', $view);
 		$file = strtolower(trim($file, '\/\/'));
 		$file_uri = Application::$viewsDir . $file;
+		header('Content-Type: text/html');
 
 		if (is_file($file_uri . '.view.php') && !preg_match('/(..\/)/', $view)) {
-			header('Content-Type: text/html');
 			return self::slides_include($file_uri . '.view.php');
 		} elseif (is_file($file_uri) && !preg_match('/(..\/)/', $view)) {
-			header('Content-Type: text/html');
 			return self::slides_include($file_uri);
 		} else {
 			self::log();

@@ -1,11 +1,7 @@
 # Change Logs
 
-## [v1.2.9]
+## [v1.3.0]
 
--  Added Authorization Guard.
--  Implemented AuthGuard to Routes
--  Implemented AuthGuard to APIs
--  Middleware is now deprecated and removed
--  Added AuthGuard to Console
--  Updated ApiController and no more interface, now an abstract class.
--
+- Added DB log `db.log` to log message into the file
+- Added creating of Database and Tables according for PhpSlides Forgery
+- Implemented ORM according to Forge Class. Used the MeekroORM library and improve it in working with namespace according to PhpSlides Forgery

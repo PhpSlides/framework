@@ -3,7 +3,9 @@
 namespace PhpSlides\Foundation;
 
 use PhpSlides\Route;
+use PhpSlides\Forge\Forge;
 use PhpSlides\Loader\FileLoader;
+use PhpSlides\Loader\Autoloader;
 use PhpSlides\Interface\ApplicationInterface;
 
 /**
@@ -15,10 +17,10 @@ class Application implements ApplicationInterface
 	/**
 	 * The version of the PhpSlides application.
 	 */
-	const PHPSLIDES_VERSION = '1.2.9';
+	const PHPSLIDES_VERSION = '1.3.0';
 
 	/**
-	 *  `$log` method prints logs in `.log` file in the root of the project each time any request has been received, when setted to true.
+	 *  `$log` method prints logs in `requests.log` file in the root of the project each time any request has been received, when setted to true.
 	 *   It's been setted to true by default, can be changed anytime.
 	 *
 	 *   @static $log
@@ -26,6 +28,16 @@ class Application implements ApplicationInterface
 	 *   @return bool
 	 */
 	public static bool $log;
+
+	/**
+	 *  `$db_log` method prints logs in `db.log` file in the root of the project any time there's message from the database management.
+	 *   It's been setted to true by default, can be changed anytime.
+	 *
+	 *   @static $db_log
+	 *   @var bool $db_log
+	 *   @return bool
+	 */
+	public static bool $db_log;
 
 	/**
 	 * @var string $basePath
@@ -118,10 +130,15 @@ class Application implements ApplicationInterface
 
 		$loader = new FileLoader();
 		$loader->load(__DIR__ . '/../Config/env.config.php');
+
 		self::$log = getenv('APP_DEBUG') == 'true' ? true : false;
+		self::$db_log = getenv('DB_DEBUG') == 'true' ? true : false;
 
 		$loader->load(__DIR__ . '/../Config/config.php');
 		Route::config();
+
+		new Forge();
+		new Autoloader();
 
 		$loader
 			->load(__DIR__ . '/../Globals/Functions.php')

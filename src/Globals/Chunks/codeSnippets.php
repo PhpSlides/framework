@@ -20,6 +20,15 @@ function getCodeSnippet(
 	int $linesBefore = 5,
 	int $linesAfter = 5
 ): array {
+	if (empty($file) || empty($line)) {
+	   $message = 'Unable to read & parse code!';
+	   
+		return [
+			'rawCode' => $message,
+			'parsedCode' => [$message]
+		];
+	}
+
 	if (!file_exists($file) || !is_readable($file)) {
 		$path = $GLOBALS['__gen_file_path'];
 

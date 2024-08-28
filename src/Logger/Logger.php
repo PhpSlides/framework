@@ -19,7 +19,7 @@ trait Logger
 		$method = $_SERVER['REQUEST_METHOD'];
 
 		// get request url
-		$uri = Application::$request_uri;
+		$uri = trim(Application::$request_uri, '/');
 
 		// get status response code for each request
 		$http_code = http_response_code();
