@@ -132,7 +132,9 @@ header span {
       <div class="code-wrapper">
          <?php foreach ($trace as $key => $value) {
          	$key = $key + 1;
-         	echo "<span>$key. {$value['file']}:{$value['line']}</span>";
+         	$_file = $value['file'] ?? 'Unknown';
+         	$_line = $value['line'] ?? 1;
+         	echo "<span>$key. {$_file}:{$_line}</span>";
          } ?>
       </div>
    </div>
