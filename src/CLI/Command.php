@@ -1,13 +1,13 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\ConsoleL;
+namespace PhpSlides\CLI;
 
 use PhpSlides\Http\Request;
 use PhpSlides\Http\ApiController;
 use PhpSlides\Http\Auth\AuthGuard;
 use PhpSlides\Controller\Controller;
-use PhpSlides\ConsoleL\Style\Console;
-use PhpSlides\ConsoleL\Interface\CommandInterface;
+use PhpSlides\CLI\Style\Console;
+use PhpSlides\CLI\Interface\CommandInterface;
 
 class Command implements CommandInterface
 {

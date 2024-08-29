@@ -25,7 +25,6 @@ trait FileHandler
 		{
 			if (!extension_loaded('fileinfo'))
 			{
-				self::log();
 				throw new Exception(
 				 'Fileinfo extension is not enabled. Please enable it in your php.ini configuration.'
 				);

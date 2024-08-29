@@ -2,10 +2,13 @@
 
 namespace PhpSlides\Foundation;
 
+use DB;
 use PhpSlides\Route;
 use PhpSlides\Forge\Forge;
-use PhpSlides\Loader\FileLoader;
+use PhpSlides\Logger\Logger;
 use PhpSlides\Loader\Autoloader;
+use PhpSlides\Loader\FileLoader;
+use PhpSlides\Database\Connection;
 use PhpSlides\Interface\ApplicationInterface;
 
 /**
@@ -14,10 +17,12 @@ use PhpSlides\Interface\ApplicationInterface;
  */
 class Application implements ApplicationInterface
 {
+	use Logger;
+
 	/**
 	 * The version of the PhpSlides application.
 	 */
-	const PHPSLIDES_VERSION = '1.3.0';
+	const PHPSLIDES_VERSION = '1.3.1';
 
 	/**
 	 *  `$log` method prints logs in `requests.log` file in the root of the project each time any request has been received, when setted to true.
@@ -134,14 +139,25 @@ class Application implements ApplicationInterface
 		self::$log = getenv('APP_DEBUG') == 'true' ? true : false;
 		self::$db_log = getenv('DB_DEBUG') == 'true' ? true : false;
 
-		$loader->load(__DIR__ . '/../Config/config.php');
-		Route::config();
-
+		try {
+			Connection::init();
+			DB::query('SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA');
+		} catch (\Exception $e) {
+			goto EXECUTION;
+		}
 		new Forge();
 		new Autoloader();
 
-		$loader
-			->load(__DIR__ . '/../Globals/Functions.php')
-			->load(self::$renderRoutePath);
+		EXECUTION:
+		try {
+			$loader->load(__DIR__ . '/../Config/config.php');
+			Route::config();
+
+			$loader
+				->load(__DIR__ . '/../Globals/Functions.php')
+				->load(self::$renderRoutePath);
+		} finally {
+			static::log();
+		}
 	}
 }

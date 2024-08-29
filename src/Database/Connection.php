@@ -3,6 +3,7 @@
 namespace PhpSlides\Database;
 
 use DB;
+use MeekroDB;
 
 class Connection
 {
@@ -19,7 +20,7 @@ class Connection
 		static::$port = getenv('DB_PORT') ?: 3306;
 		static::$host = getenv('DB_HOST');
 		static::$user = getenv('DB_USER');
-		static::$db_name = getenv('DB_BASE');
+		static::$db_name = getenv('DB_BASE') ?? '';
 		static::$db_type = getenv('DB_CONN');
 		static::$password = getenv('DB_PASS');
 
@@ -30,6 +31,8 @@ class Connection
 			static::$port,
 			static::$db_name
 		);
+		DB::$user = static::$user;
+		DB::$password = static::$password;
 	}
 
 	static function reconnect()

@@ -35,7 +35,6 @@ class RouteController
 
 			return $config_file;
 		} else {
-			self::log();
 			throw new Exception(
 				'URL request failed. Configuration file for PhpSlides is not found in the root of your project'
 			);
@@ -122,10 +121,8 @@ class RouteController
 	 *    |    --------------------
 	 *    ==============================
 	 */
-	protected static function class_info(
-		array $class_info,
-		array|null $param
-	) {
+	protected static function class_info(array $class_info, array|null $param)
+	{
 		$method = $class_info['method'];
 		$class_name = $class_info['class_name'];
 		$class_methods = $class_info['class_methods'];
@@ -141,7 +138,6 @@ class RouteController
 				count($class_methods) - 1 === $i &&
 				$method !== $class_methods
 			) {
-				self::log();
 				throw new Exception(
 					"No controller method found as '$method'. Try using __invoke method.",
 					1

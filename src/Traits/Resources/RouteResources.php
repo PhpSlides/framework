@@ -361,14 +361,12 @@ trait RouteResources
 			if (array_key_exists($guards[$i], $registered_guards)) {
 				$guard = $registered_guards[$guards[$i]];
 			} else {
-				self::log();
 				throw new Exception(
 					'No Registered AuthGuard as `' . $guards[$i] . '`'
 				);
 			}
 
 			if (!class_exists($guard)) {
-				self::log();
 				throw new Exception("AuthGuard class does not exist: `{$guard}`");
 			}
 			$cl = new $guard($request);
@@ -419,7 +417,6 @@ trait RouteResources
 			$cc = new $cc();
 			print_r($cc->$c_method($request ?? new Request($params)));
 		} else {
-			self::log();
 			throw new Exception("No class controller found as: '$cc'");
 		}
 
