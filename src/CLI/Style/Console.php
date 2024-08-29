@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\ConsoleL\Style;
+namespace PhpSlides\CLI\Style;
 
-use PhpSlides\ConsoleL\Interface\ColorCodeInterface;
-use PhpSlides\ConsoleL\Interface\StyleConsoleInterface;
+use PhpSlides\CLI\Interface\ColorCodeInterface;
+use PhpSlides\CLI\Interface\StyleConsoleInterface;
 
 /**
  * Console class provides methods to style console output with various text and background colors.

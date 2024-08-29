@@ -40,7 +40,6 @@ class ClassController extends Controller
         }
         else
         {
-            self::log();
             throw new Exception("No controller class found as - $class", 1);
         }
     }

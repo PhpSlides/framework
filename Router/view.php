@@ -45,7 +45,6 @@ final class view extends Controller
 		} elseif (is_file($file_uri) && !preg_match('/(..\/)/', $view)) {
 			return self::slides_include($file_uri);
 		} else {
-			self::log();
 			throw new Exception("No view file path found called `$file_uri`");
 		}
 	}

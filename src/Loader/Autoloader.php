@@ -14,9 +14,9 @@ class Autoloader
 		foreach (glob('App/Forge/*/*/*.php') as $value) {
 			$class = explode('.', $value);
 			$class = str_replace(['App/', '/'], ['', '\\'], $class[0]);
-			
+
 			if (class_exists($class)) {
-			new $class();
+				new $class();
 			}
 		}
 	}

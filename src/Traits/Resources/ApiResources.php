@@ -127,14 +127,12 @@ trait ApiResources
 			if (array_key_exists($guards[$i], $registered_guards)) {
 				$guard = $registered_guards[$guards[$i]];
 			} else {
-				self::log();
 				throw new Exception(
 					'No Registered AuthGuard as `' . $guards[$i] . '`'
 				);
 			}
 
 			if (!class_exists($guard)) {
-				self::log();
 				throw new Exception("AuthGuard class does not exist: `{$guard}`");
 			}
 			$cl = new $guard($request);
