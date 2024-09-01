@@ -22,7 +22,7 @@ class Application implements ApplicationInterface
 	/**
 	 * The version of the PhpSlides application.
 	 */
-	const PHPSLIDES_VERSION = '1.3.1';
+	const PHPSLIDES_VERSION = '1.3.2';
 
 	/**
 	 *  `$log` method prints logs in `requests.log` file in the root of the project each time any request has been received, when setted to true.
@@ -92,18 +92,21 @@ class Application implements ApplicationInterface
 	 * @param string $basePath The base path of the application.
 	 * @return self Returns an instance of the Application class.
 	 */
-	public static function configure(string $basePath): self
+	public static function configure (string $basePath): self
 	{
 		self::$basePath = rtrim($basePath, '/') . '/';
 		self::routing();
 
-		if (php_sapi_name() == 'cli-server') {
+		if (php_sapi_name() == 'cli-server')
+		{
 			self::$request_uri = urldecode(
-				parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)
+			 parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)
 			);
-		} else {
+		}
+		else
+		{
 			self::$request_uri = urldecode(
-				$_REQUEST['uri'] ?? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)
+			 $_REQUEST['uri'] ?? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)
 			);
 		}
 
@@ -115,7 +118,7 @@ class Application implements ApplicationInterface
 	 *
 	 * @return void
 	 */
-	private static function routing(): void
+	private static function routing (): void
 	{
 		self::$configsDir = self::$basePath . 'src/configs/';
 		self::$viewsDir = self::$basePath . 'src/resources/views/';
@@ -129,7 +132,7 @@ class Application implements ApplicationInterface
 	 *
 	 * @return void
 	 */
-	public function create(): void
+	public function create (): void
 	{
 		session_start();
 
@@ -139,24 +142,30 @@ class Application implements ApplicationInterface
 		self::$log = getenv('APP_DEBUG') == 'true' ? true : false;
 		self::$db_log = getenv('DB_DEBUG') == 'true' ? true : false;
 
-		try {
+		try
+		{
 			Connection::init();
 			DB::query('SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA');
-		} catch (\Exception $e) {
+		}
+		catch ( \Exception $e )
+		{
 			goto EXECUTION;
 		}
 		new Forge();
 		new Autoloader();
 
 		EXECUTION:
-		try {
+		try
+		{
 			$loader->load(__DIR__ . '/../Config/config.php');
 			Route::config();
 
 			$loader
-				->load(__DIR__ . '/../Globals/Functions.php')
-				->load(self::$renderRoutePath);
-		} finally {
+			 ->load(__DIR__ . '/../Globals/Functions.php')
+			 ->load(self::$renderRoutePath);
+		}
+		finally
+		{
 			static::log();
 		}
 	}

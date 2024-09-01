@@ -7,7 +7,7 @@ use PhpSlides\Foundation\Application;
 
 trait DBLogger
 {
-	protected static function log(string ...$message): void
+	protected static function log (string ...$message): void
 	{
 		$type = $message[0];
 		$message = $message[1];
@@ -20,7 +20,8 @@ trait DBLogger
 		// all content messages to log
 		$content = "[$date] [$type] $message\n";
 
-		if (Application::$db_log === true) {
+		if (Application::$db_log === true)
+		{
 			$log = fopen($log_path, 'a');
 			fwrite($log, $content);
 			fclose($log);
