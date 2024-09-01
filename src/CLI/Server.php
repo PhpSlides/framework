@@ -64,9 +64,27 @@ class Server implements ServerInterface
 		if (is_resource($this->process)) {
 			$this->pid = proc_get_status($this->process)['pid'];
 
+			echo Console::yellow(" _____  _           _____ _       _\n");
+			usleep(100000);
+			echo Console::yellow("|  __ \| |         / ____| (.)   | | \n");
+			usleep(100000);
+			echo Console::yellow("| |__) | |__  _ __| (___ | |_  __| | ___\n");
+			usleep(100000);
+			echo Console::yellow("|  ___/| '_ \| '_ \\\\___ \| | |/ _` |/ _ \\\n");
+			usleep(100000);
+			echo Console::yellow("| |    | | | | |_) |___) | | | (_| |  __/\n");
+			usleep(100000);
+			echo Console::yellow("|_|    |_| |_| .__/_____/|_|_|\__,_|\___|\n");
+			usleep(100000);
+			echo Console::yellow("             | |\n");
+			usleep(100000);
+			echo Console::yellow("             |_|\n\n");
+			usleep(100000);
+
 			echo Console::bold(
 				"Started server at http://{$this->host}:{$this->port}\n"
 			);
+			usleep(100000);
 			echo Console::text(
 				"Type 'stop' or Ctrl+C to stop the server.",
 				ColorCode::BG_CYAN,
@@ -111,10 +129,18 @@ class Server implements ServerInterface
 	 */
 	public function showCommands(): void
 	{
-		echo "stop    - Stop the server\n";
-		echo "status  - Display server status\n";
-		echo "restart - Restart the server\n";
-		echo "help    - Display this help message\n\n";
+		usleep(100000);
+		echo Console::green('stop');
+		echo "    - Stop the server\n";
+		usleep(100000);
+		echo Console::green('status');
+		echo "  - Display server status\n";
+		usleep(100000);
+		echo Console::green('restart');
+		echo " - Restart the server\n";
+		usleep(100000);
+		echo Console::green('help');
+		echo "    - Display this help message\n\n";
 	}
 
 	/**
@@ -153,7 +179,7 @@ class Server implements ServerInterface
 		register_shutdown_function([$this, 'stopServer'], $this->process);
 
 		while (true) {
-			$input = fgets(STDIN); // Using STDIN directly
+			$input = fgets(STDIN) ?: ''; // Using STDIN directly
 
 			if (trim($input) === 'stop') {
 				$this->stopServer();

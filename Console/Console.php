@@ -21,7 +21,7 @@ class Console extends Command implements CommandInterface, ConsoleInterface
 	private static array $listen = [];
 	private static bool $serve = false;
 	private static bool $is_debug = false;
-	private static string $resolve = 'src/bootstrap';
+	private static string $resolve = 'src/bootstrap/';
 	private static ?array $commands = null;
 
 	/**
@@ -38,12 +38,16 @@ class Console extends Command implements CommandInterface, ConsoleInterface
 		$arguments = array_slice($command, 1);
 		$options = getopt('h', ['help']);
 
-		if (isset($options['help']) || isset($options['h'])) {
+		if (
+			isset($options['help']) ||
+			isset($options['h']) ||
+			!isset($command[0])
+		) {
 			self::showHelp();
 		}
 
 		# Handle commands
-		switch ($command[0] ?? null) {
+		switch ($command[0]) {
 			case 'serve':
 				self::$serve = true;
 				break;
@@ -73,6 +77,15 @@ class Console extends Command implements CommandInterface, ConsoleInterface
 					);
 				}
 				self::$commands = ['auth-guard', $arguments];
+				break;
+
+			case 'make:forge-db':
+				if (count($arguments) < 1) {
+					exit(
+						"[db] argument is required! Type --help for list of commands\n"
+					);
+				}
+				self::$commands = ['forge-db', $arguments];
 				break;
 
 			case 'generate:secret-key':
@@ -113,6 +126,9 @@ class Console extends Command implements CommandInterface, ConsoleInterface
 					break;
 				case 'auth-guard':
 					self::makeAuthGuard(self::$commands[1], self::$resolve);
+					break;
+				case 'forge-db':
+					self::makeForgeDB(self::$commands[1], self::$resolve);
 					break;
 				case 'secret-key':
 					self::generateSecretKey(self::$commands[1]);

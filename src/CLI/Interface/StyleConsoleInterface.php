@@ -14,7 +14,7 @@ interface StyleConsoleInterface
 	 * @param int ...$codes One or more color codes to be applied.
 	 * @return string The styled message.
 	 */
-	public static function text(string $message, int ...$codes): string;
+	public static function text (string $message, int ...$codes): string;
 
 	/**
 	 * Applies bold formatting to a given message.
@@ -22,7 +22,7 @@ interface StyleConsoleInterface
 	 * @param string $message The message to be bolded.
 	 * @return string The bolded message.
 	 */
-	public static function bold(string $message): string;
+	public static function bold (string $message): string;
 
 	/**
 	 * Applies underline formatting to a given message.
@@ -30,7 +30,7 @@ interface StyleConsoleInterface
 	 * @param string $message The message to be underlined.
 	 * @return string The underlined message.
 	 */
-	public static function underline(string $message): string;
+	public static function underline (string $message): string;
 
 	/**
 	 * Colors the message with black text.
@@ -38,7 +38,7 @@ interface StyleConsoleInterface
 	 * @param string $message The message to be colored.
 	 * @return string The colored message.
 	 */
-	public static function black(string $message): string;
+	public static function black (string $message): string;
 
 	/**
 	 * Colors the message with red text.
@@ -46,7 +46,7 @@ interface StyleConsoleInterface
 	 * @param string $message The message to be colored.
 	 * @return string The colored message.
 	 */
-	public static function red(string $message): string;
+	public static function red (string $message): string;
 
 	/**
 	 * Colors the message with green text.
@@ -54,7 +54,7 @@ interface StyleConsoleInterface
 	 * @param string $message The message to be colored.
 	 * @return string The colored message.
 	 */
-	public static function green(string $message): string;
+	public static function green (string $message): string;
 
 	/**
 	 * Colors the message with yellow text.
@@ -62,7 +62,7 @@ interface StyleConsoleInterface
 	 * @param string $message The message to be colored.
 	 * @return string The colored message.
 	 */
-	public static function yellow(string $message): string;
+	public static function yellow (string $message): string;
 
 	/**
 	 * Colors the message with blue text.
@@ -70,7 +70,7 @@ interface StyleConsoleInterface
 	 * @param string $message The message to be colored.
 	 * @return string The colored message.
 	 */
-	public static function blue(string $message): string;
+	public static function blue (string $message): string;
 
 	/**
 	 * Colors the message with magenta text.
@@ -78,7 +78,7 @@ interface StyleConsoleInterface
 	 * @param string $message The message to be colored.
 	 * @return string The colored message.
 	 */
-	public static function magenta(string $message): string;
+	public static function magenta (string $message): string;
 
 	/**
 	 * Colors the message with cyan text.
@@ -86,7 +86,7 @@ interface StyleConsoleInterface
 	 * @param string $message The message to be colored.
 	 * @return string The colored message.
 	 */
-	public static function cyan(string $message): string;
+	public static function cyan (string $message): string;
 
 	/**
 	 * Colors the message with white text.
@@ -94,7 +94,7 @@ interface StyleConsoleInterface
 	 * @param string $message The message to be colored.
 	 * @return string The colored message.
 	 */
-	public static function white(string $message): string;
+	public static function white (string $message): string;
 
 	/**
 	 * Colors the message with a black background.
@@ -102,7 +102,7 @@ interface StyleConsoleInterface
 	 * @param string $message The message to be styled.
 	 * @return string The styled message.
 	 */
-	public static function bgBlack(string $message): string;
+	public static function bgBlack (string $message): string;
 
 	/**
 	 * Colors the message with a red background.
@@ -110,7 +110,7 @@ interface StyleConsoleInterface
 	 * @param string $message The message to be styled.
 	 * @return string The styled message.
 	 */
-	public static function bgRed(string $message): string;
+	public static function bgRed (string $message): string;
 
 	/**
 	 * Colors the message with a green background.
@@ -118,7 +118,7 @@ interface StyleConsoleInterface
 	 * @param string $message The message to be styled.
 	 * @return string The styled message.
 	 */
-	public static function bgGreen(string $message): string;
+	public static function bgGreen (string $message): string;
 
 	/**
 	 * Colors the message with a yellow background.
@@ -126,7 +126,7 @@ interface StyleConsoleInterface
 	 * @param string $message The message to be styled.
 	 * @return string The styled message.
 	 */
-	public static function bgYellow(string $message): string;
+	public static function bgYellow (string $message): string;
 
 	/**
 	 * Colors the message with a blue background.
@@ -134,7 +134,7 @@ interface StyleConsoleInterface
 	 * @param string $message The message to be styled.
 	 * @return string The styled message.
 	 */
-	public static function bgBlue(string $message): string;
+	public static function bgBlue (string $message): string;
 
 	/**
 	 * Colors the message with a magenta background.
@@ -142,7 +142,7 @@ interface StyleConsoleInterface
 	 * @param string $message The message to be styled.
 	 * @return string The styled message.
 	 */
-	public static function bgMagenta(string $message): string;
+	public static function bgMagenta (string $message): string;
 
 	/**
 	 * Colors the message with a cyan background.
@@ -150,7 +150,7 @@ interface StyleConsoleInterface
 	 * @param string $message The message to be styled.
 	 * @return string The styled message.
 	 */
-	public static function bgCyan(string $message): string;
+	public static function bgCyan (string $message): string;
 
 	/**
 	 * Colors the message with a white background.
@@ -158,5 +158,5 @@ interface StyleConsoleInterface
 	 * @param string $message The message to be styled.
 	 * @return string The styled message.
 	 */
-	public static function bgWhite(string $message): string;
+	public static function bgWhite (string $message): string;
 }

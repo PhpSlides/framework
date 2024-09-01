@@ -7,7 +7,7 @@ use PhpSlides\Foundation\Application;
 
 trait Logger
 {
-	protected static function log(): void
+	protected static function log (): void
 	{
 		$log_path = Application::$basePath . 'requests.log';
 
@@ -33,7 +33,8 @@ trait Logger
 		// all content messages to log
 		$content = "$remote_addr - - [$date] \"$method /$uri $http_protocol\" $http_code\n";
 
-		if (Application::$log === true) {
+		if (Application::$log === true)
+		{
 			$log = fopen($log_path, 'a');
 			fwrite($log, $content);
 			fclose($log);

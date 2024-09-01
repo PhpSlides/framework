@@ -10,12 +10,12 @@ interface ApplicationInterface
 	 * @param string $basePath The base path of the application.
 	 * @return self Returns an instance of the implementing class.
 	 */
-	public static function configure(string $basePath): self;
+	public static function configure (string $basePath): self;
 
 	/**
 	 * Create the application by loading configuration files and routes.
 	 *
 	 * @return void
 	 */
-	public function create(): void;
+	public function create (): void;
 }
