@@ -21,6 +21,9 @@ trait Logger
 		// get request url
 		$uri = trim(Application::$request_uri, '/');
 
+      // hot reload url
+      $hot_reload_url = 'hot-reload-' . session_id();
+
 		// get status response code for each request
 		$http_code = http_response_code();
 
@@ -33,7 +36,7 @@ trait Logger
 		// all content messages to log
 		$content = "$remote_addr - - [$date] \"$method /$uri $http_protocol\" $http_code\n";
 
-		if (Application::$log === true)
+		if (Application::$log === true && $uri !== $hot_reload_url)
 		{
 			$log = fopen($log_path, 'a');
 			fwrite($log, $content);

@@ -6,6 +6,7 @@ use DB;
 use PhpSlides\Route;
 use PhpSlides\Forge\Forge;
 use PhpSlides\Logger\Logger;
+use PhpSlides\Loader\HotReload;
 use PhpSlides\Loader\Autoloader;
 use PhpSlides\Loader\FileLoader;
 use PhpSlides\Database\Connection;
@@ -92,21 +93,18 @@ class Application implements ApplicationInterface
 	 * @param string $basePath The base path of the application.
 	 * @return self Returns an instance of the Application class.
 	 */
-	public static function configure (string $basePath): self
+	public static function configure(string $basePath): self
 	{
 		self::$basePath = rtrim($basePath, '/') . '/';
 		self::routing();
 
-		if (php_sapi_name() == 'cli-server')
-		{
+		if (php_sapi_name() == 'cli-server') {
 			self::$request_uri = urldecode(
-			 parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)
+				parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)
 			);
-		}
-		else
-		{
+		} else {
 			self::$request_uri = urldecode(
-			 $_REQUEST['uri'] ?? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)
+				$_REQUEST['uri'] ?? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)
 			);
 		}
 
@@ -118,7 +116,7 @@ class Application implements ApplicationInterface
 	 *
 	 * @return void
 	 */
-	private static function routing (): void
+	private static function routing(): void
 	{
 		self::$configsDir = self::$basePath . 'src/configs/';
 		self::$viewsDir = self::$basePath . 'src/resources/views/';
@@ -132,7 +130,7 @@ class Application implements ApplicationInterface
 	 *
 	 * @return void
 	 */
-	public function create (): void
+	public function create(): void
 	{
 		session_start();
 
@@ -142,30 +140,33 @@ class Application implements ApplicationInterface
 		self::$log = getenv('APP_DEBUG') == 'true' ? true : false;
 		self::$db_log = getenv('DB_DEBUG') == 'true' ? true : false;
 
-		try
-		{
+		$sid = session_id();
+
+		if (getenv('HOT_RELOAD') == 'true') {
+			Route::post(
+				rtrim("/hot-reload-$sid"),
+				fn() => (new HotReload())->reload()
+			);
+		}
+
+		try {
 			Connection::init();
 			DB::query('SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA');
-		}
-		catch ( \Exception $e )
-		{
+		} catch (\Exception $e) {
 			goto EXECUTION;
 		}
 		new Forge();
 		new Autoloader();
 
 		EXECUTION:
-		try
-		{
+		try {
 			$loader->load(__DIR__ . '/../Config/config.php');
 			Route::config();
 
 			$loader
-			 ->load(__DIR__ . '/../Globals/Functions.php')
-			 ->load(self::$renderRoutePath);
-		}
-		finally
-		{
+				->load(__DIR__ . '/../Globals/Functions.php')
+				->load(self::$renderRoutePath);
+		} finally {
 			static::log();
 		}
 	}

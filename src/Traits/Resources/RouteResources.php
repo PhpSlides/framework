@@ -67,9 +67,9 @@ trait RouteResources
 
 	protected static function __any(?Request $request = null): void
 	{
-		$route = self::$any['route'];
-		$method = self::$any['method'];
-		$callback = self::$any['callback'];
+		$route = self::$any['route'] ?? self::$method['route'];
+		$method = self::$any['method'] ?? self::$method['method'];
+		$callback = self::$any['callback'] ?? self::$method['callback'];
 
 		/**
 		 *   --------------------------------------------------------------
@@ -295,10 +295,6 @@ trait RouteResources
 
 	protected static function __method(?Request $request = null): void
 	{
-		self::$any['route'] = self::$method['route'];
-		self::$any['method'] = self::$method['method'];
-		self::$any['callback'] = self::$method['callback'];
-
 		self::__any($request);
 	}
 
@@ -376,7 +372,7 @@ trait RouteResources
 				exit();
 			}
 		}
-			return true;
+		return true;
 	}
 
 	protected function __file(?Request $request = null): void
