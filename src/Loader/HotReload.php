@@ -4,6 +4,7 @@ namespace PhpSlides\Loader;
 
 use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
+use PhpSlides\Foundation\Application;
 
 class HotReload
 {
@@ -11,31 +12,42 @@ class HotReload
 
 	public function reload()
 	{
-		$modify_time = $this->getLatestModificationTime($this->watchFiles);
-
-		if (!isset($_SESSION['__last_modify_time'])) {
-			$_SESSION['__last_modify_time'] = $modify_time;
-		}
-
-		if ($modify_time > $_SESSION['__last_modify_time']) {
-			echo 'reload';
-		}
-		$_SESSION['__last_modify_time'] = $modify_time;
-	}
-
-	private function getLatestModificationTime($dirs)
-	{
 		$latest = 0;
-		foreach ($dirs as $dir) {
+		clearstatcache();
+
+		foreach ($this->watchFiles as $dir) {
 			$files = new RecursiveIteratorIterator(
-				new RecursiveDirectoryIterator($dir)
+				new RecursiveDirectoryIterator($dir),
+				RecursiveIteratorIterator::LEAVES_ONLY
 			);
+
 			foreach ($files as $file) {
+				if (strpos($file->getPathname(), 'app/cache') !== false) {
+					continue;
+				}
+
 				if ($file->isFile()) {
 					$latest = max($latest, $file->getMTime());
+					$cacheFile = 'app/cache/hot-reload.json';
+
+					if (!file_exists($cacheFile)) {
+						!is_dir(dirname($cacheFile)) && mkdir(dirname($cacheFile));
+						$cc = ['__last_modify_time' => $latest, 'file' => ''];
+						file_put_contents($cacheFile, json_encode($cc));
+					}
+
+					$cache = json_decode(file_get_contents($cacheFile), true);
+
+					if ($latest > $cache['__last_modify_time']) {
+						$cache['__last_modify_time'] = $latest;
+						$cache['file'] = $file->getPathname();
+
+						file_put_contents($cacheFile, json_encode($cache));
+
+						echo 'reload';
+					}
 				}
 			}
 		}
-		return $latest;
 	}
 }
