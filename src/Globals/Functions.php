@@ -1,11 +1,10 @@
 <?php
 
+use PhpSlides\Route;
 use PhpSlides\Exception;
-use PhpSlides\Loader\FileLoader;
 use PhpSlides\Loader\ViewLoader;
+use PhpSlides\Traits\FileHandler;
 use PhpSlides\Foundation\Application;
-
-define('__ROOT__', Application::$basePath);
 
 const GET = 'GET';
 const PUT = 'PUT';
@@ -13,7 +12,7 @@ const POST = 'POST';
 const PATCH = 'PATCH';
 const DELETE = 'DELETE';
 const RELATIVE_PATH = 'path';
-const ROOT_RELATIVE_PATH = 'root_path';
+const ABSOLUTE_PATH = 'root_path';
 
 /**
  *    -----------------------------------------------------------
@@ -134,10 +133,10 @@ function route(
  *
  * @param string $filename The name of the file to get from public directory
  * @param string $path_type Path to start location which uses either `RELATIVE_PATH`
- * for path `../` OR `ROOT_RELATIVE_PATH` for root `/`
- * @return string The file path ROOT_RELATIVE_PATH|RELATIVE_PATH
+ * for path `../` OR `ABSOLUTE_PATH` starting with the root directory `/`
+ * @return string The file path ABSOLUTE_PATH|RELATIVE_PATH
  */
-function asset(string $filename, $path_type = RELATIVE_PATH): string
+function asset(string $filename, string $path_type = RELATIVE_PATH): string
 {
 	$filename = preg_replace('/(::)|::/', '/', $filename);
 	$filename = strtolower(trim($filename, '\/\/'));
@@ -169,11 +168,30 @@ function asset(string $filename, $path_type = RELATIVE_PATH): string
 	switch ($path_type) {
 		case RELATIVE_PATH:
 			return $path . $filename;
-		case ROOT_RELATIVE_PATH:
+		case ABSOLUTE_PATH:
 			return $root_path . $filename;
 		default:
 			return $filename;
 	}
+}
+
+/**
+ * IMPORTING FILES AS PART OF THE CODE
+ *
+ * @param $file The file location to import
+ */
+function import(string $file)
+{
+
+	if (!is_file($file)) {
+		throw new Exception('File does not exist: ' . $file);
+	}
+
+	$file_type = Route::file_type($file);
+	$contents = base64_encode(file_get_contents($file));
+
+	$data = "data:$file_type;base64,$contents";
+	return $data;
 }
 
 /**

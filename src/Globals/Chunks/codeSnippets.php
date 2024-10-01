@@ -39,7 +39,6 @@ function getCodeSnippet(
 			$code = file($path);
 			$content = htmlspecialchars(file_get_contents($path), ENT_NOQUOTES);
 			unset($GLOBALS['__gen_file_path']);
-			unlink($path);
 		} else {
 			throw new Exception("Cannot read file: $file");
 		}

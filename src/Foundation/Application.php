@@ -6,6 +6,7 @@ use DB;
 use PhpSlides\Route;
 use PhpSlides\Forge\Forge;
 use PhpSlides\Logger\Logger;
+use PhpSlides\Loader\HotReload;
 use PhpSlides\Loader\Autoloader;
 use PhpSlides\Loader\FileLoader;
 use PhpSlides\Database\Connection;
@@ -22,7 +23,7 @@ class Application implements ApplicationInterface
 	/**
 	 * The version of the PhpSlides application.
 	 */
-	const PHPSLIDES_VERSION = '1.3.3';
+	const PHPSLIDES_VERSION = '1.3.4';
 
 	/**
 	 *  `$log` method prints logs in `requests.log` file in the root of the project each time any request has been received, when setted to true.
@@ -43,12 +44,6 @@ class Application implements ApplicationInterface
 	 *   @return bool
 	 */
 	public static bool $db_log;
-
-	/**
-	 * @var string $basePath
-	 * The base path of the application.
-	 */
-	public static string $basePath;
 
 	/**
 	 * @var string $configsDir
@@ -81,36 +76,21 @@ class Application implements ApplicationInterface
 	public static string $request_uri;
 
 	/**
-	 * @var string $registerRoutePath
-	 * The file path for registering all routes
-	 */
-	public static string $renderRoutePath;
-
-	/**
 	 * Configure the application with the base path.
 	 *
-	 * @param string $basePath The base path of the application.
 	 * @return self Returns an instance of the Application class.
 	 */
-	public static function configure (string $basePath): self
+	private static function configure(): void
 	{
-		self::$basePath = rtrim($basePath, '/') . '/';
-		self::routing();
-
-		if (php_sapi_name() == 'cli-server')
-		{
+		if (php_sapi_name() == 'cli-server') {
 			self::$request_uri = urldecode(
-			 parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)
+				parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)
+			);
+		} else {
+			self::$request_uri = urldecode(
+				$_REQUEST['uri'] ?? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)
 			);
 		}
-		else
-		{
-			self::$request_uri = urldecode(
-			 $_REQUEST['uri'] ?? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)
-			);
-		}
-
-		return new self();
 	}
 
 	/**
@@ -118,13 +98,12 @@ class Application implements ApplicationInterface
 	 *
 	 * @return void
 	 */
-	private static function routing (): void
+	private static function routing(): void
 	{
-		self::$configsDir = self::$basePath . 'src/configs/';
-		self::$viewsDir = self::$basePath . 'src/resources/views/';
-		self::$scriptsDir = self::$basePath . 'src/resources/src/';
-		self::$stylesDir = self::$basePath . 'src/resources/styles/';
-		self::$renderRoutePath = self::$basePath . 'src/routes/render.php';
+		self::$configsDir = 'src/configs/';
+		self::$viewsDir = 'src/resources/views/';
+		self::$scriptsDir = 'src/resources/src/';
+		self::$stylesDir = 'src/resources/styles/';
 	}
 
 	/**
@@ -132,8 +111,11 @@ class Application implements ApplicationInterface
 	 *
 	 * @return void
 	 */
-	public function create (): void
+	public function create(): void
 	{
+		self::configure();
+		self::routing();
+
 		session_start();
 
 		$loader = new FileLoader();
@@ -142,30 +124,31 @@ class Application implements ApplicationInterface
 		self::$log = getenv('APP_DEBUG') == 'true' ? true : false;
 		self::$db_log = getenv('DB_DEBUG') == 'true' ? true : false;
 
-		try
-		{
+		$sid = session_id();
+
+		if (getenv('HOT_RELOAD') == 'true') {
+			Route::post("/hot-reload-$sid", fn() => (new HotReload())->reload());
+		}
+
+		try {
 			Connection::init();
 			DB::query('SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA');
-		}
-		catch ( \Exception $e )
-		{
+		} catch (\Exception $e) {
 			goto EXECUTION;
 		}
 		new Forge();
 		new Autoloader();
 
 		EXECUTION:
-		try
-		{
-			$loader->load(__DIR__ . '/../Config/config.php');
-			Route::config();
-
+		try {
 			$loader
-			 ->load(__DIR__ . '/../Globals/Functions.php')
-			 ->load(self::$renderRoutePath);
-		}
-		finally
-		{
+				->load(__DIR__ . '/../Globals/Functions.php')
+				->load(__DIR__ . '/../Config/config.php');
+
+			Route::config();
+		} catch (\Exception $e) {
+			http_response_code(500);
+		} finally {
 			static::log();
 		}
 	}

@@ -19,14 +19,12 @@ trait FileHandler
 	 *   |
 	 *   ------------------------------------------------------
 	 */
-	public static function file_type (string $filename): bool|string
+	public static function file_type(string $filename): bool|string
 	{
-		if (is_file($filename))
-		{
-			if (!extension_loaded('fileinfo'))
-			{
+		if (is_file($filename)) {
+			if (!extension_loaded('fileinfo')) {
 				throw new Exception(
-				 'Fileinfo extension is not enabled. Please enable it in your php.ini configuration.'
+					'Fileinfo extension is not enabled. Please enable it in your php.ini configuration.'
 				);
 			}
 
@@ -38,13 +36,11 @@ trait FileHandler
 			$file_ext = strtolower(end($file_ext));
 
 			if (
-			$file_type === 'text/plain' ||
-			$file_type === 'application/x-empty' ||
-			$file_type === 'application/octet-stream'
-			)
-			{
-				switch ($file_ext)
-				{
+				$file_type === 'text/plain' ||
+				$file_type === 'application/x-empty' ||
+				$file_type === 'application/octet-stream'
+			) {
+				switch ($file_ext) {
 					case 'css':
 						return 'text/css';
 					case 'txt':
@@ -87,16 +83,12 @@ trait FileHandler
 						return 'application/vnd.oasis.opendocument.text';
 
 					default:
-						return 'text/html';
+						return 'text/plain';
 				}
-			}
-			else
-			{
+			} else {
 				return $file_type;
 			}
-		}
-		else
-		{
+		} else {
 			return false;
 		}
 	}
