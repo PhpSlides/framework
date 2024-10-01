@@ -32,7 +32,8 @@
 	"autoload": {
 		"psr-4": {
 			"PhpSlides\\": ["src/Exception/", "src/", "Console/", "Router/"]
-		}
+		},
+		"files": ["src/Foundation/Configuration.php"]
 	},
 	"autoload-dev": {
 		"psr-4": {
