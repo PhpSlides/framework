@@ -160,11 +160,12 @@ class Application implements ApplicationInterface
 
 		EXECUTION:
 		try {
-			$loader->load(__DIR__ . '/../Config/config.php');
+			$loader
+				->load(__DIR__ . '/../Globals/Functions.php')
+			->load(__DIR__ . '/../Config/config.php');
 			Route::config();
 
 			$loader
-				->load(__DIR__ . '/../Globals/Functions.php')
 				->load(self::$renderRoutePath);
 		} finally {
 			static::log();

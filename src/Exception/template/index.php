@@ -4,6 +4,7 @@ $code_values = htmlspecialchars(
 	ENT_NOQUOTES
 );
 $code_keys = json_encode(array_keys($codeSnippet['parsedCode']));
+$sid = session_id();
 ?>
 
 <!doctype html>
@@ -12,8 +13,16 @@ $code_keys = json_encode(array_keys($codeSnippet['parsedCode']));
 <head>
    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-   <title>Parse Error - <?php echo str_replace(__ROOT__, '/', $message) ?></title>
 </head>
+
+<script>
+   document.head.innerHTML = ''
+   document.title = 'Parse Error - <?php echo str_replace(
+   	__ROOT__,
+   	'/',
+   	$message
+   ); ?>'
+</script>
 
 <style type="text/css" media="all">
 <?php echo file_get_contents(__DIR__ . '/src/highlight.min.css'); ?>
@@ -175,6 +184,36 @@ header span {
          }).join('\n');
       }
    </script>
+
+   <?php
+   $protocol =
+   	(!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ||
+   	$_SERVER['SERVER_PORT'] == 443
+   		? 'https://'
+   		: 'http://';
+
+   $sid = session_id();
+   $host = $protocol . $_SERVER['HTTP_HOST'] . "/hot-reload-$sid";
+   $phpslides_version = \PhpSlides\Foundation\Application::PHPSLIDES_VERSION;
+
+   if (getenv('HOT_RELOAD') == 'true'): ?>
+   <script>
+      /**
+       * PHPSLIDES HOT RELOAD GENERATED
+       * @version <?php echo $phpslides_version; ?>
+       */
+       setInterval(function() {
+           fetch('<?php echo $host; ?>', { method: 'POST' })
+               .then(response => response.text())
+               .then(data => {
+                   if (data === 'reload') {
+                       window.location.reload()
+                   }
+               });
+       }, 1000);
+   </script>
+   <?php endif;
+   ?>
 </body>
 
 </html>

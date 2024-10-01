@@ -35,7 +35,7 @@ class ViewLoader
 			// get and make generated file name & directory
 			$gen_file = explode('/', $viewFile);
 			$new_name = explode('.', end($gen_file), 2);
-			$new_name = ucfirst($new_name[0]) . '.g.' . $new_name[1];
+			$new_name = $new_name[0] . '.g.' . $new_name[1];
 
 			$gen_file[count($gen_file) - 1] = $new_name;
 			$gen_file = implode('/', $gen_file);
@@ -51,10 +51,10 @@ class ViewLoader
 				$parsedLoad = (new FileLoader())->parseLoad($gen_file);
 				$this->result[] = $parsedLoad->getLoad();
 
-				unlink($gen_file);
 				unset($GLOBALS['__gen_file_path']);
 			} finally {
-				$GLOBALS['__gen_file_path'] = $gen_file;
+				unlink($gen_file);
+				$GLOBALS['__gen_file_path'] = $viewFile;
 			}
 		}
 		return $this;
@@ -142,6 +142,17 @@ class ViewLoader
 				$formattedContents
 			);
 		}
+
+		$formattedContents = str_replace(
+			'import(\'',
+			'import(__DIR__ . \'/',
+			$formattedContents
+		);
+		$formattedContents = str_replace(
+			'import("',
+			'import(__DIR__ . "/',
+			$formattedContents
+		);
 
 		return $formattedContents;
 	}

@@ -37,13 +37,13 @@ final class view extends Controller
 		// split :: into array and extract the folder and files
 		$file = preg_replace('/(::)|::/', '/', $view);
 		$file = strtolower(trim($file, '\/\/'));
-		$file_uri = Application::$viewsDir . $file;
+		$file_uri = 'src/resources/views/' . $file;
 		header('Content-Type: text/html');
 
-		if (is_file($file_uri . '.view.php') && !preg_match('/(..\/)/', $view)) {
-			return self::slides_include($file_uri . '.view.php');
-		} elseif (is_file($file_uri) && !preg_match('/(..\/)/', $view)) {
-			return self::slides_include($file_uri);
+		if (is_file($file_uri . '.view.php')) {
+			return(self::slides_include($file_uri . '.view.php'));
+		} elseif (is_file($file_uri)) {
+			return(self::slides_include($file_uri));
 		} else {
 			throw new Exception("No view file path found called `$file_uri`");
 		}
