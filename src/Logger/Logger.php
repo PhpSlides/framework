@@ -7,9 +7,9 @@ use PhpSlides\Foundation\Application;
 
 trait Logger
 {
-	protected static function log (): void
+	protected static function log(): void
 	{
-		$log_path = Application::$basePath . 'requests.log';
+		$log_path = 'requests.log';
 
 		// set current date format
 		$date = new DateTime('now');
@@ -21,8 +21,8 @@ trait Logger
 		// get request url
 		$uri = trim(Application::$request_uri, '/');
 
-      // hot reload url
-      $hot_reload_url = 'hot-reload-' . session_id();
+		// hot reload url
+		$hot_reload_url = 'hot-reload-' . session_id();
 
 		// get status response code for each request
 		$http_code = http_response_code();
@@ -36,8 +36,7 @@ trait Logger
 		// all content messages to log
 		$content = "$remote_addr - - [$date] \"$method /$uri $http_protocol\" $http_code\n";
 
-		if (Application::$log === true && $uri !== $hot_reload_url)
-		{
+		if (Application::$log === true && $uri !== $hot_reload_url) {
 			$log = fopen($log_path, 'a');
 			fwrite($log, $content);
 			fclose($log);

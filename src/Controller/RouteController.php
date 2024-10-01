@@ -25,7 +25,7 @@ class RouteController
 	 */
 	protected static function config_file(): array|bool
 	{
-		$file_path = Application::$basePath . 'config.json';
+		$file_path = 'config.json';
 
 		// checks if the config file exist in project root directory
 		if (file_exists($file_path)) {
