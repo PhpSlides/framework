@@ -6,6 +6,7 @@ use DB;
 use PhpSlides\Route;
 use PhpSlides\Forgery\Forge;
 use PhpSlides\Logger\Logger;
+use PhpSlides\Logger\DBLogger;
 use PhpSlides\Loader\HotReload;
 use PhpSlides\Loader\Autoloader;
 use PhpSlides\Loader\FileLoader;
@@ -18,7 +19,10 @@ use PhpSlides\Interface\ApplicationInterface;
  */
 class Application implements ApplicationInterface
 {
-	use Logger;
+	use Logger, DBLogger {
+		Logger::log insteadof DBLogger;
+		DBLogger::log as db_log;
+	}
 
 	/**
 	 * The version of the PhpSlides application.
@@ -141,6 +145,7 @@ class Application implements ApplicationInterface
 			Connection::init();
 			DB::query('SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA');
 		} catch (\Exception $e) {
+			static::db_log('WARNING', $e->getMessage());
 			goto EXECUTION;
 		}
 		new Forge();
