@@ -131,7 +131,7 @@ class Route extends Controller implements RouteInterface
 		$req = preg_replace("/(^\/)|(\/$)/", '', self::$request_uri);
 		$file_url = self::$root_dir . 'public/' . $req;
 
-		$file = is_file($file) ? file_get_contents($file_url) : null;
+		$file = is_file($file_url) ? file_get_contents($file_url) : null;
 
 		$file_type = $file !== null ? self::file_type($file_url) : null;
 		$config_file = self::config_file();

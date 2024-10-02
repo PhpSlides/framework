@@ -13,7 +13,7 @@ class Autoloader
 
 	protected static function ORMLoad()
 	{
-		foreach (glob(Application::$basePath . 'App/Forge/*/*/*.php') as $value) {
+		foreach (glob(Application::$basePath . 'App/Forgery/*/*/*.php') as $value) {
 			$class = explode('.', $value);
 			$class = str_replace(['App/', '/'], ['', '\\'], $class[0]);
 

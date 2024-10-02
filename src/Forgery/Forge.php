@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpSlides\Forge;
+namespace PhpSlides\Forgery;
 
 use DB;
 use PhpSlides\Parser\SqlParser;
@@ -9,7 +9,7 @@ use PhpSlides\Foundation\Application;
 class Forge extends Database
 {
 	/**
-	 * Search all files and directories that are in the `App/Forge` directory.
+	 * Search all files and directories that are in the `App/Forgery` directory.
 	 * Get the Database name from the directory
 	 * Get the Table name from the file and the directory
 	 * will be that database for the table.
@@ -18,8 +18,9 @@ class Forge extends Database
 	 */
 	public function __construct()
 	{
-		foreach (glob(Application::$basePath . 'App/Forge/*') as $value) {
-			$db_name = str_replace('App/Forge/', '', $value);
+		foreach (glob(Application::$basePath . 'App/Forgery/*') as $value) {
+			$value = str_replace('../../', '', $value);
+			$db_name = str_replace('App/Forgery/', '', $value);
 			$sdb_name = $db_name;
 
 			# Ignoring Database
@@ -55,7 +56,11 @@ class Forge extends Database
 			DB::useDB(self::format($db_name));
 			$all_class = [];
 
-			foreach (glob(Application::$basePath . "App/Forge/$db_name/*") as $value) {
+			foreach (
+				glob(Application::$basePath . "App/Forgery/$db_name/*")
+				as $value
+			) {
+				$value = str_replace('../../', $value);
 				$all_names = explode('/', $value);
 				$table_name = end($all_names);
 				$class = str_replace(

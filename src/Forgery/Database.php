@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpSlides\Forge;
+namespace PhpSlides\Forgery;
 
 use DB;
 use PhpSlides\Logger\DBLogger;

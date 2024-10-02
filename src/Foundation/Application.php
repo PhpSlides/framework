@@ -4,7 +4,7 @@ namespace PhpSlides\Foundation;
 
 use DB;
 use PhpSlides\Route;
-use PhpSlides\Forge\Forge;
+use PhpSlides\Forgery\Forge;
 use PhpSlides\Logger\Logger;
 use PhpSlides\Loader\HotReload;
 use PhpSlides\Loader\Autoloader;
@@ -99,8 +99,6 @@ class Application implements ApplicationInterface
 			);
 			self::$basePath = '../../';
 		}
-
-		return new self();
 	}
 
 	/**
@@ -123,9 +121,9 @@ class Application implements ApplicationInterface
 	 */
 	public function create(): void
 	{
-		session_start();
-		self::routing();
 		self::configure();
+		self::routing();
+		session_start();
 
 		$loader = new FileLoader();
 		$loader->load(__DIR__ . '/../Config/env.config.php');
@@ -154,8 +152,6 @@ class Application implements ApplicationInterface
 				->load(__DIR__ . '/../Globals/Functions.php')
 				->load(__DIR__ . '/../Config/config.php');
 			Route::config();
-
-			$loader->load(self::$renderRoutePath);
 		} catch (\Exception $e) {
 			http_response_code(500);
 		} finally {

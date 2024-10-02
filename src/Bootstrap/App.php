@@ -1,3 +1,3 @@
 <?php
 
-(new \PhpSlides\Foundation\Application())->create()
+(new \PhpSlides\Foundation\Application())->create();
