@@ -3,16 +3,15 @@
 use Dotenv\Dotenv;
 use PhpSlides\Foundation\Application;
 
+$basePath = Application::$basePath === '' ? 'app/../' : Application::$basePath;
+
 try {
-Dotenv::createUnsafeMutable(Application::$basePath)->load();
+	Dotenv::createUnsafeMutable($basePath)->load();
 } catch (Exception $e) {
-   exit($e->getMessage());
+	exit($e->getMessage());
 }
 
 // Get the APP_ENV value
 $appEnv = getenv('APP_ENV') ?: 'production';
 
-Dotenv::createUnsafeMutable(
-	Application::$basePath,
-	'.env.' . $appEnv
-)->safeLoad();
+Dotenv::createUnsafeMutable($basePath, '.env.' . $appEnv)->safeLoad();

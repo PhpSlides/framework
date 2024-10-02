@@ -33,7 +33,7 @@
 		"psr-4": {
 			"PhpSlides\\": ["src/Exception/", "src/", "Console/", "Router/"]
 		},
-		"files": ["src/Foundation/Configuration.php"]
+		"files": ["src/Bootstrap/App.php"]
 	},
 	"autoload-dev": {
 		"psr-4": {

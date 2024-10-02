@@ -146,7 +146,7 @@ function asset(string $filename, string $path_type = RELATIVE_PATH): string
 	if (php_sapi_name() == 'cli-server') {
 		$root_path = '/';
 	} else {
-		$find = '/src/bootstrap/app.php';
+		$find = '/src/routes/render.php';
 		$self = $_SERVER['PHP_SELF'];
 
 		$root_path = substr_replace(

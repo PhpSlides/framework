@@ -82,30 +82,22 @@ class Application implements ApplicationInterface
 	public static string $request_uri;
 
 	/**
-	 * @var string $registerRoutePath
-	 * The file path for registering all routes
-	 */
-	public static string $renderRoutePath;
-
-	/**
 	 * Configure the application with the base path.
 	 *
-	 * @param string $basePath The base path of the application.
 	 * @return self Returns an instance of the Application class.
 	 */
-	public static function configure(string $basePath): self
+	private static function configure(): void
 	{
-		self::$basePath = rtrim($basePath, '/') . '/';
-		self::routing();
-
 		if (php_sapi_name() == 'cli-server') {
 			self::$request_uri = urldecode(
 				parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)
 			);
+			self::$basePath = '';
 		} else {
 			self::$request_uri = urldecode(
-				$_REQUEST['uri'] ?? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)
+				parse_url($_REQUEST['uri'] ?? $_SERVER['REQUEST_URI'], PHP_URL_PATH)
 			);
+			self::$basePath = '../../';
 		}
 
 		return new self();
@@ -122,7 +114,6 @@ class Application implements ApplicationInterface
 		self::$viewsDir = self::$basePath . 'src/resources/views/';
 		self::$scriptsDir = self::$basePath . 'src/resources/src/';
 		self::$stylesDir = self::$basePath . 'src/resources/styles/';
-		self::$renderRoutePath = self::$basePath . 'src/routes/render.php';
 	}
 
 	/**
@@ -133,6 +124,8 @@ class Application implements ApplicationInterface
 	public function create(): void
 	{
 		session_start();
+		self::routing();
+		self::configure();
 
 		$loader = new FileLoader();
 		$loader->load(__DIR__ . '/../Config/env.config.php');
@@ -143,10 +136,7 @@ class Application implements ApplicationInterface
 		$sid = session_id();
 
 		if (getenv('HOT_RELOAD') == 'true') {
-			Route::post(
-				rtrim("/hot-reload-$sid"),
-				fn() => (new HotReload())->reload()
-			);
+			Route::post("/hot-reload-$sid", fn() => (new HotReload())->reload());
 		}
 
 		try {
@@ -162,11 +152,12 @@ class Application implements ApplicationInterface
 		try {
 			$loader
 				->load(__DIR__ . '/../Globals/Functions.php')
-			->load(__DIR__ . '/../Config/config.php');
+				->load(__DIR__ . '/../Config/config.php');
 			Route::config();
 
-			$loader
-				->load(self::$renderRoutePath);
+			$loader->load(self::$renderRoutePath);
+		} catch (\Exception $e) {
+			http_response_code(500);
 		} finally {
 			static::log();
 		}

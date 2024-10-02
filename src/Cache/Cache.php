@@ -2,6 +2,8 @@
 
 namespace PhpSlides\Cache;
 
+use PhpSlides\Foundation\Application;
+
 /**
  * Handles Cache Performance
  */
@@ -12,8 +14,8 @@ class Cache
 	 */
 	public function clear()
 	{
-		if (is_dir('app/cache')) {
-			rmdir('app/cache');
+		if (is_dir(Application::$basePath . 'app/cache')) {
+			rmdir(Application::$basePath . 'app/cache');
 		}
 	}
 
@@ -22,8 +24,8 @@ class Cache
 	 */
 	public function clearHotReload()
 	{
-		if (file_exists('app/cache/hot-reload.json')) {
-			unlink('app/cache/hot-reload.json');
+		if (file_exists(Application::$basePath . 'app/cache/hot-reload.json')) {
+			unlink(Application::$basePath . 'app/cache/hot-reload.json');
 		}
 	}
 }

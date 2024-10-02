@@ -17,7 +17,7 @@ class HotReload
 
 		foreach ($this->watchFiles as $dir) {
 			$files = new RecursiveIteratorIterator(
-				new RecursiveDirectoryIterator($dir),
+				new RecursiveDirectoryIterator(Application::$basePath . $dir),
 				RecursiveIteratorIterator::LEAVES_ONLY
 			);
 
