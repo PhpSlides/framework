@@ -3,7 +3,7 @@
 namespace PhpSlides\Parser;
 
 use DB;
-use PhpSlides\Forge\Forge;
+use PhpSlides\Forgery\Forge;
 
 class ORMParser extends Forge
 {

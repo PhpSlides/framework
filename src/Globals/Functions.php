@@ -3,8 +3,10 @@
 use PhpSlides\Route;
 use PhpSlides\Exception;
 use PhpSlides\Loader\ViewLoader;
-use PhpSlides\Traits\FileHandler;
+use PhpSlides\Loader\FileLoader;
 use PhpSlides\Foundation\Application;
+
+define('__ROOT__', Application::$basePath);
 
 const GET = 'GET';
 const PUT = 'PUT';
@@ -144,7 +146,7 @@ function asset(string $filename, string $path_type = RELATIVE_PATH): string
 	if (php_sapi_name() == 'cli-server') {
 		$root_path = '/';
 	} else {
-		$find = '/src/bootstrap/app.php';
+		$find = '/src/routes/render.php';
 		$self = $_SERVER['PHP_SELF'];
 
 		$root_path = substr_replace(
@@ -182,7 +184,6 @@ function asset(string $filename, string $path_type = RELATIVE_PATH): string
  */
 function import(string $file)
 {
-
 	if (!is_file($file)) {
 		throw new Exception('File does not exist: ' . $file);
 	}

@@ -17,7 +17,7 @@ class HotReload
 
 		foreach ($this->watchFiles as $dir) {
 			$files = new RecursiveIteratorIterator(
-				new RecursiveDirectoryIterator($dir),
+				new RecursiveDirectoryIterator(Application::$basePath . $dir),
 				RecursiveIteratorIterator::LEAVES_ONLY
 			);
 
@@ -28,7 +28,8 @@ class HotReload
 
 				if ($file->isFile()) {
 					$latest = max($latest, $file->getMTime());
-					$cacheFile = 'app/cache/hot-reload.json';
+					$cacheFile =
+						Application::$basePath . 'app/cache/hot-reload.json';
 
 					if (!file_exists($cacheFile)) {
 						!is_dir(dirname($cacheFile)) && mkdir(dirname($cacheFile));

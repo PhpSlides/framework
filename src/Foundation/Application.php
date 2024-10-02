@@ -4,7 +4,7 @@ namespace PhpSlides\Foundation;
 
 use DB;
 use PhpSlides\Route;
-use PhpSlides\Forge\Forge;
+use PhpSlides\Forgery\Forge;
 use PhpSlides\Logger\Logger;
 use PhpSlides\Loader\HotReload;
 use PhpSlides\Loader\Autoloader;
@@ -44,6 +44,12 @@ class Application implements ApplicationInterface
 	 *   @return bool
 	 */
 	public static bool $db_log;
+
+	/**
+	 * @var string $basePath
+	 * The base path of the application.
+	 */
+	public static string $basePath;
 
 	/**
 	 * @var string $configsDir
@@ -86,10 +92,12 @@ class Application implements ApplicationInterface
 			self::$request_uri = urldecode(
 				parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)
 			);
+			self::$basePath = '';
 		} else {
 			self::$request_uri = urldecode(
-				$_REQUEST['uri'] ?? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)
+				parse_url($_REQUEST['uri'] ?? $_SERVER['REQUEST_URI'], PHP_URL_PATH)
 			);
+			self::$basePath = '../../';
 		}
 	}
 
@@ -100,10 +108,10 @@ class Application implements ApplicationInterface
 	 */
 	private static function routing(): void
 	{
-		self::$configsDir = 'src/configs/';
-		self::$viewsDir = 'src/resources/views/';
-		self::$scriptsDir = 'src/resources/src/';
-		self::$stylesDir = 'src/resources/styles/';
+		self::$configsDir = self::$basePath . 'src/configs/';
+		self::$viewsDir = self::$basePath . 'src/resources/views/';
+		self::$scriptsDir = self::$basePath . 'src/resources/src/';
+		self::$stylesDir = self::$basePath . 'src/resources/styles/';
 	}
 
 	/**
@@ -115,7 +123,6 @@ class Application implements ApplicationInterface
 	{
 		self::configure();
 		self::routing();
-
 		session_start();
 
 		$loader = new FileLoader();
@@ -144,7 +151,6 @@ class Application implements ApplicationInterface
 			$loader
 				->load(__DIR__ . '/../Globals/Functions.php')
 				->load(__DIR__ . '/../Config/config.php');
-
 			Route::config();
 		} catch (\Exception $e) {
 			http_response_code(500);

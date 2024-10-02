@@ -125,15 +125,15 @@ class Route extends Controller implements RouteInterface
 	public static function config(): void
 	{
 		self::$log = Application::$log;
+		self::$root_dir = Application::$basePath;
 		self::$request_uri = Application::$request_uri;
 
 		$req = preg_replace("/(^\/)|(\/$)/", '', self::$request_uri);
+		$file_url = self::$root_dir . 'public/' . $req;
 
-		$file = is_file('public/' . $req)
-			? file_get_contents('public/' . $req)
-			: null;
+		$file = is_file($file_url) ? file_get_contents($file_url) : null;
 
-		$file_type = $file !== null ? self::file_type('public/' . $req) : null;
+		$file_type = $file !== null ? self::file_type($file_url) : null;
 		$config_file = self::config_file();
 
 		$charset = $config_file['charset'] ?? 'UTF-8';

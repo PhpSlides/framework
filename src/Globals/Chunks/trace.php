@@ -36,5 +36,16 @@ function filterTrace(array $trace)
 	$minorFilterValue = array_values($minorFilter);
 	$newFilter = array_merge($majorFilterValue, $minorFilterValue);
 
+		/**
+		 * Replace generated views files to the corresponding view
+		 */
+		$newFilter = array_map(function ($item) {
+			$item['file'] = str_replace('.g.php', '.php', $item['file']);
+			$item['file'] = str_replace('.g.psl', '.psl', $item['file']);
+			$item['file'] = str_replace('.g.view.php', '.view.php', $item['file']);
+
+			return $item;
+		}, $newFilter);
+		
 	return $newFilter;
 }
