@@ -6,6 +6,8 @@ use PhpSlides\Loader\ViewLoader;
 use PhpSlides\Traits\FileHandler;
 use PhpSlides\Foundation\Application;
 
+define('__ROOT__', Application::$basePath);
+
 const GET = 'GET';
 const PUT = 'PUT';
 const POST = 'POST';

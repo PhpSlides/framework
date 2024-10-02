@@ -125,6 +125,7 @@ class Route extends Controller implements RouteInterface
 	public static function config(): void
 	{
 		self::$log = Application::$log;
+		self::$root_dir = Application::$basePath;
 		self::$request_uri = Application::$request_uri;
 
 		$req = preg_replace("/(^\/)|(\/$)/", '', self::$request_uri);

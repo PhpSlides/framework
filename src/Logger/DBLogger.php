@@ -11,7 +11,7 @@ trait DBLogger
 	{
 		$type = $message[0];
 		$message = $message[1];
-		$log_path = 'db.log';
+		$log_path = Application::$basePath . 'db.log';
 
 		// set current date format
 		$date = new DateTime('now');
