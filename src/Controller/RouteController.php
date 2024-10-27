@@ -71,14 +71,21 @@ class RouteController
 		$reqUri = strtolower(
 			preg_replace("/(^\/)|(\/$)/", '', Application::$request_uri)
 		);
+		$reqUri = empty($reqUri) ? '/' : $reqUri;
 
 		if (is_array($route)) {
 			for ($i = 0; $i < count($route); $i++) {
 				$each_route = preg_replace("/(^\/)|(\/$)/", '', $route[$i]);
-				array_push($uri, strtolower($each_route));
+
+				if (empty($each_route)) {
+					array_push($uri, '/');
+				} else {
+					array_push($uri, strtolower($each_route));
+				}
 			}
 		} else {
 			$str_route = strtolower(preg_replace("/(^\/)|(\/$)/", '', $route));
+			$str_route = empty($str_route) ? '/' : $str_route;
 		}
 
 		if (in_array($reqUri, $uri) || $reqUri === $str_route) {

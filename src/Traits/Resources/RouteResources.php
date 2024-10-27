@@ -109,7 +109,7 @@ trait RouteResources
 		}
 
 		// if the route does not contain any param call routing();
-		if (empty($paramMatches[0]) || is_array($route)) {
+		if (empty($paramMatches[0] ?? []) || is_array($route)) {
 			/**
 			 *   ------------------------------------------------------
 			 *   Check if $callback is a callable function
@@ -314,14 +314,19 @@ trait RouteResources
 		$reqUri = strtolower(
 			preg_replace("/(^\/)|(\/$)/", '', self::$request_uri)
 		);
+		$reqUri = empty($reqUri) ? '/' : $reqUri;
 
 		if (is_array($route)) {
 			for ($i = 0; $i < count($route); $i++) {
 				$each_route = preg_replace("/(^\/)|(\/$)/", '', $route[$i]);
-				array_push($uri, strtolower($each_route));
+
+				empty($each_route)
+					? array_push($uri, '/')
+					: array_push($uri, strtolower($each_route));
 			}
 		} else {
 			$str_route = strtolower(preg_replace("/(^\/)|(\/$)/", '', $route));
+			$str_route = empty($str_route) ? '/' : $str_route;
 		}
 
 		if (in_array($reqUri, $uri) || $reqUri === $str_route) {
