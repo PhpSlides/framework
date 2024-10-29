@@ -87,10 +87,12 @@ class Forge extends Database
 					$table_name = self::format($table_name);
 					$db_name = self::format($db_name);
 
-					static::log(
-						'WARNING',
-						"Ignored Table `$table_name` in `$db_name` Database."
-					);
+					if ($table_name != 'options.sql') {
+						static::log(
+							'WARNING',
+							"Ignored Table `$table_name` in `$db_name` Database."
+						);
+					}
 					continue;
 				}
 
@@ -104,11 +106,11 @@ class Forge extends Database
 				);
 
 				if (!empty($query)) {
-					continue;
+					$table_already_exists = true;
 				}
 
-				$filePath = lcfirst($value);
-				$filePath = glob("$filePath/*");
+				$filePath = Application::$basePath . lcfirst($value);
+				$filePath = glob("$filePath/*.sql");
 				$query = [];
 
 				$constraint = [
@@ -122,37 +124,92 @@ class Forge extends Database
 					'OTHERS' => null
 				];
 
-				foreach ($filePath as $file) {
-					if (!str_contains($file, '.')) {
-						$res = (new SqlParser())->parse($file, $constraint);
-						$query[] = $res[0];
-						$constraint = $res[1];
+				$db_columns = array_keys(DB::columnList($table_name));
+
+				/**
+				 * Filter the array, if the column already exists in the database
+				 * then remove it from the array of columns that will be created.
+				 */
+				$filePath = array_filter($filePath, function ($path) use (
+					$table_already_exists,
+					$db_columns
+				) {
+					if ($table_already_exists) {
+						$column_name = self::get_column_name($path);
+						return in_array($column_name, $db_columns) ? false : true;
 					}
+					return true;
+				});
+
+				/**
+				 * IF NO COLUMNS TO ADD, MOVE TO THE NEXT TABLE
+				 */
+				if (empty($filePath)) {
+					continue;
+				}
+
+				/**
+				 * Rearrange the array
+				 */
+				$filePath = array_values($filePath);
+
+				$columns = array_map(function ($file) {
+					return [self::get_column_name($file), $file];
+				}, $filePath);
+
+				$only_columns = array_map(function ($file) {
+					return self::get_column_name($file);
+				}, $filePath);
+
+				for ($i = 0; $i < count($columns); $i++) {
+					$res = (new SqlParser())->parse(
+						$columns[$i][0],
+						$columns[$i][1],
+						$constraint
+					);
+					$query[] = $res[0];
+					$constraint = $res[1];
+				}
+
+				if ($table_already_exists) {
+					$query = array_map(function ($que) {
+						return 'ADD COLUMN ' . $que;
+					}, $query);
 				}
 
 				if ($constraint['PRIMARY']) {
 					$key = implode(', ', $constraint['PRIMARY']);
-					$query[] = "PRIMARY KEY ($key)";
+					$query[] = $table_already_exists
+						? "ADD PRIMARY KEY ($key)"
+						: "PRIMARY KEY ($key)";
 				}
 
 				if ($constraint['UNIQUE']) {
 					$key = implode(', ', $constraint['UNIQUE']);
-					$query[] = "UNIQUE ($key)";
+					$query[] = $table_already_exists
+						? "ADD UNIQUE ($key)"
+						: "UNIQUE ($key)";
 				}
 
 				if ($constraint['INDEX']) {
 					$key = implode(', ', $constraint['INDEX']);
-					$query[] = "INDEX ($key)";
+					$query[] = $table_already_exists
+						? "ADD INDEX ($key)"
+						: "INDEX ($key)";
 				}
 
 				if ($constraint['OTHERS']) {
-					$key = implode(', ', $constraint['OTHERS']);
+					$key = $table_already_exists
+						? implode(', ', 'ADD ' . $constraint['OTHERS'])
+						: implode(', ', $constraint['OTHERS']);
 					$query[] = "$key";
 				}
 
 				if ($constraint['FOREIGN']) {
 					foreach ($constraint['FOREIGN'] as $key) {
-						$que = "FOREIGN KEY ($key)";
+						$que = $table_already_exists
+							? "ADD FOREIGN KEY ($key)"
+							: "FOREIGN KEY ($key)";
 
 						if (isset($constraint['REFERENCES'][$key])) {
 							$value = $constraint['REFERENCES'][$key];
@@ -173,16 +230,29 @@ class Forge extends Database
 				}
 
 				$query = implode(', ', $query);
-				DB::query("CREATE TABLE $table_name ($query)");
-				static::log(
-					'INFO',
-					"Created Table `$table_name` in `$db_name` Database"
-				);
+				$only_columns = implode(', ', $only_columns);
+
+				/**
+				 * IF TABLE ALREADY EXISTS THEN IT'LL UPDATE THE COLUMNS
+				 */
+				if ($table_already_exists) {
+					DB::query("ALTER TABLE $table_name $query");
+					static::log(
+						'INFO',
+						"Altered Table `$table_name` and adds column `$only_columns`"
+					);
+				} else {
+					DB::query("CREATE TABLE $table_name ($query)");
+					static::log(
+						'INFO',
+						"Created Table `$table_name` in `$db_name` Database"
+					);
+				}
 			}
 		} catch (\Exception $e) {
 			static::log(
 				'ERROR',
-				"Unable to create Table `{$table_name}` in `$db_name` Database. [Exception]: {$e->getMessage()}"
+				"Unable to create Table `$table_name` in `$db_name` Database. [Exception]: {$e->getMessage()}"
 			);
 			return;
 		}
@@ -199,5 +269,19 @@ class Forge extends Database
 	{
 		// Convert the variable to the desired format
 		return strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $name));
+	}
+
+	/**
+	 * Get the column name and parse it from file.
+	 *
+	 * @param string $path The file path to extract the name
+	 */
+	protected static function get_column_name(string $path): string
+	{
+		$name = explode('/', $path);
+
+		$column_name = explode('-', end($name));
+		$column_name = explode('.', $column_name[1] ?? $column_name[0]);
+		return $column_name[0];
 	}
 }
