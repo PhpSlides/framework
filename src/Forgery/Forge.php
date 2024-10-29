@@ -52,6 +52,8 @@ class Forge extends Database
 
 	protected static function table($db_name)
 	{
+		$table_name = '';
+
 		try {
 			DB::useDB(self::format($db_name));
 			$all_class = [];
@@ -180,7 +182,7 @@ class Forge extends Database
 		} catch (\Exception $e) {
 			static::log(
 				'ERROR',
-				"Unable to create Table `$table_name` in `$db_name` Database. [Exception]: {$e->getMessage()}"
+				"Unable to create Table `{$table_name}` in `$db_name` Database. [Exception]: {$e->getMessage()}"
 			);
 			return;
 		}

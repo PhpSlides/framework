@@ -93,7 +93,7 @@ class ViewLoader
 		$formattedContents = preg_replace_callback(
 			'/{{\s*(.*?)\s*}}/',
 			function ($matches) {
-				return '"<' . '?php print_r(' . $matches[1] . ') ?' . '>"';
+				return '<' . '?php print_r(' . $matches[1] . ') ?' . '>';
 			},
 			$formattedContents
 		);
@@ -104,7 +104,7 @@ class ViewLoader
 			function ($matches) {
 				$val = trim($matches[1]);
 				$val = trim($val, ';');
-				return '<' . '?php print_r(' . $val . ') ?' . '>';
+				return '<' . '?php ' . $val . ' ?' . '>';
 			},
 			$formattedContents
 		);

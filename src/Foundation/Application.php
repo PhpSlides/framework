@@ -10,6 +10,7 @@ use PhpSlides\Logger\DBLogger;
 use PhpSlides\Loader\HotReload;
 use PhpSlides\Loader\Autoloader;
 use PhpSlides\Loader\FileLoader;
+use PhpSlides\Database\Database;
 use PhpSlides\Database\Connection;
 use PhpSlides\Interface\ApplicationInterface;
 
@@ -145,7 +146,8 @@ class Application implements ApplicationInterface
 			Connection::init();
 			DB::query('SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA');
 		} catch (\Exception $e) {
-			static::db_log('WARNING', $e->getMessage());
+			//static::db_log('WARNING', $e->getMessage());
+			Database::$_connect_error = $e->getMessage();
 			goto EXECUTION;
 		}
 		new Forge();
