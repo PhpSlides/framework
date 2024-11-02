@@ -36,19 +36,25 @@ class Request extends Application implements RequestInterface
 	/**
 	 * Returns URL parameters as an object.
 	 *
-	 * @return object The URL parameters.
+	 * @param ?string $key If specified it'll get a particular parameter value using this $key
+	 * and if not specified it'll return an object intries of all key & values
+	 * @return object|string The URL parameters.
 	 */
-	public function urlParam(): object
+	public function urlParam(?string $key = null): object|string
 	{
-		return (object) $this->param;
+		if (!$key) {
+			return (object) $this->param;
+		}
+		return $this->param[$key];
 	}
 
 	/**
 	 * Parses and returns the query string parameters from the URL.
 	 *
-	 * @return stdClass The parsed query parameters.
+	 * @param ?string $name Get a particular query and if not specified, it'll list all queries as an object
+	 * @return stdClass|string The parsed query parameters.
 	 */
-	public function urlQuery(): stdClass
+	public function urlQuery(?string $name = null): stdClass|string
 	{
 		$cl = new stdClass();
 		$parsed = parse_url(self::$request_uri, PHP_URL_QUERY);
@@ -68,7 +74,10 @@ class Request extends Application implements RequestInterface
 			$i++;
 		}
 
-		return $cl;
+		if (!$name) {
+			return $cl;
+		}
+		return $cl->$name;
 	}
 
 	/**

@@ -163,9 +163,10 @@ class Forge extends Database
 
 				for ($i = 0; $i < count($columns); $i++) {
 					$res = (new SqlParser())->parse(
-						$columns[$i][0],
-						$columns[$i][1],
-						$constraint
+						column_name: $columns[$i][0],
+						path: $columns[$i][1],
+						constraint: $constraint,
+						table_name: $table_name
 					);
 					$query[] = $res[0];
 					$constraint = $res[1];

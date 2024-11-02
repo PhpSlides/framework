@@ -37,8 +37,12 @@ class SqlParser extends SqlFormat
 		'OTHERS' => null
 	];
 
-	public function parse(string $column_name, string $path, array $constraint)
-	{
+	public function parse(
+		string $column_name,
+		string $path,
+		array $constraint,
+		?string $table_name
+	) {
 		$code = file($path);
 		$this->column_types['COLUMN_NAME'] = $column_name;
 
@@ -50,9 +54,9 @@ class SqlParser extends SqlFormat
 			$value = explode('#', $value)[0];
 			$v = explode('=>', $value);
 			$type = trim($v[0]);
-			$value = trim($v[1]);
-			$value = trim($value, "'\"");
-			$value = str_replace('%this%', $column_name, $value);
+			$value = trim(end($v));
+			$value = str_replace('__table__', $table_name, $value);
+			$value = str_replace('__column__', $column_name, $value);
 
 			if (array_key_exists($type, $this->column_types)) {
 				$this->column_types[$type] = $value;

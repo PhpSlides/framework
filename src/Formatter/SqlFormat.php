@@ -6,152 +6,127 @@ abstract class SqlFormat
 {
 	protected $column_types;
 
-	protected function format (array $constraint)
+	protected function trimQuote($value): string
+	{
+		return trim($value, "'\"");
+	}
+
+	protected function format(array $constraint): array
 	{
 		$column = $this->column_types;
 		$definition = "{$column['COLUMN_NAME']} ";
 
-		if ($column['TYPE'])
-		{
+		if ($column['TYPE']) {
 			$definition .= $column['TYPE'];
 
-			if ($column['LENGTH'])
-			{
+			if ($column['LENGTH']) {
 				$definition .= "({$column['LENGTH']})";
 			}
 		}
 
-		if ($column['UNSIGNED'] == 'TRUE')
-		{
+		if ($column['UNSIGNED'] == 'TRUE') {
 			$definition .= ' UNSIGNED';
 		}
 
-		if ($column['ZEROFILL'] == 'TRUE')
-		{
+		if ($column['ZEROFILL'] == 'TRUE') {
 			$definition .= ' ZEROFILL';
 		}
 
-		if ($column['CHARACTER'])
-		{
-			$definition .= " CHARACTER SET {$column['CHARACTER']}";
+		if ($column['CHARACTER']) {
+			$definition .= " CHARACTER SET {$this->trimQuote(
+				$column['CHARACTER']
+			)}";
 		}
 
-		if ($column['COLLATION'])
-		{
+		if ($column['COLLATION']) {
 			$definition .= " COLLATE {$column['COLLATION']}";
 		}
 
-		if ($column['NULL'] == 'FALSE' || $column['NULL'] === null)
-		{
+		if ($column['NULL'] == 'FALSE' || $column['NULL'] === null) {
 			$definition .= ' NOT NULL';
-		}
-		elseif ($column['NULL'] == 'TRUE')
-		{
+		} elseif ($column['NULL'] == 'TRUE') {
 			$definition .= ' NULL';
 		}
 
-		if ($column['DEFAULT'] !== null)
-		{
-			$types = [ 'NULL', '0', 'TRUE', 'FALSE', 'CURRENT_TIMESTAMP' ];
+		if ($column['DEFAULT'] !== null) {
+			$types = ['NULL', '0', 'TRUE', 'FALSE', 'CURRENT_TIMESTAMP'];
 
-			if (in_array($column['DEFAULT'], $types))
-			{
+			if (in_array($column['DEFAULT'], $types)) {
 				$definition .= " DEFAULT {$column['DEFAULT']}";
-			}
-			else
-			{
-				$definition .= " DEFAULT '{$column['DEFAULT']}'";
+			} else {
+				$definition .= " DEFAULT '{$this->trimQuote($column['DEFAULT'])}'";
 			}
 		}
 
-		if ($column['AUTO_INCREMENT'] == 'TRUE')
-		{
+		if ($column['AUTO_INCREMENT'] == 'TRUE') {
 			$definition .= ' AUTO_INCREMENT';
 		}
 
-		if ($column['UNIQUE'] == 'TRUE')
-		{
+		if ($column['UNIQUE'] == 'TRUE') {
 			$constraint['UNIQUE'][] = $column['COLUMN_NAME'];
 		}
 
-		if ($column['INDEX'] == 'TRUE')
-		{
+		if ($column['INDEX'] == 'TRUE') {
 			$constraint['INDEX'][] = $column['COLUMN_NAME'];
 		}
 
-		if ($column['PRIMARY'] == 'TRUE')
-		{
+		if ($column['PRIMARY'] == 'TRUE') {
 			$constraint['PRIMARY'][] = $column['COLUMN_NAME'];
 		}
 
-		if ($column['CHECK'])
-		{
+		if ($column['CHECK']) {
 			$definition .= " CHECK ({$column['CHECK']})";
 		}
 
-		if ($column['FOREIGN'] == true)
-		{
+		if ($column['FOREIGN'] == true) {
 			$constraint['FOREIGN'][] = $column['COLUMN_NAME'];
 		}
 
-		if ($column['REFERENCES'])
-		{
+		if ($column['REFERENCES']) {
 			$constraint['REFERENCES'][$column['COLUMN_NAME']] =
-			 $column['REFERENCES'];
+				$column['REFERENCES'];
 		}
 
-		if ($column['DELETE'])
-		{
+		if ($column['DELETE']) {
 			$constraint['DELETE'][$column['COLUMN_NAME']] = $column['DELETE'];
 		}
 
-		if ($column['UPDATE'])
-		{
-			if ($column['FOREIGN'])
-			{
+		if ($column['UPDATE']) {
+			if ($column['FOREIGN']) {
 				$constraint['UPDATE'][$column['COLUMN_NAME']] = $column['UPDATE'];
-			}
-			else
-			{
+			} else {
 				$definition .= " ON UPDATE {$column['UPDATE']}";
 			}
 		}
 
-		if ($column['COMMENT'])
-		{
-			$definition .= " COMMENT '{$column['COMMENT']}'";
+		if ($column['COMMENT']) {
+			$definition .= " COMMENT '{$this->trimQuote($column['COMMENT'])}'";
 		}
 
-		if ($column['VISIBLE'] !== null)
-		{
+		if ($column['VISIBLE'] !== null) {
 			$definition .= ' ' . ($column['VISIBLE'] ? 'VISIBLE' : 'INVISIBLE');
 		}
 
-		if ($column['STORAGE'])
-		{
+		if ($column['STORAGE']) {
 			$definition .= " STORAGE {$column['STORAGE']}";
 		}
 
-		if ($column['GENERATED'])
-		{
+		if ($column['GENERATED']) {
 			$definition .= " GENERATED ALWAYS AS ({$column['GENERATED']})";
 		}
 
-		if ($column['VIRTUAL'])
-		{
+		if ($column['VIRTUAL']) {
 			$definition .= ' VIRTUAL';
 		}
 
-		if ($column['PERSISTENT'])
-		{
+		if ($column['PERSISTENT']) {
 			$definition .= ' PERSISTENT';
 		}
 
-		if ($column['OTHERS'])
-		{
+		if ($column['OTHERS']) {
 			$constraint['OTHERS'][] = $column['OTHERS'];
 		}
 
-		return [ trim($definition), $constraint ];
+		return [trim($definition), $constraint];
 	}
 }
