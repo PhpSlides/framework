@@ -19,14 +19,15 @@ const ABSOLUTE_PATH = 'root_path';
 /**
  *    -----------------------------------------------------------
  *   |
- *   @param mixed $filename The file which to gets the contents
+ *   @param string $filename The file which to gets the contents
+ *   @param mixed ...$props Properties in which would be available in the file
  *   @return mixed The executed included file received
  *   |
  *    -----------------------------------------------------------
  */
-function slides_include($filename)
+function slides_include(string $filename, mixed ...$props): mixed
 {
-	$loaded = (new ViewLoader())->load($filename);
+	$loaded = (new ViewLoader())->load($filename, ...$props);
 	return $loaded->getLoad();
 }
 

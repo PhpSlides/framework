@@ -3,7 +3,7 @@
 namespace PhpSlides\Loader;
 
 use PhpSlides\Exception;
-use PhpSlides\Foundation\Application;
+use PhpSlides\Formatter\ViewFormatter;
 
 class ViewLoader
 {
@@ -12,24 +12,28 @@ class ViewLoader
 	/**
 	 * Load view file in view formatted way
 	 *
+	 * @param string $viewFile The file path to be loaded
+	 * @param mixed ...$props Properties in which would be available in the file
 	 * @throws Exception if the file does not seem to be existing
 	 * @return self
 	 */
-	public function load($viewFile): self
+	public function load(string $viewFile, mixed ...$props): self
 	{
 		if (!is_file($viewFile)) {
 			throw new Exception("File does not exist: $viewFile");
 		}
-		return self::safeLoad($viewFile);
+		return self::safeLoad($viewFile, ...$props);
 	}
 
 	/**
 	 * Load view file in view formatted way.
 	 * If the file does not exist then nothing will be executed.
 	 *
+	 * @param string $viewFile The file path to be loaded
+	 * @param mixed ...$props Properties in which would be available in the file
 	 * @return self
 	 */
-	public function safeLoad($viewFile): self
+	public function safeLoad(string $viewFile, mixed ...$props): self
 	{
 		if (is_file($viewFile)) {
 			// get and make generated file name & directory
@@ -41,7 +45,7 @@ class ViewLoader
 			$gen_file = implode('/', $gen_file);
 
 			$file_contents = file_get_contents($viewFile);
-			$file_contents = $this->format($file_contents);
+			$file_contents = $this->format($file_contents, ...$props);
 
 			try {
 				$file = fopen($gen_file, 'w');
@@ -71,89 +75,8 @@ class ViewLoader
 		return $this->result;
 	}
 
-	protected function format($contents)
+	private function format(string $contents, mixed ...$props)
 	{
-		$pattern = '/<include\s+path=["|\']([^"]+)["|\']\s*!?\s*\/>/';
-
-		// replace <include> match elements
-		$formattedContents = preg_replace_callback(
-			$pattern,
-			function ($matches) {
-				$path = trim($matches[1]);
-				return '<' .
-					'? slides_include(__DIR__ . \'/' .
-					$path .
-					'\') ?' .
-					'>';
-			},
-			$contents
-		);
-
-		// Replace bracket interpolation {{ }}
-		$formattedContents = preg_replace_callback(
-			'/{{\s*(.*?)\s*}}/',
-			function ($matches) {
-				return '<' . '?php print_r(' . $matches[1] . ') ?' . '>';
-			},
-			$formattedContents
-		);
-
-		// replace <? elements
-		$formattedContents = preg_replace_callback(
-			'/<' . '\?' . '\s+([^?]*)\?' . '>/s',
-			function ($matches) {
-				$val = trim($matches[1]);
-				$val = trim($val, ';');
-				return '<' . '?php ' . $val . ' ?' . '>';
-			},
-			$formattedContents
-		);
-
-		$protocol =
-			(!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ||
-			$_SERVER['SERVER_PORT'] == 443
-				? 'https://'
-				: 'http://';
-
-		$sid = session_id();
-		$phpslides_version = Application::PHPSLIDES_VERSION;
-		$host = $protocol . $_SERVER['HTTP_HOST'] . "/hot-reload-$sid";
-
-		if (getenv('HOT_RELOAD') == 'true') {
-			$formattedContents = str_replace(
-				'</body>',
-				"\n
-   <script>
-      /**
-       * PHPSLIDES HOT RELOAD GENERATED
-       * @version $phpslides_version
-       */
-       setInterval(function() {
-           fetch('$host', { method: 'POST' })
-               .then(response => response.text())
-               .then(data => {
-                   if (data === 'reload') {
-                       window.location.reload()
-                   }
-               });
-       }, 1000);
-   </script>\n
-</body>",
-				$formattedContents
-			);
-		}
-
-		$formattedContents = str_replace(
-			'import(\'',
-			'import(__DIR__ . \'/',
-			$formattedContents
-		);
-		$formattedContents = str_replace(
-			'import("',
-			'import(__DIR__ . "/',
-			$formattedContents
-		);
-
-		return $formattedContents;
+		return (new ViewFormatter($contents))->resolve(...$props);
 	}
 }

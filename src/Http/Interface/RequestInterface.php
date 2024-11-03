@@ -20,7 +20,7 @@ interface RequestInterface
 	 * and if not specified it'll return an object intries of all key & values
 	 * @return object|string The URL parameters.
 	 */
-	public function urlParam(): object;
+	public function urlParam(?string $key = null): object|string;
 
 	/**
 	 * Parses and returns the query string parameters from the URL.
@@ -28,7 +28,7 @@ interface RequestInterface
 	 * @param ?string $name Get a particular query and if not specified, it'll list all queries as an object
 	 * @return stdClass|string The parsed query parameters.
 	 */
-	public function urlQuery(): stdClass;
+	public function urlQuery(?string $name = null): stdClass|string;
 
 	/**
 	 * Retrieves headers from the request.
