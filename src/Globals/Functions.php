@@ -227,6 +227,39 @@ function payload(
 	);
 }
 
+/**
+ * Handle Properties in view files.
+ *
+ * @param ?string $name The name of the property value to get
+ * if not specified, it'll return the whole properties names and values in pair.
+ */
+function Props(?string $name = null)
+{
+	if ($name === null) {
+		$all = \PhpSlides\Props::all();
+		$new_all = [];
+
+		foreach ($all as $key => $value) {
+			if (str_starts_with($key, '_')) {
+				$s = substr($key, 1);
+
+				if (is_numeric($s)) {
+					$new_all[$s] = $value;
+				}
+			} else {
+				$new_all[$key] = $value;
+			}
+		}
+		return $new_all;
+	}
+
+	if (is_numeric($name)) {
+		$name = '_' . $name;
+		return (new \PhpSlides\Props())->$name;
+	}
+	return (new \PhpSlides\Props())->$name;
+}
+
 function ExceptionHandler(Throwable $exception)
 {
 	// Check if the exception is a CustomException to use its specific methods

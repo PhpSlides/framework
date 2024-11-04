@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace PhpSlides\Formatter;
 
@@ -33,11 +33,11 @@ class ViewFormatter
 	{
 		$this->contents = $contents;
 
-		$this->psl_tags();
 		$this->includes();
 		$this->hot_reload();
 		$this->import_quotes();
 		$this->bracket_interpolation();
+		$this->psl_tags();
 	}
 
 	/**

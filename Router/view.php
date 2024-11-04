@@ -41,12 +41,6 @@ final class view extends Controller
 		$file_uri = Application::$viewsDir . $file;
 		header('Content-Type: text/html');
 
-		if (is_file($file_uri . '.psl')) {
-			return self::slides_include($file_uri . '.psl', ...$props);
-		} elseif (is_file($file_uri . '.view.php')) {
-			return self::slides_include($file_uri . '.view.php', ...$props);
-		} else {
-			throw new Exception("No view file path found called `$file_uri`");
-		}
+		return self::slides_include($file_uri, ...$props);
 	}
 }

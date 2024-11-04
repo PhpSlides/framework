@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace PhpSlides\Loader;
 
@@ -19,7 +19,11 @@ class ViewLoader
 	 */
 	public function load(string $viewFile, mixed ...$props): self
 	{
-		if (!is_file($viewFile)) {
+		if (
+			!is_file($viewFile) &&
+			!is_file($viewFile . '.psl') &&
+			!is_file($viewFile . '.view.php')
+		) {
 			throw new Exception("File does not exist: $viewFile");
 		}
 		return self::safeLoad($viewFile, ...$props);
@@ -35,6 +39,12 @@ class ViewLoader
 	 */
 	public function safeLoad(string $viewFile, mixed ...$props): self
 	{
+		if (is_file($viewFile . '.psl')) {
+			$viewFile = $viewFile . '.psl';
+		}
+		if (is_file($viewFile . '.view.php')) {
+			$viewFile = $viewFile . '.view.php';
+		}
 		if (is_file($viewFile)) {
 			// get and make generated file name & directory
 			$gen_file = explode('/', $viewFile);

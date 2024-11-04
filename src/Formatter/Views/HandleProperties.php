@@ -22,7 +22,27 @@ trait HandleProperties
 	 */
 	protected function properties(mixed ...$props)
 	{
-		$code = "<?php\nconst Props = $props;\n?>\n";
+		if (empty($props)) {
+			return;
+		}
+		$code = '<' . '?php $s = new \PhpSlides\Props(); ';
+
+		foreach ($props as $key => $value) {
+			if (is_int($key)) {
+				$key = "_$key";
+			}
+
+			if (is_int($value) || is_bool($value)) {
+				$code .= '$s->' . "$key = $value; ";
+			} elseif (is_array($value)) {
+				$s = serialize($value);
+				$code .= '$s->' . "$key = unserialize('$s'); ";
+			} else {
+				$code .= '$s->' . "$key = '$value'; ";
+			}
+		}
+		$code .= '$s = null; ?' . '>';
+
 		$this->contents = $code . $this->contents;
 	}
 }
