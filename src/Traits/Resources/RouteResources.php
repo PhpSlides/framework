@@ -92,7 +92,6 @@ trait RouteResources
 					? $callback($request ?? new Request())
 					: $callback
 			);
-			self::log();
 			exit();
 		}
 
@@ -141,7 +140,6 @@ trait RouteResources
 					);
 				}
 
-				self::log();
 				exit();
 			} else {
 				return;
@@ -235,7 +233,6 @@ trait RouteResources
 				$method !== '*'
 			) {
 				http_response_code(405);
-				self::log();
 				exit('Method Not Allowed');
 			}
 
@@ -265,7 +262,6 @@ trait RouteResources
 				);
 			}
 
-			self::log();
 			exit();
 		}
 	}
@@ -287,7 +283,6 @@ trait RouteResources
 
 		if (strtolower($reqUri) === strtolower($route)) {
 			http_response_code($code);
-			self::log();
 			header("Location: $new_url", true, $code);
 			exit();
 		}
@@ -332,7 +327,6 @@ trait RouteResources
 		if (in_array($reqUri, $uri) || $reqUri === $str_route) {
 			if (strtoupper($_SERVER['REQUEST_METHOD']) !== 'GET') {
 				http_response_code(405);
-				self::log();
 				exit('Method Not Allowed');
 			}
 
@@ -341,7 +335,6 @@ trait RouteResources
 			// render view page to browser
 			$GLOBALS['request'] = $request;
 			print_r(view::render($view));
-			self::log();
 			exit();
 		}
 	}
@@ -373,7 +366,6 @@ trait RouteResources
 			$cl = new $guard($request);
 
 			if ($cl->authorize() !== true) {
-				self::log();
 				exit();
 			}
 		}
@@ -392,7 +384,6 @@ trait RouteResources
 		}
 
 		print_r(view::render($file));
-		self::log();
 		exit();
 	}
 
@@ -402,7 +393,6 @@ trait RouteResources
 		header('Content-Type: text/html');
 
 		if (!preg_match('/(?=.*Controller)(?=.*::)/', $controller)) {
-			self::log();
 			throw new Exception(
 				'Parameter $controller must match Controller named rule.'
 			);
@@ -421,7 +411,6 @@ trait RouteResources
 			throw new Exception("No class controller found as: '$cc'");
 		}
 
-		self::log();
 		exit();
 	}
 
@@ -443,7 +432,6 @@ trait RouteResources
 			print_r($action);
 		}
 
-		self::log();
 		exit();
 	}
 }

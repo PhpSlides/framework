@@ -169,7 +169,6 @@ class Route extends Controller implements RouteInterface
 					} elseif ($contents) {
 						print_r($contents);
 					}
-					self::log();
 					exit();
 				}
 			}
@@ -183,7 +182,6 @@ class Route extends Controller implements RouteInterface
 			header("Content-Type: $file_type; charset=$charset");
 
 			print_r($file);
-			self::log();
 			exit();
 		}
 	}

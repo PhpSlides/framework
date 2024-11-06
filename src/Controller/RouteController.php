@@ -97,7 +97,6 @@ class RouteController
 				$method !== '*'
 			) {
 				http_response_code(405);
-				self::log();
 				exit('Method Not Allowed');
 			}
 

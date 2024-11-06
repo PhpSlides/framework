@@ -56,8 +56,18 @@ class Request extends Application implements RequestInterface
 	 */
 	public function urlQuery(?string $name = null): stdClass|string
 	{
+		if (php_sapi_name() == 'cli-server') {
+			$parsed = urldecode(parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY));
+		} else {
+			$parsed = urldecode(
+				parse_url(
+					$_REQUEST['uri'] ?? $_SERVER['REQUEST_URI'],
+					PHP_URL_QUERY
+				)
+			);
+		}
+
 		$cl = new stdClass();
-		$parsed = parse_url(self::$request_uri, PHP_URL_QUERY);
 
 		if (!$parsed) {
 			return $cl;

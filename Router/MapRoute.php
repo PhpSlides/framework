@@ -134,7 +134,6 @@ class MapRoute extends Controller implements MapInterface
 				!in_array('dynamic', self::$method)
 			) {
 				http_response_code(405);
-				self::log();
 				exit('Method Not Allowed');
 			}
 
@@ -181,7 +180,6 @@ class MapRoute extends Controller implements MapInterface
 				!in_array('dynamic', self::$method)
 			) {
 				http_response_code(405);
-				self::log();
 				exit('Method Not Allowed');
 			}
 

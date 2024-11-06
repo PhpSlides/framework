@@ -6,7 +6,7 @@ abstract class SqlFormat
 {
 	protected $column_types;
 
-	protected function trimQuote($value): string
+	private function trimQuote($value): string
 	{
 		return trim($value, "'\"");
 	}
