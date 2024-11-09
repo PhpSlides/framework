@@ -44,14 +44,17 @@ class RouteController
 	/**
 	 *    -----------------------------------------------------------
 	 *    |
-	 *    @param mixed $filename The file which to gets the contents
+	 *    @param string $filename The file which to gets the contents
+	 *    @param mixed ...$props Properties in which would be available in the file
 	 *    @return mixed The executed included file received
 	 *    |
 	 *    -----------------------------------------------------------
 	 */
-	public static function slides_include($filename)
-	{
-		$loaded = (new ViewLoader())->load($filename);
+	public static function slides_include(
+		string $filename,
+		mixed ...$props
+	): mixed {
+		$loaded = (new ViewLoader())->load($filename, ...$props);
 		return $loaded->getLoad();
 	}
 
@@ -71,14 +74,21 @@ class RouteController
 		$reqUri = strtolower(
 			preg_replace("/(^\/)|(\/$)/", '', Application::$request_uri)
 		);
+		$reqUri = empty($reqUri) ? '/' : $reqUri;
 
 		if (is_array($route)) {
 			for ($i = 0; $i < count($route); $i++) {
 				$each_route = preg_replace("/(^\/)|(\/$)/", '', $route[$i]);
-				array_push($uri, strtolower($each_route));
+
+				if (empty($each_route)) {
+					array_push($uri, '/');
+				} else {
+					array_push($uri, strtolower($each_route));
+				}
 			}
 		} else {
 			$str_route = strtolower(preg_replace("/(^\/)|(\/$)/", '', $route));
+			$str_route = empty($str_route) ? '/' : $str_route;
 		}
 
 		if (in_array($reqUri, $uri) || $reqUri === $str_route) {
@@ -87,7 +97,6 @@ class RouteController
 				$method !== '*'
 			) {
 				http_response_code(405);
-				self::log();
 				exit('Method Not Allowed');
 			}
 

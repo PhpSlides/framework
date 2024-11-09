@@ -88,7 +88,6 @@ trait ApiResources
 					$r_method = '__default';
 				} else {
 					http_response_code(405);
-					self::log();
 					exit('Request method not allowed.');
 				}
 				break;
@@ -106,7 +105,6 @@ trait ApiResources
 		$r_method = 'error';
 		$response = !$response ? $cc->$r_method($request) : $response;
 
-		self::log();
 		return $response;
 	}
 
@@ -138,11 +136,10 @@ trait ApiResources
 			$cl = new $guard($request);
 
 			if ($cl->authorize() !== true) {
-				self::log();
 				exit();
 			}
 		}
-			return true;
+		return true;
 	}
 
 	protected function __api_map(?Request $request = null): void

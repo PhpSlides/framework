@@ -1,20 +1,20 @@
 {
 	"name": "phpslides/framework",
 	"description": "The PhpSlides Framework",
-	"homepage": "https://github.com/phpslides/framework",
+	"homepage": "https://github.com/PhpSlides",
 	"type": "library",
 	"license": "MIT",
 	"keywords": ["framework", "phpslides"],
 	"support": {
-		"issues": "https://github.com/phpslides/framework/issues",
-		"source": "https://github.com/phpslides/framework"
+		"issues": "https://github.com/PhpSlides/framework/issues",
+		"source": "https://github.com/PhpSlides/framework"
 	},
 	"authors": [
 		{
 			"name": "Dave Conco",
-			"email": "concodave@gmail.com",
+			"email": "info@dconco.dev",
 			"role": "Developer",
-			"homepage": "https://dconco.github.io"
+			"homepage": "https://dconco.dev"
 		}
 	],
 	"require": {

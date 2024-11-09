@@ -28,11 +28,12 @@ final class view extends Controller
 	 * Render views and parse public URL in views
 	 *
 	 * @param string $view
+	 * @param mixed ...$props
 	 * @return mixed return the file gotten from the view parameters
 	 *
 	 *   --------------------------------------------------------------
 	 */
-	final public static function render(string $view): mixed
+	final public static function render(string $view, mixed ...$props): mixed
 	{
 		// split :: into array and extract the folder and files
 		$file = preg_replace('/(::)|::/', '/', $view);
@@ -40,12 +41,6 @@ final class view extends Controller
 		$file_uri = Application::$viewsDir . $file;
 		header('Content-Type: text/html');
 
-		if (is_file($file_uri . '.view.php')) {
-			return self::slides_include($file_uri . '.view.php');
-		} elseif (is_file($file_uri)) {
-			return self::slides_include($file_uri);
-		} else {
-			throw new Exception("No view file path found called `$file_uri`");
-		}
+		return self::slides_include($file_uri, ...$props);
 	}
 }

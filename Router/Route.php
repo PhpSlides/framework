@@ -8,8 +8,8 @@
  * @package Router
  * @version ^1.2.2
  * @since 1.0.0
- * @link https://github.com/dconco/php_slides
- * @author Dave Conco <concodave@gmail.com>
+ * @link https://github.com/PhpSlides/phpslides
+ * @author Dave Conco <info@dconco.dev>
  * @license MIT
  */
 
@@ -169,7 +169,6 @@ class Route extends Controller implements RouteInterface
 					} elseif ($contents) {
 						print_r($contents);
 					}
-					self::log();
 					exit();
 				}
 			}
@@ -183,7 +182,6 @@ class Route extends Controller implements RouteInterface
 			header("Content-Type: $file_type; charset=$charset");
 
 			print_r($file);
-			self::log();
 			exit();
 		}
 	}
@@ -222,9 +220,9 @@ class Route extends Controller implements RouteInterface
 	 * Route Mapping method
 	 * Check out documentation for using Map method
 	 *
-	 * @link https://github.com/dconco/php_slides
+	 * @link https://github.com/phpslides/phpslides
 	 * @param string $method Request method
-	 * @param string|array|null $route Route parameter
+	 * @param string|array $route Route parameter
 	 */
 	public static function map(string $method, string|array $route): self
 	{

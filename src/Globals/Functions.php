@@ -19,14 +19,15 @@ const ABSOLUTE_PATH = 'root_path';
 /**
  *    -----------------------------------------------------------
  *   |
- *   @param mixed $filename The file which to gets the contents
+ *   @param string $filename The file which to gets the contents
+ *   @param mixed ...$props Properties in which would be available in the file
  *   @return mixed The executed included file received
  *   |
  *    -----------------------------------------------------------
  */
-function slides_include($filename)
+function slides_include(string $filename, mixed ...$props): mixed
 {
-	$loaded = (new ViewLoader())->load($filename);
+	$loaded = (new ViewLoader())->load($filename, ...$props);
 	return $loaded->getLoad();
 }
 
@@ -224,6 +225,39 @@ function payload(
 		],
 		$data
 	);
+}
+
+/**
+ * Handle Properties in view files.
+ *
+ * @param ?string $name The name of the property value to get
+ * if not specified, it'll return the whole properties names and values in pair.
+ */
+function Props(?string $name = null)
+{
+	if ($name === null) {
+		$all = \PhpSlides\Props::all();
+		$new_all = [];
+
+		foreach ($all as $key => $value) {
+			if (str_starts_with($key, '_')) {
+				$s = substr($key, 1);
+
+				if (is_numeric($s)) {
+					$new_all[$s] = $value;
+				}
+			} else {
+				$new_all[$key] = $value;
+			}
+		}
+		return $new_all;
+	}
+
+	if (is_numeric($name)) {
+		$name = '_' . $name;
+		return (new \PhpSlides\Props())->$name;
+	}
+	return (new \PhpSlides\Props())->$name;
 }
 
 function ExceptionHandler(Throwable $exception)

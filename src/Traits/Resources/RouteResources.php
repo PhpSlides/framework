@@ -92,7 +92,6 @@ trait RouteResources
 					? $callback($request ?? new Request())
 					: $callback
 			);
-			self::log();
 			exit();
 		}
 
@@ -109,7 +108,7 @@ trait RouteResources
 		}
 
 		// if the route does not contain any param call routing();
-		if (empty($paramMatches[0]) || is_array($route)) {
+		if (empty($paramMatches[0] ?? []) || is_array($route)) {
 			/**
 			 *   ------------------------------------------------------
 			 *   Check if $callback is a callable function
@@ -120,8 +119,6 @@ trait RouteResources
 			$callback = self::routing($route, $callback, $method);
 
 			if ($callback) {
-				$GLOBALS['request'] = null;
-
 				if (
 					is_array($callback) &&
 					(preg_match('/(Controller)/', $callback[0], $matches) &&
@@ -134,6 +131,7 @@ trait RouteResources
 						)
 					);
 				} else {
+					$GLOBALS['request'] = new Request();
 					print_r(
 						is_callable($callback)
 							? $callback($request ?? new Request())
@@ -141,7 +139,6 @@ trait RouteResources
 					);
 				}
 
-				self::log();
 				exit();
 			} else {
 				return;
@@ -235,7 +232,6 @@ trait RouteResources
 				$method !== '*'
 			) {
 				http_response_code(405);
-				self::log();
 				exit('Method Not Allowed');
 			}
 
@@ -259,13 +255,12 @@ trait RouteResources
 					)
 				);
 			} else {
-				$GLOBALS['params'] = $req;
+				$GLOBALS['request'] = new Request($req);
 				print_r(
 					is_callable($callback) ? $callback(new Request($req)) : $callback
 				);
 			}
 
-			self::log();
 			exit();
 		}
 	}
@@ -287,7 +282,6 @@ trait RouteResources
 
 		if (strtolower($reqUri) === strtolower($route)) {
 			http_response_code($code);
-			self::log();
 			header("Location: $new_url", true, $code);
 			exit();
 		}
@@ -314,20 +308,24 @@ trait RouteResources
 		$reqUri = strtolower(
 			preg_replace("/(^\/)|(\/$)/", '', self::$request_uri)
 		);
+		$reqUri = empty($reqUri) ? '/' : $reqUri;
 
 		if (is_array($route)) {
 			for ($i = 0; $i < count($route); $i++) {
 				$each_route = preg_replace("/(^\/)|(\/$)/", '', $route[$i]);
-				array_push($uri, strtolower($each_route));
+
+				empty($each_route)
+					? array_push($uri, '/')
+					: array_push($uri, strtolower($each_route));
 			}
 		} else {
 			$str_route = strtolower(preg_replace("/(^\/)|(\/$)/", '', $route));
+			$str_route = empty($str_route) ? '/' : $str_route;
 		}
 
 		if (in_array($reqUri, $uri) || $reqUri === $str_route) {
 			if (strtoupper($_SERVER['REQUEST_METHOD']) !== 'GET') {
 				http_response_code(405);
-				self::log();
 				exit('Method Not Allowed');
 			}
 
@@ -336,7 +334,6 @@ trait RouteResources
 			// render view page to browser
 			$GLOBALS['request'] = $request;
 			print_r(view::render($view));
-			self::log();
 			exit();
 		}
 	}
@@ -368,7 +365,6 @@ trait RouteResources
 			$cl = new $guard($request);
 
 			if ($cl->authorize() !== true) {
-				self::log();
 				exit();
 			}
 		}
@@ -380,14 +376,13 @@ trait RouteResources
 		$file = self::$file;
 
 		if (array_key_exists('params', self::$map_info)) {
-			$GLOBALS['params'] = self::$map_info['params'] ?? null;
+			$GLOBALS['request'] = new Request(self::$map_info['params']);
 		}
 		if ($request) {
 			$GLOBALS['request'] = $request;
 		}
 
 		print_r(view::render($file));
-		self::log();
 		exit();
 	}
 
@@ -397,7 +392,6 @@ trait RouteResources
 		header('Content-Type: text/html');
 
 		if (!preg_match('/(?=.*Controller)(?=.*::)/', $controller)) {
-			self::log();
 			throw new Exception(
 				'Parameter $controller must match Controller named rule.'
 			);
@@ -405,7 +399,7 @@ trait RouteResources
 
 		[$c_name, $c_method] = explode('::', $controller);
 
-		$cc = 'App\\Controller\\' . $c_name;
+		$cc = 'App\\Http\\Controller\\' . $c_name;
 
 		if (class_exists($cc)) {
 			$params = self::$map_info['params'] ?? null;
@@ -416,7 +410,6 @@ trait RouteResources
 			throw new Exception("No class controller found as: '$cc'");
 		}
 
-		self::log();
 		exit();
 	}
 
@@ -433,12 +426,10 @@ trait RouteResources
 			self::$use = $action;
 			$this->__use($request);
 		} else {
-			$GLOBALS['params'] = $params;
-			$GLOBALS['request'] = $request;
+			$GLOBALS['request'] = $request ?? new Request($params);
 			print_r($action);
 		}
 
-		self::log();
 		exit();
 	}
 }
