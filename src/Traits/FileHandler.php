@@ -53,6 +53,8 @@ trait FileHandler
 						return 'text/html';
 					case 'php':
 						return 'text/html';
+					case 'psl':
+						return 'text/html';
 					case 'xml':
 						return 'text/xml';
 					case 'js':

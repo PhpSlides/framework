@@ -139,7 +139,7 @@ trait ApiResources
 				exit();
 			}
 		}
-			return true;
+		return true;
 	}
 
 	protected function __api_map(?Request $request = null): void

@@ -119,8 +119,6 @@ trait RouteResources
 			$callback = self::routing($route, $callback, $method);
 
 			if ($callback) {
-				$GLOBALS['request'] = null;
-
 				if (
 					is_array($callback) &&
 					(preg_match('/(Controller)/', $callback[0], $matches) &&
@@ -133,6 +131,7 @@ trait RouteResources
 						)
 					);
 				} else {
+					$GLOBALS['request'] = new Request();
 					print_r(
 						is_callable($callback)
 							? $callback($request ?? new Request())
@@ -256,7 +255,7 @@ trait RouteResources
 					)
 				);
 			} else {
-				$GLOBALS['params'] = $req;
+				$GLOBALS['request'] = new Request($req);
 				print_r(
 					is_callable($callback) ? $callback(new Request($req)) : $callback
 				);
@@ -377,7 +376,7 @@ trait RouteResources
 		$file = self::$file;
 
 		if (array_key_exists('params', self::$map_info)) {
-			$GLOBALS['params'] = self::$map_info['params'] ?? null;
+			$GLOBALS['request'] = new Request(self::$map_info['params']);
 		}
 		if ($request) {
 			$GLOBALS['request'] = $request;
@@ -400,7 +399,7 @@ trait RouteResources
 
 		[$c_name, $c_method] = explode('::', $controller);
 
-		$cc = 'App\\Controller\\' . $c_name;
+		$cc = 'App\\Http\\Controller\\' . $c_name;
 
 		if (class_exists($cc)) {
 			$params = self::$map_info['params'] ?? null;
@@ -427,8 +426,7 @@ trait RouteResources
 			self::$use = $action;
 			$this->__use($request);
 		} else {
-			$GLOBALS['params'] = $params;
-			$GLOBALS['request'] = $request;
+			$GLOBALS['request'] = $request ?? new Request($params);
 			print_r($action);
 		}
 

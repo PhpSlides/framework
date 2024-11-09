@@ -220,9 +220,9 @@ class Route extends Controller implements RouteInterface
 	 * Route Mapping method
 	 * Check out documentation for using Map method
 	 *
-	 * @link https://github.com/dconco/php_slides
+	 * @link https://github.com/phpslides/phpslides
 	 * @param string $method Request method
-	 * @param string|array|null $route Route parameter
+	 * @param string|array $route Route parameter
 	 */
 	public static function map(string $method, string|array $route): self
 	{
