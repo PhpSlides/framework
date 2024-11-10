@@ -38,10 +38,10 @@ trait FormatPslTags
 			function ($matches) {
 				// Trim the content inside the PHP tags, removing trailing semicolons
 				$val = trim($matches[1]);
-				$val = trim($val, ';');
+				$val = str_ends_with(')', $val) ? $val . ';' : $val;
 
 				// Reformat the PHP content and return it
-				return '<' . '?php ' . $val . '; ?' . '>';
+				return '<' . '?php ' . $val . ' ?' . '>';
 			},
 			$this->contents
 		);
