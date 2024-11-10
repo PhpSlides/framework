@@ -10,14 +10,15 @@ trait FileHandler
 	use Logger;
 
 	/**
-	 *   ------------------------------------------------------
-	 *   |
-	 *   Get the file extension content-type with mime
+	 * Get the MIME content type for a file.
 	 *
-	 *   @param string $filename File path or file resources
-	 *   @return bool|string Returns the MIME content type for a file as determined by using information from the magic.mime file.
-	 *   |
-	 *   ------------------------------------------------------
+	 * This method returns the MIME type of a file based on its extension
+	 * and the file's contents. If the `fileinfo` extension is not enabled,
+	 * an exception is thrown.
+	 *
+	 * @param string $filename The path to the file whose MIME type is being determined.
+	 * @return bool|string The MIME type of the file as a string, or `false` if the file doesn't exist.
+	 * @throws Exception If the `fileinfo` extension is not enabled in PHP.
 	 */
 	public static function file_type(string $filename): bool|string
 	{
@@ -83,7 +84,6 @@ trait FileHandler
 						return 'application/postscript';
 					case 'odt':
 						return 'application/vnd.oasis.opendocument.text';
-
 					default:
 						return 'text/plain';
 				}

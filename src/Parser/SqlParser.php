@@ -5,10 +5,27 @@ namespace PhpSlides\Parser;
 use PhpSlides\Logger\DBLogger;
 use PhpSlides\Formatter\SqlFormat;
 
+/**
+ * SqlParser is responsible for parsing SQL column definitions and constraints.
+ *
+ * This class parses the SQL column definition from a given path, processes
+ * various column attributes such as type, length, default value, etc., and
+ * formats them for database operations. It also handles logging of issues when
+ * invalid column types or constraints are encountered.
+ */
 class SqlParser extends SqlFormat
 {
 	use DBLogger;
 
+	/**
+	 * Column types map to store various column attributes.
+	 *
+	 * This associative array holds different column-related attributes such
+	 * as the column's name, type, length, default value, nullability, etc.
+	 * Each key represents an attribute that can be defined in the SQL column
+	 * declaration. Initially, all values are set to `null` and will be populated
+	 * as the SQL file is parsed.
+	 */
 	protected $column_types = [
 		'COLUMN_NAME' => null,
 		'TYPE' => null,
@@ -37,6 +54,22 @@ class SqlParser extends SqlFormat
 		'OTHERS' => null
 	];
 
+	/**
+	 * Parses the SQL column definition from a specified file.
+	 *
+	 * This method reads a file containing column definitions and constraints,
+	 * processes each line to extract relevant information, and populates the
+	 * `$column_types` array. It replaces placeholders like `__table__` and
+	 * `__column__` with the actual table and column names. If an unknown column
+	 * type is encountered, a warning is logged.
+	 *
+	 * @param string $column_name The name of the column being processed.
+	 * @param string $path The path to the file containing column definitions.
+	 * @param array $constraint Any constraints associated with the column.
+	 * @param ?string $table_name The name of the table to which the column belongs.
+	 *
+	 * @return string The formatted SQL constraint for the column.
+	 */
 	public function parse(
 		string $column_name,
 		string $path,
@@ -68,6 +101,7 @@ class SqlParser extends SqlFormat
 			}
 		}
 
+		// Return the formatted SQL constraint for the column.
 		return static::format($constraint);
 	}
 }

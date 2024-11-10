@@ -42,23 +42,6 @@ class RouteController
 	}
 
 	/**
-	 *    -----------------------------------------------------------
-	 *    |
-	 *    @param string $filename The file which to gets the contents
-	 *    @param mixed ...$props Properties in which would be available in the file
-	 *    @return mixed The executed included file received
-	 *    |
-	 *    -----------------------------------------------------------
-	 */
-	public static function slides_include(
-		string $filename,
-		mixed ...$props
-	): mixed {
-		$loaded = (new ViewLoader())->load($filename, ...$props);
-		return $loaded->getLoad();
-	}
-
-	/**
 	 *    ==============================
 	 *    |    Don't use this function!!!
 	 *    |    --------------------
@@ -99,9 +82,6 @@ class RouteController
 				http_response_code(405);
 				exit('Method Not Allowed');
 			}
-
-			header('Content-Type: */*');
-			http_response_code(200);
 
 			return $callback;
 		} else {

@@ -134,9 +134,6 @@ class Route extends Controller implements RouteInterface
 		$file = is_file($file_url) ? file_get_contents($file_url) : null;
 
 		$file_type = $file !== null ? self::file_type($file_url) : null;
-		$config_file = self::config_file();
-
-		$charset = $config_file['charset'] ?? 'UTF-8';
 
 		/**
 		 *   ----------------------------------------------
@@ -161,7 +158,7 @@ class Route extends Controller implements RouteInterface
 					http_response_code($http_code);
 
 					if ($contentType) {
-						header("Content-Type: $contentType; charset=$charset");
+						header("Content-Type: $contentType");
 					}
 
 					if ($components) {
@@ -169,6 +166,8 @@ class Route extends Controller implements RouteInterface
 					} elseif ($contents) {
 						print_r($contents);
 					}
+
+					self::log();
 					exit();
 				}
 			}
@@ -178,10 +177,10 @@ class Route extends Controller implements RouteInterface
 			 *    Proceed to accepts current file
 			 *  -----------------------------------------------
 			 */
-			http_response_code(200);
-			header("Content-Type: $file_type; charset=$charset");
+			header("Content-Type: $file_type");
 
 			print_r($file);
+			self::log();
 			exit();
 		}
 	}

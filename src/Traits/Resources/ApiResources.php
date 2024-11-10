@@ -27,6 +27,7 @@ trait ApiResources
 			self::__api_guards(self::$route['guards'] ?? null);
 
 			print_r(self::__routeSelection());
+			self::log();
 			exit();
 		}
 	}
@@ -88,6 +89,7 @@ trait ApiResources
 					$r_method = '__default';
 				} else {
 					http_response_code(405);
+					self::log();
 					exit('Request method not allowed.');
 				}
 				break;
@@ -136,6 +138,7 @@ trait ApiResources
 			$cl = new $guard($request);
 
 			if ($cl->authorize() !== true) {
+				self::log();
 				exit();
 			}
 		}
@@ -167,6 +170,7 @@ trait ApiResources
 				$this->__api_guards($guards);
 
 				print_r(self::__routeSelection());
+				self::log();
 				exit();
 			}
 		}

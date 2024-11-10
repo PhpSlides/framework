@@ -4,47 +4,52 @@ namespace PhpSlides\Loader;
 
 use PhpSlides\Exception;
 
+/**
+ * The FileLoader class provides functionality for loading, parsing, and
+ * retrieving PHP files dynamically. It includes options for loading files
+ * safely (skipping non-existent files) and parsing file contents as strings.
+ */
 class FileLoader
 {
+	/**
+	 * Stores the result of each loaded or parsed file.
+	 * @var array|null $result
+	 */
 	private array|null $result = null;
 
 	/**
-	 * Load File, and include it in your project
+	 * Loads a specified PHP file into the project.
 	 *
-	 * @throws Exception if the file does not seem to be existing
-	 * @return self
+	 * This method attempts to include the given file. If successful, the result
+	 * is stored and the method returns the current instance for method chaining.
+	 *
+	 * @param string $file The file path to load.
+	 * @throws Exception if the specified file does not exist.
+	 * @return self The instance for chaining.
 	 */
-	public function load ($file): self
+	public function load($file): self
 	{
-		/**
-		 * Checks if File exists
-		 */
-		if (file_exists($file))
-		{
+		if (file_exists($file)) {
 			$result = include $file;
 			$this->result[] = $result;
-
 			return $this;
-		}
-		else
-		{
+		} else {
 			throw new Exception("File does not exist: $file");
 		}
 	}
 
 	/**
-	 * Load File, and include it in your project.
-	 * If the file does not exist then nothing will be executed.
+	 * Safely loads a specified PHP file into the project.
 	 *
-	 * @return self
+	 * This method attempts to include the specified file only if it exists,
+	 * storing the result without throwing an exception if the file is missing.
+	 *
+	 * @param string $file The file path to load.
+	 * @return self The instance for chaining.
 	 */
-	public function safeLoad ($file): self
+	public function safeLoad($file): self
 	{
-		/**
-		 * Checks if File exists
-		 */
-		if (file_exists($file))
-		{
+		if (file_exists($file)) {
 			$result = include $file;
 			$this->result[] = $result;
 		}
@@ -52,89 +57,63 @@ class FileLoader
 	}
 
 	/**
-	 * Get Loaded File Result
+	 * Retrieves the result of loaded or parsed files.
+	 *
+	 * If only one file has been loaded, this method returns its content directly.
+	 * Otherwise, it returns an array of results for multiple files.
+	 *
+	 * @return mixed The content of the loaded file(s), either as a single result or an array.
 	 */
-	public function getLoad ()
+	public function getLoad()
 	{
-		if (count($this->result ?? []) === 1)
-		{
+		if (count($this->result ?? []) === 1) {
 			return $this->result[0];
 		}
 		return $this->result;
 	}
 
 	/**
-	 * Load File Contents and return Parsed Content
-	 * Loaded File will be loaded without executing any code in the file.
+	 * Parses a specified PHP file and stores its content as a string.
 	 *
-	 * It'll wrap the whole code and return them
-	 * Load Included Contents as String
+	 * This method includes the file, capturing its output without executing
+	 * any code within it. Parsed content is stored, with empty content represented
+	 * as an empty string.
 	 *
-	 * @return self Parsed File content as `string` and if no content, returns empty `string`
+	 * @param string $file The file path to parse.
+	 * @throws Exception if the specified file does not exist.
+	 * @return self The instance for chaining.
 	 */
-	public function parseLoad (string $file): self
+	public function parseLoad(string $file): self
 	{
-		/**
-		 * Checks if File exists
-		 */
-		if (file_exists($file))
-		{
-			/**
-			 * Store the file content and clear cache
-			 */
+		if (file_exists($file)) {
 			ob_start();
 			include $file;
 			$output = ob_get_clean();
-
-			if ($output !== false && strlen($output ?? '') > 0)
-			{
-				$this->result[] = $output;
-			}
-			else
-			{
-				$this->result[] = '';
-			}
+			$this->result[] =
+				$output !== false && strlen($output ?? '') > 0 ? $output : '';
 			return $this;
-		}
-		else
-		{
+		} else {
 			throw new Exception("File does not exist: $file");
 		}
 	}
 
 	/**
-	 * Load File Contents and return Parsed Content
-	 * Loaded File will be loaded without executing any code in the file.
+	 * Safely parses a specified PHP file and stores its content as a string.
 	 *
-	 * It'll wrap the whole code and return them
-	 * Load Included Contents as String.
-	 * If the file does not exist then nothing will be executed.
+	 * This method captures the file’s output without executing code in the file.
+	 * If the file is missing, no exception is thrown, allowing flexible handling.
 	 *
-	 * @throws An Exception if the file does not seem to be existing
-	 * @return self Parsed File content as `string` and if no content, returns empty `string`
+	 * @param string $file The file path to parse.
+	 * @return self The instance for chaining.
 	 */
-	public function parseSafeLoad (string $file): self
+	public function parseSafeLoad(string $file): self
 	{
-		/**
-		 * Checks if File exists
-		 */
-		if (file_exists($file))
-		{
-			/**
-			 * Store the file content and clear cache
-			 */
+		if (file_exists($file)) {
 			ob_start();
 			include $file;
 			$output = ob_get_clean();
-
-			if ($output !== false && strlen($output ?? '') > 0)
-			{
-				$this->result[] = $output;
-			}
-			else
-			{
-				$this->result[] = '';
-			}
+			$this->result[] =
+				$output !== false && strlen($output ?? '') > 0 ? $output : '';
 		}
 		return $this;
 	}

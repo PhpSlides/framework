@@ -12,13 +12,14 @@ use PhpSlides\Loader\Autoloader;
 use PhpSlides\Loader\FileLoader;
 use PhpSlides\Database\Database;
 use PhpSlides\Database\Connection;
+use PhpSlides\Controller\Controller;
 use PhpSlides\Interface\ApplicationInterface;
 
 /**
  * The Application class is the foundation of the PhpSlides project
  * and provides methods to configure and initialize the PhpSlides application.
  */
-class Application implements ApplicationInterface
+class Application extends Controller implements ApplicationInterface
 {
 	use Logger, DBLogger {
 		Logger::log insteadof DBLogger;
@@ -28,7 +29,7 @@ class Application implements ApplicationInterface
 	/**
 	 * The version of the PhpSlides application.
 	 */
-	const PHPSLIDES_VERSION = '1.3.5';
+	const PHPSLIDES_VERSION = '1.3.6';
 
 	/**
 	 *  `$log` method prints logs in `requests.log` file in the root of the project each time any request has been received, when setted to true.
@@ -111,7 +112,7 @@ class Application implements ApplicationInterface
 	 *
 	 * @return void
 	 */
-	private static function routing(): void
+	private static function paths(): void
 	{
 		self::$configsDir = self::$basePath . 'src/configs/';
 		self::$viewsDir = self::$basePath . 'src/resources/views/';
@@ -127,7 +128,7 @@ class Application implements ApplicationInterface
 	public function create(): void
 	{
 		self::configure();
-		self::routing();
+		self::paths();
 		session_start();
 
 		$loader = new FileLoader();
@@ -158,11 +159,17 @@ class Application implements ApplicationInterface
 			$loader
 				->load(__DIR__ . '/../Globals/Functions.php')
 				->load(__DIR__ . '/../Config/config.php');
+
+			$config_file = self::config_file();
+			$charset = $config_file['charset'] ?? 'UTF-8';
+
+			http_response_code(200);
+			header("Content-Type: text/html; charset=$charset");
+
 			Route::config();
 		} catch (\Exception $e) {
 			http_response_code(500);
-		} finally {
-			static::log();
+			Logger::log();
 		}
 	}
 }

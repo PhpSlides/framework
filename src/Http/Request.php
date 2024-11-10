@@ -12,6 +12,7 @@ use PhpSlides\Http\Interface\RequestInterface;
  * Class Request
  *
  * Handles HTTP request data including URL parameters, query strings, headers, authentication, body data, and more.
+ * This class provides an abstraction for interacting with the HTTP request in a structured way.
  */
 class Request extends Application implements RequestInterface
 {
@@ -26,6 +27,8 @@ class Request extends Application implements RequestInterface
 	/**
 	 * Request constructor.
 	 *
+	 * Initializes the request object and optionally accepts URL parameters.
+	 *
 	 * @param ?array $urlParam Optional URL parameters.
 	 */
 	public function __construct(?array $urlParam = null)
@@ -34,11 +37,13 @@ class Request extends Application implements RequestInterface
 	}
 
 	/**
-	 * Returns URL parameters as an object.
+	 * Returns URL parameters as an object or a specific parameter if key is provided.
 	 *
-	 * @param ?string $key If specified it'll get a particular parameter value using this $key
-	 * and if not specified it'll return an object intries of all key & values
-	 * @return object|string The URL parameters.
+	 * This method retrieves the URL parameters for the current request. If a key is provided, it returns the
+	 * value for that parameter; otherwise, it returns all parameters as an object.
+	 *
+	 * @param ?string $key If specified, retrieves the value of the given parameter key.
+	 * @return object|string The URL parameters or a specific parameter value.
 	 */
 	public function urlParam(?string $key = null): object|string
 	{
@@ -51,17 +56,22 @@ class Request extends Application implements RequestInterface
 	/**
 	 * Parses and returns the query string parameters from the URL.
 	 *
-	 * @param ?string $name Get a particular query and if not specified, it'll list all queries as an object
-	 * @return stdClass|string The parsed query parameters.
+	 * This method parses the query string of the request URL and returns it as an object. If a name is specified,
+	 * it will return the specific query parameter value.
+	 *
+	 * @param ?string $name If specified, returns a specific query parameter by name.
+	 * @return stdClass|string The parsed query parameters or a specific parameter value.
 	 */
 	public function urlQuery(?string $name = null): stdClass|string
 	{
 		if (php_sapi_name() == 'cli-server') {
-			$parsed = urldecode(parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY));
+			$parsed = urldecode(
+				parse_url($this->server('REQUEST_URI'), PHP_URL_QUERY)
+			);
 		} else {
 			$parsed = urldecode(
 				parse_url(
-					$_REQUEST['uri'] ?? $_SERVER['REQUEST_URI'],
+					$_REQUEST['uri'] ?? $this->server('REQUEST_URI'),
 					PHP_URL_QUERY
 				)
 			);
@@ -93,7 +103,10 @@ class Request extends Application implements RequestInterface
 	/**
 	 * Retrieves headers from the request.
 	 *
-	 * @param ?string $name Optional header name to retrieve a specific header.
+	 * This method returns the headers sent with the HTTP request. If a specific header name is provided,
+	 * it will return the value of that header; otherwise, it returns all headers as an object.
+	 *
+	 * @param ?string $name The header name to retrieve. If omitted, returns all headers.
 	 * @return mixed The headers, or a specific header value if $name is provided.
 	 */
 	public function headers(?string $name = null): mixed
@@ -113,6 +126,9 @@ class Request extends Application implements RequestInterface
 	/**
 	 * Retrieves authentication credentials from the request.
 	 *
+	 * This method retrieves the authentication credentials from the request, including both Basic Auth and Bearer token.
+	 * Returns an object with `basic` and `bearer` properties containing the respective credentials.
+	 *
 	 * @return stdClass The authentication credentials.
 	 */
 	public function auth(): stdClass
@@ -125,11 +141,13 @@ class Request extends Application implements RequestInterface
 	}
 
 	/**
-	 * Get the request body and if no parameter is specified,
-	 * Parses and returns the body of the request as an associative array.
+	 * Retrieves the request body as an associative array.
 	 *
-	 * @param ?string $name The particular request body to get
-	 * @return mixed The request body data, or null if parsing fails.
+	 * This method parses the raw POST body data and returns it as an associative array.
+	 * If a specific parameter is provided, it returns only that parameter's value.
+	 *
+	 * @param ?string $name The name of the body parameter to retrieve.
+	 * @return mixed The body data or null if parsing fails.
 	 */
 	public function body(?string $name = null): mixed
 	{
@@ -147,7 +165,9 @@ class Request extends Application implements RequestInterface
 
 	/**
 	 * Retrieves a GET parameter by key.
-	 * And if no parameter is provided, returns all key and values in pairs
+	 *
+	 * This method retrieves the value of a GET parameter by key. If no key is specified, it returns all GET parameters
+	 * as an object.
 	 *
 	 * @param ?string $key The key of the GET parameter.
 	 * @return mixed The parameter value, or null if not set.
@@ -165,10 +185,12 @@ class Request extends Application implements RequestInterface
 
 	/**
 	 * Retrieves a POST parameter by key.
-	 * And if no parameter is provided, returns all key and values in pairs
 	 *
-	 * @param string $key The key of the POST parameter.
-	 * @return mixed The parameter values, or null if not set.
+	 * This method retrieves the value of a POST parameter by key. If no key is specified, it returns all POST parameters
+	 * as an object.
+	 *
+	 * @param ?string $key The key of the POST parameter.
+	 * @return mixed The parameter value, or null if not set.
 	 */
 	public function post(?string $key = null): mixed
 	{
@@ -185,7 +207,9 @@ class Request extends Application implements RequestInterface
 
 	/**
 	 * Retrieves a request parameter by key from all input sources.
-	 * And if no parameter is provided, returns all key and values in pairs
+	 *
+	 * This method retrieves the value of a request parameter (from GET, POST, or the request body).
+	 * If no key is specified, it returns all parameters as an object.
 	 *
 	 * @param ?string $key The key of the request parameter.
 	 * @return mixed The parameter value, or null if not set.
@@ -205,7 +229,9 @@ class Request extends Application implements RequestInterface
 
 	/**
 	 * Retrieves file data from the request by name.
-	 * And if no parameter is provided, returns all key and values in pairs
+	 *
+	 * This method retrieves file data from the request. If a name is provided, it returns the file data for that specific
+	 * input field; otherwise, it returns all file data as an object.
 	 *
 	 * @param ?string $name The name of the file input.
 	 * @return object|null File data, or null if not set.
@@ -226,8 +252,10 @@ class Request extends Application implements RequestInterface
 	/**
 	 * Retrieves a cookie value by key, or all cookies if no key is provided.
 	 *
-	 * @param ?string $key Optional cookie key.
-	 * @return mixed The cookie value, all cookies as an object, or null if key is provided but not found.
+	 * This method retrieves a specific cookie by its key. If no key is provided, it returns all cookies as an object.
+	 *
+	 * @param ?string $key The key of the cookie.
+	 * @return mixed The cookie value, or null if not set.
 	 */
 	public function cookie(?string $key = null): mixed
 	{
@@ -238,28 +266,38 @@ class Request extends Application implements RequestInterface
 	}
 
 	/**
-	 * Retrieves a session value by key, or all session if no key is provided.
+	 * Retrieves a session value by key, or all session data if no key is provided.
 	 *
-	 * @param ?string $key Optional cookie key.
-	 * @return mixed The cookie value, all cookies as an object, or null if key is provided but not found.
+	 * This method retrieves a specific session value by key. If no key is specified, it returns all session data as an object.
+	 * It ensures that the session is started before accessing session data.
+	 *
+	 * @param ?string $key The key of the session value.
+	 * @return mixed The session value, or null if not set.
 	 */
 	public function session(?string $key = null): mixed
 	{
+		// Start the session if it's not already started
 		session_status() < 2 && session_start();
+
+		// If no key is provided, return all session data as an object
 		if (!$key) {
 			return (object) $this->validate($_SESSION);
 		}
+
+		// If the session key exists, return its value; otherwise, return null
 		return isset($_SESSION[$key]) ? $this->validate($_SESSION[$key]) : null;
 	}
 
 	/**
-	 * Retrieves the HTTP method used for the request.
+	 * Retrieves the HTTP request method (GET, POST, PUT, DELETE, etc.).
 	 *
-	 * @return string The HTTP method (e.g., GET, POST).
+	 * This method provides the HTTP request method used in the current request, e.g., "GET", "POST", "PUT", etc.
+	 *
+	 * @return string The HTTP method of the request.
 	 */
 	public function method(): string
 	{
-		return $_SERVER['REQUEST_METHOD'];
+		return $this->server('REQUEST_METHOD');
 	}
 
 	/**
@@ -289,34 +327,43 @@ class Request extends Application implements RequestInterface
 	}
 
 	/**
-	 * Retrieves the client's IP address.
+	 * Retrieves the IP address of the client making the request.
+	 *
+	 * This method returns the IP address of the client that initiated the request, taking into account possible proxies or load balancers.
 	 *
 	 * @return string The client's IP address.
 	 */
 	public function ip(): string
 	{
-		return $this->validate($_SERVER['REMOTE_ADDR']);
+		// Check for forwarded IP addresses from proxies or load balancers
+		if ($this->server('HTTP_X_FORWARDED_FOR') !== null) {
+			return $this->server('HTTP_X_FORWARDED_FOR');
+		}
+		return $this->server('REMOTE_ADDR');
 	}
 
 	/**
-	 * Retrieves the client's user agent string.
+	 * Retrieves the user agent string from the request headers.
 	 *
-	 * @return string The user agent string.
+	 * This method returns the value of the `User-Agent` header, which typically contains information about the client's browser and operating system.
+	 *
+	 * @return string The user agent.
 	 */
 	public function userAgent(): string
 	{
-		return $this->validate($_SERVER['HTTP_USER_AGENT']);
+		return $this->server('HTTP_USER_AGENT');
 	}
 
 	/**
-	 * Checks if the request was made via AJAX.
+	 * Checks if the current request is an AJAX request.
 	 *
-	 * @return bool True if the request is an AJAX request, false otherwise.
+	 * This method determines if the current request was made via AJAX by checking the value of the `X-Requested-With` header.
+	 *
+	 * @return bool Returns true if the request is an AJAX request, otherwise false.
 	 */
 	public function isAjax(): bool
 	{
-		return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
-			strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+		return $this->server('HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest';
 	}
 
 	/**
@@ -326,8 +373,8 @@ class Request extends Application implements RequestInterface
 	 */
 	public function referrer(): ?string
 	{
-		return isset($_SERVER['HTTP_REFERER'])
-			? $this->validate($_SERVER['HTTP_REFERER'])
+		return $this->server('HTTP_REFERER') !== null
+			? $this->server('HTTP_REFERER')
 			: null;
 	}
 
@@ -338,7 +385,7 @@ class Request extends Application implements RequestInterface
 	 */
 	public function protocol(): string
 	{
-		return $this->validate($_SERVER['SERVER_PROTOCOL']);
+		return $this->server('SERVER_PROTOCOL');
 	}
 
 	/**
@@ -385,7 +432,7 @@ class Request extends Application implements RequestInterface
 	 */
 	public function isHttps(): bool
 	{
-		return isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
+		return isset($this->server('HTTPS')) && $this->server('HTTPS') === 'on';
 	}
 
 	/**
@@ -395,6 +442,32 @@ class Request extends Application implements RequestInterface
 	 */
 	public function requestTime(): int
 	{
-		return $_SERVER['REQUEST_TIME'];
+		return $this->server('REQUEST_TIME');
+	}
+
+	/**
+	 * Returns the content type of the request.
+	 *
+	 * This method returns the value of the `Content-Type` header, which indicates the type of data being sent in the request.
+	 *
+	 * @return string|null The content type, or null if not set.
+	 */
+	public function contentType(): ?string
+	{
+		return $this->headers('Content-Type');
+	}
+
+	/**
+	 * Returns the length of the request's body content.
+	 *
+	 * This method returns the value of the `Content-Length` header, which indicates the size of the request body in bytes.
+	 *
+	 * @return int|null The content length, or null if not set.
+	 */
+	public function contentLength(): ?int
+	{
+		return $this->server('CONTENT_LENGTH') !== null
+			? (int) $this->server('CONTENT_LENGTH')
+			: null;
 	}
 }

@@ -13,7 +13,6 @@ class MapRoute extends Controller implements MapInterface
 {
 	private static string|array $route;
 	private static string $request_uri;
-	private static string $charset;
 	private static array $method;
 
 	/**
@@ -24,8 +23,6 @@ class MapRoute extends Controller implements MapInterface
 	 */
 	public function match(string $method, string|array $route): bool|array
 	{
-		$config_file = self::config_file();
-		self::$charset = $config_file['charset'] ?? 'UTF-8';
 		self::$method = explode('|', $method);
 		/**
 		 *   ----------------------------------------------
@@ -137,18 +134,12 @@ class MapRoute extends Controller implements MapInterface
 				exit('Method Not Allowed');
 			}
 
-			$charset = self::$charset;
-
-			http_response_code(200);
-			header("Content-Type: text/html; charset=$charset");
-
-			$s = [
+			return [
 				'method' => $_SERVER['REQUEST_METHOD'],
 				'route' => self::$route,
 				'params_value' => $req_value,
 				'params' => $req
 			];
-			return $s;
 		}
 
 		return false;
@@ -184,10 +175,6 @@ class MapRoute extends Controller implements MapInterface
 			}
 
 			$method = implode('|', self::$method);
-			$charset = self::$charset;
-
-			http_response_code(200);
-			header("Content-Type: text/html; charset=$charset");
 
 			return [
 				'method' => $_SERVER['REQUEST_METHOD'],
