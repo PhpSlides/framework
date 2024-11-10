@@ -4,52 +4,84 @@ namespace PhpSlides\Http\Auth;
 
 trait Authentication
 {
-	private static $authorizationHeader;
+    // Static variable to store the authorization header
+    private static ?string $authorizationHeader = null;
 
-	private static function getAuthorizationHeader ()
-	{
-		$headers = getallheaders();
-		self::$authorizationHeader = isset($headers['Authorization'])
-		 ? $headers['Authorization']
-		 : null;
-	}
+    /**
+     * Retrieves the Authorization header from the request.
+     *
+     * This method fetches all headers from the request and stores the Authorization header
+     * in a static property for subsequent use in authentication methods.
+     *
+     * @return void
+     */
+    private static function getAuthorizationHeader(): void
+    {
+        $headers = getallheaders();
+        self::$authorizationHeader = isset($headers['Authorization']) ? $headers['Authorization'] : null;
+    }
 
-	/**
-	 * Get Basic Authentication Credentials
-	 */
-	public static function BasicAuthCredentials (): ?array
-	{
-		self::getAuthorizationHeader();
+    /**
+     * Get Basic Authentication credentials from the Authorization header.
+     *
+     * This method checks the `Authorization` header for the Basic authentication scheme,
+     * decodes the Base64 credentials, and splits them into the username and password.
+     *
+     * The username and password are returned as an associative array, or null if the 
+     * authorization header is not found or does not contain Basic credentials.
+     *
+     * @return array|null Returns an associative array with 'username' and 'password' or null if not found.
+     */
+    public static function BasicAuthCredentials(): ?array
+    {
+        self::getAuthorizationHeader();
 
-		if (
-		self::$authorizationHeader &&
-		strpos(self::$authorizationHeader, 'Basic ') === 0
-		)
-		{
-			$base64Credentials = substr(self::$authorizationHeader, 6);
-			$decodedCredentials = base64_decode($base64Credentials);
+        // Check if the Authorization header is set and starts with "Basic"
+        if (self::$authorizationHeader && strpos(self::$authorizationHeader, 'Basic ') === 0) {
+            // Remove "Basic " from the header to extract base64 encoded credentials
+            $base64Credentials = substr(self::$authorizationHeader, 6);
 
-			[ $username, $password ] = explode(':', $decodedCredentials, 2);
-			return [ 'username' => trim(htmlspecialchars($username)), 'password' => trim(htmlspecialchars($password)) ];
-		}
-		return null;
-	}
+            // Decode the base64 credentials
+            $decodedCredentials = base64_decode($base64Credentials, true);
 
-	/**
-	 * Get Bearer Token Authentication
-	 */
-	public static function BearerToken (): ?string
-	{
-		self::getAuthorizationHeader();
+            // Check if decoding was successful
+            if ($decodedCredentials === false) {
+                return null; // Return null if decoding fails
+            }
 
-		if (
-		self::$authorizationHeader &&
-		strpos(self::$authorizationHeader, 'Bearer ') === 0
-		)
-		{
-			$token = substr(self::$authorizationHeader, 7);
-			return $token;
-		}
-		return null;
-	}
+            // Split the decoded string into username and password
+            [$username, $password] = explode(':', $decodedCredentials, 2);
+
+            // Return the credentials as an associative array
+            return [
+                'username' => trim(htmlspecialchars($username)),
+                'password' => trim(htmlspecialchars($password)),
+            ];
+        }
+
+        // Return null if no valid Basic Auth credentials are found
+        return null;
+    }
+
+    /**
+     * Get Bearer Token from the Authorization header.
+     *
+     * This method checks the `Authorization` header for the Bearer authentication scheme
+     * and returns the token if found.
+     *
+     * @return string|null Returns the token as a string, or null if not found.
+     */
+    public static function BearerToken(): ?string
+    {
+        self::getAuthorizationHeader();
+
+        // Check if the Authorization header is set and starts with "Bearer"
+        if (self::$authorizationHeader && strpos(self::$authorizationHeader, 'Bearer ') === 0) {
+            // Extract the token by removing "Bearer " from the header
+            return substr(self::$authorizationHeader, 7);
+        }
+
+        // Return null if no Bearer token is found
+        return null;
+    }
 }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 use PhpSlides\Route;
 use PhpSlides\Exception;
@@ -19,13 +19,15 @@ const ABSOLUTE_PATH = 'root_path';
 /**
  *    -----------------------------------------------------------
  *   |
+ *   | Includes view file and returned the formatted view file as string
+ *
  *   @param string $filename The file which to gets the contents
  *   @param mixed ...$props Properties in which would be available in the file
  *   @return mixed The executed included file received
  *   |
  *    -----------------------------------------------------------
  */
-function slides_include(string $filename, mixed ...$props): mixed
+function psl(string $filename, mixed ...$props): mixed
 {
 	$loaded = (new ViewLoader())->load($filename, ...$props);
 	return $loaded->getLoad();
@@ -228,35 +230,40 @@ function payload(
 }
 
 /**
- * Handle Properties in view files.
+ * Handles properties in view files.
  *
- * @param ?string $name The name of the property value to get
- * if not specified, it'll return the whole properties names and values in pair.
+ * Retrieves a specific property or all properties from the `\PhpSlides\Props` class.
+ * - If a name is provided, it returns the corresponding property.
+ * - If no name is given, it returns all properties, with special handling for properties starting with an underscore.
+ *
+ * @param ?string $name The property name to retrieve. If null, all properties are returned.
+ *
+ * @return array|mixed The value of the specified property, or all properties if no name is given.
  */
 function Props(?string $name = null)
 {
 	if ($name === null) {
-		$all = \PhpSlides\Props::all();
-		$new_all = [];
+		$allProperties = \PhpSlides\Props::all();
+		$filteredProperties = [];
 
-		foreach ($all as $key => $value) {
+		foreach ($allProperties as $key => $value) {
 			if (str_starts_with($key, '_')) {
-				$s = substr($key, 1);
-
-				if (is_numeric($s)) {
-					$new_all[$s] = $value;
+				$numericKey = substr($key, 1);
+				if (is_numeric($numericKey)) {
+					$filteredProperties[$numericKey] = $value;
 				}
 			} else {
-				$new_all[$key] = $value;
+				$filteredProperties[$key] = $value;
 			}
 		}
-		return $new_all;
+
+		return $filteredProperties;
 	}
 
 	if (is_numeric($name)) {
 		$name = '_' . $name;
-		return (new \PhpSlides\Props())->$name;
 	}
+
 	return (new \PhpSlides\Props())->$name;
 }
 

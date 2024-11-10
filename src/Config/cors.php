@@ -19,20 +19,19 @@ foreach ($cors as $key => $value) {
 	header($header_value);
 }
 
-class Log
-{
-	use Logger;
-	public function __construct()
-	{
-		self::log();
-	}
-}
-
 /**
  * Handle preflight requests (OPTIONS method)
  */
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+	class Log
+	{
+		use Logger;
+		public function __construct()
+		{
+			self::log();
+		}
+	}
+
 	new Log();
-	http_response_code(200);
 	exit();
 }

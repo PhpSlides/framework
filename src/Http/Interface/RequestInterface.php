@@ -198,4 +198,22 @@ interface RequestInterface
 	 * @return int The request time as a Unix timestamp.
 	 */
 	public function requestTime(): int;
+
+	/**
+	 * Returns the content type of the request.
+	 *
+	 * This method returns the value of the `Content-Type` header, which indicates the type of data being sent in the request.
+	 *
+	 * @return string|null The content type, or null if not set.
+	 */
+	public function contentType(): ?string;
+
+	/**
+	 * Returns the length of the request's body content.
+	 *
+	 * This method returns the value of the `Content-Length` header, which indicates the size of the request body in bytes.
+	 *
+	 * @return int|null The content length, or null if not set.
+	 */
+	public function contentLength(): ?int;
 }

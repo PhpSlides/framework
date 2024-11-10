@@ -2,15 +2,48 @@
 
 namespace PhpSlides\Formatter;
 
+/**
+ * Abstract class for formatting SQL column definitions.
+ *
+ * This class provides functionality for formatting SQL column definitions based on various column attributes.
+ * The formatting includes handling types, lengths, nullability, defaults, constraints, and other column-specific properties.
+ */
 abstract class SqlFormat
 {
+	/**
+	 * The column types and attributes.
+	 *
+	 * This property holds an array of column properties that define the column's characteristics such as name, type,
+	 * length, nullability, default values, and other constraints.
+	 * It is intended to be populated by a subclass or an instance.
+	 *
+	 * @var array
+	 */
 	protected $column_types;
 
+	/**
+	 * Trim quotes from a string.
+	 *
+	 * This helper function removes any surrounding single or double quotes from a string.
+	 *
+	 * @param string $value The value to trim quotes from.
+	 * @return string The value without surrounding quotes.
+	 */
 	private function trimQuote($value): string
 	{
 		return trim($value, "'\"");
 	}
 
+	/**
+	 * Format the column definition based on the provided column properties.
+	 *
+	 * This method constructs an SQL column definition string and a set of constraints based on the properties
+	 * of the column in `$this->column_types`. It handles various column attributes such as type, length, nullability,
+	 * default values, indexing, and foreign keys, among others.
+	 *
+	 * @param array $constraint The existing constraints to which new constraints might be added.
+	 * @return array An array containing the formatted column definition string and the updated constraints.
+	 */
 	protected function format(array $constraint): array
 	{
 		$column = $this->column_types;

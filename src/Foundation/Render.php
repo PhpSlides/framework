@@ -7,19 +7,24 @@ use PhpSlides\Foundation\Application;
 use PhpSlides\Traits\Resources\Resources;
 
 /**
- * Render all registered routes
+ * Handles the rendering of all registered routes.
  */
 final class Render extends Controller
 {
 	use Resources;
 
+	/**
+	 * Loads the request URI for routing.
+	 */
 	private static function Load()
 	{
 		self::$request_uri = Application::$request_uri;
 	}
 
 	/**
-	 * Render the web route - primary routing
+	 * Handles rendering of web routes based on the registered routes.
+	 * Loops through all registered web routes and processes actions like redirection,
+	 * method handling, guards, view rendering, and others.
 	 */
 	public static function WebRoute()
 	{
@@ -59,6 +64,10 @@ final class Render extends Controller
 		}
 	}
 
+	/**
+	 * Handles rendering of API routes based on the registered API routes.
+	 * Loops through all registered API routes and processes their respective map and route actions.
+	 */
 	public static function ApiRoute()
 	{
 		self::Load();
@@ -79,9 +88,15 @@ final class Render extends Controller
 		}
 	}
 
+	/**
+	 * Placeholder function for handling form routes.
+	 * Currently, the implementation for form routes is not defined.
+	 */
 	public static function FormsRoute()
 	{
 		self::Load();
 		$reg_route = $GLOBALS['__registered_forms_routes'] ?? null;
+
+		// Future form handling can be implemented here.
 	}
 }

@@ -5,33 +5,35 @@ namespace PhpSlides;
 use PhpSlides\Exception;
 use PhpSlides\Logger\Logger;
 use PhpSlides\Traits\FileHandler;
-use PhpSlides\Controller\Controller;
 use PhpSlides\Foundation\Application;
 
 /**
- *   --------------------------------------------------------------
+ * --------------------------------------------------------------
+ * Router View
  *
- *   Router View
+ * This class controls public URL parsing and validation. It is responsible for rendering views
+ * and parsing public URLs within views.
  *
- *   Which control the public URL and validating.
- *   This class is used in rendering views and parsing public URL in views.
- *
- *   --------------------------------------------------------------
+ * --------------------------------------------------------------
  */
-final class view extends Controller
+final class view
 {
 	use Logger, FileHandler;
 
 	/**
-	 *   --------------------------------------------------------------
+	 * --------------------------------------------------------------
+	 * Render Views and Parse Public URL in Views
 	 *
-	 * Render views and parse public URL in views
+	 * This method is used to render a view by parsing the provided view name, validating
+	 * the path, and passing any additional parameters to the view file.
+	 * It returns the output from the view file as a result.
 	 *
-	 * @param string $view
-	 * @param mixed ...$props
-	 * @return mixed return the file gotten from the view parameters
+	 * @param string $view The name or path of the view to be rendered.
+	 * @param mixed ...$props Additional parameters to be passed into the view.
 	 *
-	 *   --------------------------------------------------------------
+	 * @return mixed The rendered content of the view.
+	 *
+	 * --------------------------------------------------------------
 	 */
 	final public static function render(string $view, mixed ...$props): mixed
 	{
@@ -41,6 +43,6 @@ final class view extends Controller
 		$file_uri = Application::$viewsDir . $file;
 		header('Content-Type: text/html');
 
-		return self::slides_include($file_uri, ...$props);
+		return \psl($file_uri, ...$props);
 	}
 }
