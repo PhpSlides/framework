@@ -33,7 +33,7 @@ class Application extends Controller implements ApplicationInterface
 	/**
 	 * The version of the PhpSlides application.
 	 */
-	const PHPSLIDES_VERSION = '1.3.6';
+	const PHPSLIDES_VERSION = '1.3.7';
 
 	/**
 	 *  `$log` method prints logs in `requests.log` file in the root of the project each time any request has been received, when setted to true.
