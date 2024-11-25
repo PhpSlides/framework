@@ -1,4 +1,7 @@
 <?php
+/**
+ * @format
+ */
 
 namespace PhpSlides\Formatter\Views;
 
@@ -46,7 +49,7 @@ trait FormatHotReload
 		// Get session ID and PhpSlides version
 		$sid = session_id();
 		$phpslides_version = Application::PHPSLIDES_VERSION;
-		$host = $protocol . $_SERVER['HTTP_HOST'] . "/hot-reload-$sid";
+		$host = $protocol . $_SERVER['HTTP_HOST'] . "/hot-reload-a$sid";
 
 		// Check if HOT_RELOAD is enabled in the environment
 		if (getenv('HOT_RELOAD') == 'true') {
@@ -73,7 +76,7 @@ trait FormatHotReload
        }, 1000);
    </script>\n
 </body>",
-				$this->contents
+				$this->contents,
 			);
 		}
 

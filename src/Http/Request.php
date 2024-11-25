@@ -1,4 +1,8 @@
-<?php declare(strict_types=1);
+<?php
+/**
+ * @format
+ */
+declare(strict_types=1);
 
 namespace PhpSlides\Http;
 
@@ -65,15 +69,11 @@ class Request extends Application implements RequestInterface
 	public function urlQuery(?string $name = null): stdClass|string
 	{
 		if (php_sapi_name() == 'cli-server') {
-			$parsed = urldecode(
-				parse_url($this->server('REQUEST_URI'), PHP_URL_QUERY)
-			);
+			$parsed = parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY);
 		} else {
-			$parsed = urldecode(
-				parse_url(
-					$_REQUEST['uri'] ?? $this->server('REQUEST_URI'),
-					PHP_URL_QUERY
-				)
+			$parsed = parse_url(
+				$_REQUEST['uri'] ?? $_SERVER['REQUEST_URI'],
+				PHP_URL_QUERY,
 			);
 		}
 
@@ -82,7 +82,7 @@ class Request extends Application implements RequestInterface
 		if (!$parsed) {
 			return $cl;
 		}
-		$parsed = mb_split('&', $parsed);
+		$parsed = mb_split('&', urldecode($parsed));
 
 		$i = 0;
 		while ($i < count($parsed)) {
@@ -297,7 +297,7 @@ class Request extends Application implements RequestInterface
 	 */
 	public function method(): string
 	{
-		return $this->server('REQUEST_METHOD');
+		return $_SERVER['REQUEST_METHOD'];
 	}
 
 	/**
@@ -336,10 +336,10 @@ class Request extends Application implements RequestInterface
 	public function ip(): string
 	{
 		// Check for forwarded IP addresses from proxies or load balancers
-		if ($this->server('HTTP_X_FORWARDED_FOR') !== null) {
-			return $this->server('HTTP_X_FORWARDED_FOR');
+		if ($_SERVER['HTTP_X_FORWARDED_FOR'] !== null) {
+			return $_SERVER['HTTP_X_FORWARDED_FOR'];
 		}
-		return $this->server('REMOTE_ADDR');
+		return $_SERVER['REMOTE_ADDR'];
 	}
 
 	/**
@@ -351,7 +351,7 @@ class Request extends Application implements RequestInterface
 	 */
 	public function userAgent(): string
 	{
-		return $this->server('HTTP_USER_AGENT');
+		return $_SERVER['HTTP_USER_AGENT'];
 	}
 
 	/**
@@ -363,7 +363,7 @@ class Request extends Application implements RequestInterface
 	 */
 	public function isAjax(): bool
 	{
-		return $this->server('HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest';
+		return $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest';
 	}
 
 	/**
@@ -373,8 +373,8 @@ class Request extends Application implements RequestInterface
 	 */
 	public function referrer(): ?string
 	{
-		return $this->server('HTTP_REFERER') !== null
-			? $this->server('HTTP_REFERER')
+		return $_SERVER['HTTP_REFERER'] !== null
+			? $_SERVER['HTTP_REFERER']
 			: null;
 	}
 
@@ -385,7 +385,7 @@ class Request extends Application implements RequestInterface
 	 */
 	public function protocol(): string
 	{
-		return $this->server('SERVER_PROTOCOL');
+		return $_SERVER['SERVER_PROTOCOL'];
 	}
 
 	/**
@@ -411,7 +411,7 @@ class Request extends Application implements RequestInterface
 		if (!$key) {
 			return $this->validate($_SERVER);
 		}
-		return isset($_SERVER[$key]) ? $this->validate($_SERVER[$key]) : null;
+		return $_SERVER[$key] !== null ? $this->validate($_SERVER[$key]) : null;
 	}
 
 	/**
@@ -432,7 +432,7 @@ class Request extends Application implements RequestInterface
 	 */
 	public function isHttps(): bool
 	{
-		return isset($this->server('HTTPS')) && $this->server('HTTPS') === 'on';
+		return $_SERVER['HTTPS'] !== null && $_SERVER['HTTPS'] === 'on';
 	}
 
 	/**
@@ -442,7 +442,7 @@ class Request extends Application implements RequestInterface
 	 */
 	public function requestTime(): int
 	{
-		return $this->server('REQUEST_TIME');
+		return $_SERVER['REQUEST_TIME'];
 	}
 
 	/**
@@ -466,8 +466,8 @@ class Request extends Application implements RequestInterface
 	 */
 	public function contentLength(): ?int
 	{
-		return $this->server('CONTENT_LENGTH') !== null
-			? (int) $this->server('CONTENT_LENGTH')
+		return $_SERVER['CONTENT_LENGTH'] !== null
+			? (int) $_SERVER['CONTENT_LENGTH']
 			: null;
 	}
 }
