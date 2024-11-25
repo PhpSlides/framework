@@ -1,4 +1,8 @@
-<?php declare(strict_types=1);
+<?php
+/**
+ * @format
+ */
+declare(strict_types=1);
 
 namespace PhpSlides\Foundation;
 
@@ -96,12 +100,15 @@ class Application extends Controller implements ApplicationInterface
 	{
 		if (php_sapi_name() == 'cli-server') {
 			self::$request_uri = urldecode(
-				parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)
+				parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),
 			);
 			self::$basePath = '';
 		} else {
 			self::$request_uri = urldecode(
-				parse_url($_REQUEST['uri'] ?? $_SERVER['REQUEST_URI'], PHP_URL_PATH)
+				parse_url(
+					$_REQUEST['uri'] ?? $_SERVER['REQUEST_URI'],
+					PHP_URL_PATH,
+				),
 			);
 			self::$basePath = '../../';
 		}
@@ -140,7 +147,7 @@ class Application extends Controller implements ApplicationInterface
 		$sid = session_id();
 
 		if (getenv('HOT_RELOAD') == 'true') {
-			Route::post("/hot-reload-$sid", fn() => (new HotReload())->reload());
+			Route::post("/hot-reload-a$sid", fn() => (new HotReload())->reload());
 		}
 
 		try {

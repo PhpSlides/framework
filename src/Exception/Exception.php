@@ -1,4 +1,7 @@
 <?php
+/**
+ * @format
+ */
 
 namespace PhpSlides;
 
@@ -33,7 +36,7 @@ class Exception extends DefaultException implements SlidesException
 			'Error: %s in %s on line %d',
 			$this->getMessage(),
 			$file,
-			$line
+			$line,
 		);
 	}
 
@@ -45,33 +48,41 @@ class Exception extends DefaultException implements SlidesException
 	public function filterStackTrace(): array
 	{
 		/**
-        /**
-         * This filter removes all file paths that come from the vendor folders.
-         */
+		 * This filter removes all file paths that come from the vendor folders.
+		 */
+
+		/*
 		$majorFilter = array_filter($this->getTrace(), function ($item) {
 			$ss = strpos($item['file'], '/vendor/') === false;
 			$sss = strpos($item['file'], '\vendor\\') === false;
 
 			return $ss && $sss === true;
 		});
+	   */
 
 		/**
 		 * This filter adds only file paths from the vendor folders.
 		 */
+
+		/*
 		$minorFilter = array_filter($this->getTrace(), function ($item) {
 			$ss = strpos($item['file'], '/vendor/') !== false;
 			$sss = strpos($item['file'], '\vendor\\') !== false;
 
 			return $ss || $sss === true;
 		});
+      */
 
 		/**
 		 * Create a new array and merge them together.
 		 * Major filters first, then the minor filters.
 		 */
+
+		/*
 		$majorFilterValue = array_values($majorFilter);
 		$minorFilterValue = array_values($minorFilter);
 		$newFilter = array_merge($majorFilterValue, $minorFilterValue);
+      */
 
 		/**
 		 * Replace generated views files to the corresponding view
@@ -79,10 +90,9 @@ class Exception extends DefaultException implements SlidesException
 		$newFilter = array_map(function ($item) {
 			$item['file'] = str_replace('.g.php', '.php', $item['file']);
 			$item['file'] = str_replace('.g.psl', '.psl', $item['file']);
-			$item['file'] = str_replace('.g.view.php', '.view.php', $item['file']);
 
 			return $item;
-		}, $newFilter);
+		}, $this->getTrace());
 
 		return $newFilter;
 	}
@@ -133,7 +143,7 @@ class Exception extends DefaultException implements SlidesException
 			file: $file,
 			line: $line,
 			linesBefore: $linesBefore,
-			linesAfter: $linesAfter
+			linesAfter: $linesAfter,
 		);
 	}
 }
