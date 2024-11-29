@@ -34,9 +34,9 @@ interface RequestInterface
 	 * Retrieves headers from the request.
 	 *
 	 * @param ?string $name Optional header name to retrieve a specific header.
-	 * @return mixed The headers, or a specific header value if $name is provided.
+	 * @return string|array|null The headers, or a specific header value if $name is provided.
 	 */
-	public function headers(?string $name = null): mixed;
+	public function headers(?string $name = null): string|array|null;
 
 	/**
 	 * Retrieves authentication credentials from the request.

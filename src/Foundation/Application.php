@@ -1,20 +1,17 @@
-<?php
-/**
- * @format
- */
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace PhpSlides\Foundation;
 
 use DB;
 use PhpSlides\Route;
+use PhpSlides\Http\Request;
 use PhpSlides\Forgery\Forge;
 use PhpSlides\Logger\Logger;
 use PhpSlides\Logger\DBLogger;
 use PhpSlides\Loader\HotReload;
+use PhpSlides\Database\Database;
 use PhpSlides\Loader\Autoloader;
 use PhpSlides\Loader\FileLoader;
-use PhpSlides\Database\Database;
 use PhpSlides\Database\Connection;
 use PhpSlides\Controller\Controller;
 use PhpSlides\Interface\ApplicationInterface;
@@ -25,15 +22,21 @@ use PhpSlides\Interface\ApplicationInterface;
  */
 class Application extends Controller implements ApplicationInterface
 {
-	use Logger, DBLogger {
-		Logger::log insteadof DBLogger;
-		DBLogger::log as db_log;
+	use Logger, DBLogger
+	{
+			Logger::log insteadof DBLogger;
+			DBLogger::log as db_log;
 	}
 
 	/**
 	 * The version of the PhpSlides application.
 	 */
-	const PHPSLIDES_VERSION = '1.3.7';
+	public const PHPSLIDES_VERSION = '1.3.8';
+
+	/**
+	 * @var string $REMOTE_ADDR The remote address of the client making the request.
+	 */
+	public static string $REMOTE_ADDR;
 
 	/**
 	 *  `$log` method prints logs in `requests.log` file in the root of the project each time any request has been received, when setted to true.
@@ -96,22 +99,32 @@ class Application extends Controller implements ApplicationInterface
 	 *
 	 * @return self Returns an instance of the Application class.
 	 */
-	private static function configure(): void
+	private static function configure (): void
 	{
-		if (php_sapi_name() == 'cli-server') {
+		if (php_sapi_name() == 'cli-server')
+		{
 			self::$request_uri = urldecode(
-				parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),
+			 parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),
 			);
 			self::$basePath = '';
-		} else {
+		}
+		else
+		{
 			self::$request_uri = urldecode(
-				parse_url(
-					$_REQUEST['uri'] ?? $_SERVER['REQUEST_URI'],
-					PHP_URL_PATH,
-				),
+			 parse_url(
+			  $_REQUEST['uri'] ?? $_SERVER['REQUEST_URI'],
+			  PHP_URL_PATH,
+			 ),
 			);
 			self::$basePath = '../../';
 		}
+
+		$req = new Request();
+		$protocol = $req->isHttps()
+		? 'https://'
+		: 'http://';
+
+		self::$REMOTE_ADDR = $protocol . $req->server('HTTP_HOST');
 	}
 
 	/**
@@ -119,7 +132,7 @@ class Application extends Controller implements ApplicationInterface
 	 *
 	 * @return void
 	 */
-	private static function paths(): void
+	private static function paths (): void
 	{
 		self::$configsDir = self::$basePath . 'src/configs/';
 		self::$viewsDir = self::$basePath . 'src/resources/views/';
@@ -132,7 +145,7 @@ class Application extends Controller implements ApplicationInterface
 	 *
 	 * @return void
 	 */
-	public function create(): void
+	public function create (): void
 	{
 		self::configure();
 		self::paths();
@@ -146,14 +159,25 @@ class Application extends Controller implements ApplicationInterface
 
 		$sid = session_id();
 
-		if (getenv('HOT_RELOAD') == 'true') {
-			Route::post("/hot-reload-a$sid", fn() => (new HotReload())->reload());
+		if (getenv('HOT_RELOAD') == 'true')
+		{
+			Route::post("/hot-reload-a$sid", fn () => (new HotReload())->reload());
+			Route::get("/hot-reload-a$sid/worker", function () use ($sid): string
+			{
+				$addr = self::$REMOTE_ADDR . "/hot-reload-a$sid";
+				header('Content-Type: application/javascript');
+
+				return "(function start() {'use strict';fetch('$addr',{method:'POST'}).then(e=>e.text()).then(e=>'reload'===e&&postMessage(e)).finally(()=>setTimeout(start,1000))})()";
+			});
 		}
 
-		try {
+		try
+		{
 			Connection::init();
 			DB::query('SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA');
-		} catch (\Exception $e) {
+		}
+		catch ( \Exception $e )
+		{
 			//static::db_log('WARNING', $e->getMessage());
 			Database::$_connect_error = $e->getMessage();
 			goto EXECUTION;
@@ -162,10 +186,11 @@ class Application extends Controller implements ApplicationInterface
 		new Autoloader();
 
 		EXECUTION:
-		try {
+		try
+		{
 			$loader
-				->load(__DIR__ . '/../Globals/Functions.php')
-				->load(__DIR__ . '/../Config/config.php');
+			 ->load(__DIR__ . '/../Globals/Functions.php')
+			 ->load(__DIR__ . '/../Config/config.php');
 
 			$config_file = self::config_file();
 			$charset = $config_file['charset'] ?? 'UTF-8';
@@ -174,7 +199,9 @@ class Application extends Controller implements ApplicationInterface
 			header("Content-Type: text/html; charset=$charset");
 
 			Route::config();
-		} catch (\Exception $e) {
+		}
+		catch ( \Exception $e )
+		{
 			http_response_code(500);
 			Logger::log();
 		}

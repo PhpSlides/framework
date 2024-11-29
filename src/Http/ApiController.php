@@ -89,5 +89,6 @@ abstract class ApiController
 	 */
 	public function __default (Request $request)
 	{
+		http_response_code(405);
 	}
 }

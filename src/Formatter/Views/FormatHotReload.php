@@ -1,7 +1,4 @@
-<?php
-/**
- * @format
- */
+<?php declare(strict_types=1);
 
 namespace PhpSlides\Formatter\Views;
 
@@ -22,7 +19,7 @@ trait FormatHotReload
 	 * This constructor is a placeholder for any necessary initialization for
 	 * the class using this trait. It currently does not perform any operations.
 	 */
-	public function __construct()
+	public function __construct ()
 	{
 		// code...
 	}
@@ -37,26 +34,19 @@ trait FormatHotReload
 	 *
 	 * The script also includes PhpSlides version and author information in the comment block.
 	 */
-	protected function hot_reload()
+	protected function hot_reload ()
 	{
-		// Determine the protocol (http or https)
-		$protocol =
-			(!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ||
-			$_SERVER['SERVER_PORT'] == 443
-				? 'https://'
-				: 'http://';
-
-		// Get session ID and PhpSlides version
 		$sid = session_id();
 		$phpslides_version = Application::PHPSLIDES_VERSION;
-		$host = $protocol . $_SERVER['HTTP_HOST'] . "/hot-reload-a$sid";
-
+		$host = Application::$REMOTE_ADDR . "/hot-reload-a$sid/worker";
+		
 		// Check if HOT_RELOAD is enabled in the environment
-		if (getenv('HOT_RELOAD') == 'true') {
+		if (getenv('HOT_RELOAD') == 'true')
+		{
 			// Insert hot reload script into the contents
 			$formattedContents = str_replace(
-				'</body>',
-				"\n
+			 '</body>',
+			 "\n
    <script>
       /**
        * PHPSLIDES HOT RELOAD GENERATED
@@ -65,22 +55,18 @@ trait FormatHotReload
        * @author Dave Conco <info@dconco.dev>
        * @copyright 2023 - 2024 Dave Conco
        */
-       setInterval(function() {
-           fetch('$host', { method: 'POST' })
-               .then(response => response.text())
-               .then(data => {
-                   if (data === 'reload') {
-                       window.location.reload()
-                   }
-               });
-       }, 1000);
+      new Worker('$host').addEventListener('message', (event) => {
+   		if (event.data === 'reload') {
+      		window.location.reload();
+		}
+	  })
    </script>\n
 </body>",
-				$this->contents,
+			 $this->contents,
 			);
 		}
 
 		// Update the contents with the hot reload script if enabled
-		$this->contents = $formattedContents;
+		$this->contents = $formattedContents ?? $this->contents;
 	}
 }
