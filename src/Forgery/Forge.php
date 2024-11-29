@@ -20,7 +20,7 @@ class Forge extends Database
 	{
 		foreach (glob(Application::$basePath . 'App/Forgery/*') as $value)
 		{
-			$value = str_replace('../../', '', $value);
+			$value = ltrim($value, './');
 			$db_name = str_replace('App/Forgery/', '', $value);
 			$sdb_name = $db_name;
 
