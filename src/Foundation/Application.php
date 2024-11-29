@@ -31,7 +31,7 @@ class Application extends Controller implements ApplicationInterface
 	/**
 	 * The version of the PhpSlides application.
 	 */
-	public const PHPSLIDES_VERSION = '1.3.8';
+	public const PHPSLIDES_VERSION = '1.3.9';
 
 	/**
 	 * @var string $REMOTE_ADDR The remote address of the client making the request.
