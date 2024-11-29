@@ -428,7 +428,7 @@ class Request extends Application implements RequestInterface
 	 */
 	public function isHttps(): bool
 	{
-		return $_SERVER['HTTPS'] !== null && ($_SERVER['HTTPS'] === 'on' || $_SERVER['SERVER_PORT'] == 443);
+		return (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') || $_SERVER['SERVER_PORT'] == 443;
 	}
 
 	/**
