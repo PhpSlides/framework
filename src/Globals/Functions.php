@@ -6,7 +6,7 @@ use PhpSlides\Loader\ViewLoader;
 use PhpSlides\Loader\FileLoader;
 use PhpSlides\Foundation\Application;
 
-define('__ROOT__', Application::$basePath);
+putenv(sprintf('__DIR__=%s', Application::$basePath));
 
 const GET = 'GET';
 const PUT = 'PUT';
