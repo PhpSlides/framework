@@ -68,7 +68,7 @@ class Forge extends Database
 				$class = str_replace(
 					'App\\',
 					'',
-					implode('\\', $all_names) . '\\' . $table_name
+					implode('\\', $all_names) . '\\' . $table_name,
 				);
 
 				# Drop Table
@@ -90,7 +90,7 @@ class Forge extends Database
 					if ($table_name != 'options.sql') {
 						static::log(
 							'WARNING',
-							"Ignored Table `$table_name` in `$db_name` Database."
+							"Ignored Table `$table_name` in `$db_name` Database.",
 						);
 					}
 					continue;
@@ -102,7 +102,7 @@ class Forge extends Database
 				$query = DB::query(
 					'SELECT * FROM information_schema.tables WHERE table_schema=%s AND table_name=%s',
 					$db_name,
-					$table_name
+					$table_name,
 				);
 
 				if (!empty($query)) {
@@ -121,10 +121,13 @@ class Forge extends Database
 					'REFERENCES' => null,
 					'DELETE' => null,
 					'UPDATE' => null,
-					'OTHERS' => null
+					'OTHERS' => null,
 				];
 
-				$db_columns = array_keys(DB::columnList($table_name));
+				$db_columns = [];
+				if ($table_already_exists) {
+					$db_columns = array_keys(DB::columnList($table_name));
+				}
 
 				/**
 				 * Filter the array, if the column already exists in the database
@@ -132,7 +135,7 @@ class Forge extends Database
 				 */
 				$filePath = array_filter($filePath, function ($path) use (
 					$table_already_exists,
-					$db_columns
+					$db_columns,
 				) {
 					if ($table_already_exists) {
 						$column_name = self::get_column_name($path);
@@ -166,7 +169,7 @@ class Forge extends Database
 						column_name: $columns[$i][0],
 						path: $columns[$i][1],
 						constraint: $constraint,
-						table_name: $table_name
+						table_name: $table_name,
 					);
 					$query[] = $res[0];
 					$constraint = $res[1];
@@ -240,20 +243,20 @@ class Forge extends Database
 					DB::query("ALTER TABLE $table_name $query");
 					static::log(
 						'INFO',
-						"Altered Table `$table_name` and adds column `$only_columns`"
+						"Altered Table `$table_name` and adds column `$only_columns`",
 					);
 				} else {
 					DB::query("CREATE TABLE $table_name ($query)");
 					static::log(
 						'INFO',
-						"Created Table `$table_name` in `$db_name` Database"
+						"Created Table `$table_name` in `$db_name` Database",
 					);
 				}
 			}
 		} catch (\Exception $e) {
 			static::log(
 				'ERROR',
-				"Unable to create Table `$table_name` in `$db_name` Database. [Exception]: {$e->getMessage()}"
+				"Unable to create Table `$table_name` in `$db_name` Database. [Exception]: {$e->getMessage()}",
 			);
 			return;
 		}
