@@ -1,8 +1,4 @@
-<?php
-/**
- * @format
- */
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace PhpSlides\Http;
 
@@ -432,7 +428,7 @@ class Request extends Application implements RequestInterface
 	 */
 	public function isHttps(): bool
 	{
-		return $_SERVER['HTTPS'] !== null && $_SERVER['HTTPS'] === 'on';
+		return $_SERVER['HTTPS'] !== null && ($_SERVER['HTTPS'] === 'on' || $_SERVER['SERVER_PORT'] == 443);
 	}
 
 	/**
