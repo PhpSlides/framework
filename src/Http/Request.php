@@ -261,6 +261,9 @@ class Request extends Application implements RequestInterface
 		{
 			return null;
 		}
+		if ($_FILES[$name]['error'] !== 0) {
+			return null;
+		}
 
 		$files = $_FILES[$name];
 		return (object) $files;
