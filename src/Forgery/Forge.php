@@ -65,7 +65,7 @@ class Forge extends Database
 
 			foreach (glob(Application::$basePath . "App/Forgery/$db_name/*") as $value)
 			{
-				$value = str_replace('../../', '', $value);
+				$value = ltrim($value, './');
 				$all_names = explode('/', $value);
 				$table_name = end($all_names);
 				$class = str_replace(
