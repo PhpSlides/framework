@@ -39,7 +39,7 @@ trait FormatHotReload
 		$sid = session_id();
 		$phpslides_version = Application::PHPSLIDES_VERSION;
 		$host = Application::$REMOTE_ADDR . "/hot-reload-a$sid/worker";
-
+		
 		// Check if HOT_RELOAD is enabled in the environment
 		if (getenv('HOT_RELOAD') == 'true')
 		{
@@ -67,6 +67,6 @@ trait FormatHotReload
 		}
 
 		// Update the contents with the hot reload script if enabled
-		$this->contents = $formattedContents;
+		$this->contents = $formattedContents ?? $this->contents;
 	}
 }
