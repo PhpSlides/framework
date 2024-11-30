@@ -2,6 +2,7 @@
 
 use PhpSlides\Route;
 use PhpSlides\Exception;
+use PhpSlides\Http\Request;
 use PhpSlides\Loader\ViewLoader;
 use PhpSlides\Loader\FileLoader;
 use PhpSlides\Foundation\Application;
@@ -13,8 +14,9 @@ const PUT = 'PUT';
 const POST = 'POST';
 const PATCH = 'PATCH';
 const DELETE = 'DELETE';
-const RELATIVE_PATH = 'path';
-const ABSOLUTE_PATH = 'root_path';
+const REMOTE_PATH = 2;
+const RELATIVE_PATH = 0;
+const ABSOLUTE_PATH = 1;
 
 /**
  *    -----------------------------------------------------------
@@ -61,7 +63,7 @@ function add_route_name(string $name, string|array $value): void
  */
 function route(
 	string|null $name = null,
-	array|null $param = null
+	array|null $param = null,
 ): array|object|string {
 	$routes = $GLOBALS['__routes'] ?? [];
 
@@ -73,7 +75,7 @@ function route(
 				$route_class->$key = function (string ...$args) use (
 					$routes,
 					$value,
-					$key
+					$key,
 				) {
 					$route = '';
 
@@ -86,14 +88,14 @@ function route(
 									'/\{[^}]+\}/',
 									$args[$i],
 									$value,
-									1
+									1,
 								);
 							} else {
 								$route = preg_replace(
 									'/\{[^}]+\}/',
 									$args[$i],
 									$route,
-									1
+									1,
 								);
 							}
 						}
@@ -121,7 +123,7 @@ function route(
 							'/\{[^}]+\}/',
 							$param[$i],
 							$routes[$name],
-							1
+							1,
 						);
 					} else {
 						$route = preg_replace('/\{[^}]+\}/', $param[$i], $route, 1);
@@ -156,7 +158,7 @@ function asset(string $filename, string $path_type = RELATIVE_PATH): string
 			$self,
 			'/',
 			strrpos($self, $find),
-			strlen($find)
+			strlen($find),
 		);
 	}
 
@@ -175,6 +177,8 @@ function asset(string $filename, string $path_type = RELATIVE_PATH): string
 			return $path . $filename;
 		case ABSOLUTE_PATH:
 			return $root_path . $filename;
+		case REMOTE_PATH:
+			return Application::$REMOTE_ADDR . '/' . $filename;
 		default:
 			return $filename;
 	}
@@ -206,7 +210,7 @@ function payload(
 	array $data,
 	int $expires,
 	int $issued_at = 0,
-	string $issuer = ''
+	string $issuer = '',
 ): array {
 	$jwt = (new FileLoader())
 		->load(__DIR__ . '/../Config/jwt.config.php')
@@ -223,9 +227,9 @@ function payload(
 		[
 			'iss' => $issuer,
 			'iat' => $issued_at,
-			'exp' => $expires
+			'exp' => $expires,
 		],
-		$data
+		$data,
 	);
 }
 
@@ -294,13 +298,21 @@ function ExceptionHandler(Throwable $exception)
 			'Error: %s in %s on line %d',
 			$exception->getMessage(),
 			$file,
-			$line
+			$line,
 		);
 	}
 
 	// Log the detailed error message
 	error_log($detailedMessage);
 
+	if ((new Request())->isAjax()) {
+		echo json_encode([
+			'exception' => $message,
+			'file' => $file,
+			'line' => $line,
+		]);
+		exit();
+	}
 	include_once __DIR__ . '/../Exception/template/index.php';
 }
 

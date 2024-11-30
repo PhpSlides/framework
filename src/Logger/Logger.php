@@ -43,7 +43,7 @@ trait Logger
 		$uri = trim(Application::$request_uri, '/');
 
 		// Define the hot-reload URL for session-specific requests.
-		$hot_reload_url = 'hot-reload-' . session_id();
+		$hot_reload_url = 'hot-reload-a' . session_id();
 
 		// Capture the HTTP response status code.
 		$http_code = http_response_code();

@@ -89,7 +89,7 @@ trait RouteResources
 			print_r(
 				is_callable($callback)
 					? $callback($request ?? new Request())
-					: $callback
+					: $callback,
 			);
 
 			self::log();
@@ -120,6 +120,10 @@ trait RouteResources
 			$callback = self::routing($route, $callback, $method);
 
 			if ($callback) {
+				if (self::$guards !== null) {
+					(new static())->__guards(self::$guards ?? null);
+				}
+
 				if (
 					is_array($callback) &&
 					(preg_match('/(Controller)/', $callback[0], $matches) &&
@@ -128,15 +132,15 @@ trait RouteResources
 					print_r(
 						self::controller(
 							$callback[0],
-							count($callback) > 1 ? $callback[1] : ''
-						)
+							count($callback) > 1 ? $callback[1] : '',
+						),
 					);
 				} else {
 					$GLOBALS['request'] = new Request();
 					print_r(
 						is_callable($callback)
 							? $callback($request ?? new Request())
-							: $callback
+							: $callback,
 					);
 				}
 
@@ -162,7 +166,7 @@ trait RouteResources
 		if (!empty(self::$request_uri)) {
 			$route = strtolower(preg_replace("/(^\/)|(\/$)/", '', $route));
 			$reqUri = strtolower(
-				preg_replace("/(^\/)|(\/$)/", '', self::$request_uri)
+				preg_replace("/(^\/)|(\/$)/", '', self::$request_uri),
 			);
 		} else {
 			$reqUri = '/';
@@ -207,7 +211,7 @@ trait RouteResources
 			// setting params with params names
 			$req[$paramKey[$key]] = htmlspecialchars(
 				$reqUri[$index],
-				ENT_NOQUOTES
+				ENT_NOQUOTES,
 			);
 			$req_value[] = htmlspecialchars($reqUri[$index], ENT_NOQUOTES);
 
@@ -251,13 +255,15 @@ trait RouteResources
 					self::controller(
 						$callback[0],
 						count($callback) > 1 ? $callback[1] : '',
-						$req
-					)
+						$req,
+					),
 				);
 			} else {
 				$GLOBALS['request'] = new Request($req);
 				print_r(
-					is_callable($callback) ? $callback(new Request($req)) : $callback
+					is_callable($callback)
+						? $callback(new Request($req))
+						: $callback,
 				);
 			}
 
@@ -309,7 +315,7 @@ trait RouteResources
 		$uri = [];
 		$str_route = '';
 		$reqUri = strtolower(
-			preg_replace("/(^\/)|(\/$)/", '', self::$request_uri)
+			preg_replace("/(^\/)|(\/$)/", '', self::$request_uri),
 		);
 		$reqUri = empty($reqUri) ? '/' : $reqUri;
 
@@ -360,7 +366,7 @@ trait RouteResources
 				$guard = $registered_guards[$guards[$i]];
 			} else {
 				throw new Exception(
-					'No Registered AuthGuard as `' . $guards[$i] . '`'
+					'No Registered AuthGuard as `' . $guards[$i] . '`',
 				);
 			}
 
@@ -399,7 +405,7 @@ trait RouteResources
 
 		if (!preg_match('/(?=.*Controller)(?=.*::)/', $controller)) {
 			throw new Exception(
-				'Parameter $controller must match Controller named rule.'
+				'Parameter $controller must match Controller named rule.',
 			);
 		}
 
