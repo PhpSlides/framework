@@ -16,7 +16,7 @@ class HotReload
 	/**
 	 * @var array Directories to watch for changes.
 	 */
-	private array $watchFiles = [ 'app', 'src', 'public' ];
+	private array $watchFiles = ['src', 'public'];
 
 	/**
 	 * Scans watched directories for file modifications and updates a
@@ -26,41 +26,38 @@ class HotReload
 	 * This method uses recursive directory iteration to monitor files in
 	 * the specified directories, excluding any files in the cache directory.
 	 */
-	public function reload ()
+	public function reload()
 	{
 		$latest = 0;
 		clearstatcache(); // Clear file status cache to ensure fresh data.
 
-		foreach ($this->watchFiles as $dir)
-		{
+		foreach ($this->watchFiles as $dir) {
 			// Set up a recursive iterator to scan files in the directory.
 			$files = new RecursiveIteratorIterator(
-			 new RecursiveDirectoryIterator(Application::$basePath . $dir),
-			 RecursiveIteratorIterator::LEAVES_ONLY
+				new RecursiveDirectoryIterator(Application::$basePath . $dir),
+				RecursiveIteratorIterator::LEAVES_ONLY,
 			);
 
-			foreach ($files as $file)
-			{
+			foreach ($files as $file) {
 				// Skip files within the 'app/cache' directory.
-				if (strpos(ltrim($file->getPathname(), './'), 'app/cache') !== false)
-				{
+				if (
+					strpos(ltrim($file->getPathname(), './'), 'app/cache') !== false
+				) {
 					continue;
 				}
 
-				if ($file->isFile())
-				{
+				if ($file->isFile()) {
 					// Track the latest modification time of all files.
 					$latest = max($latest, $file->getMTime());
 					$cacheFile =
-					 Application::$basePath . 'app/cache/hot-reload.json';
+						Application::$basePath . 'app/cache/hot-reload.json';
 
 					// If cache file doesn't exist, create it with initial data.
-					if (!file_exists($cacheFile))
-					{
+					if (!file_exists($cacheFile)) {
 						!is_dir(dirname($cacheFile)) && mkdir(dirname($cacheFile));
 						$initialCache = [
-						 '__last_modify_time' => $latest,
-						 'file' => ''
+							'__last_modify_time' => $latest,
+							'file' => '',
 						];
 						file_put_contents($cacheFile, json_encode($initialCache));
 					}
@@ -69,8 +66,7 @@ class HotReload
 					$cache = json_decode(file_get_contents($cacheFile), true);
 
 					// If a newer modification is detected, update cache and trigger reload.
-					if ($latest > $cache['__last_modify_time'] + 5)
-					{
+					if ($latest > $cache['__last_modify_time'] + 5) {
 						$cache['__last_modify_time'] = $latest;
 						$cache['file'] = $file->getPathname();
 						file_put_contents($cacheFile, json_encode($cache));

@@ -2,6 +2,7 @@
 
 namespace PhpSlides;
 
+use component;
 use PhpSlides\Exception;
 use PhpSlides\Logger\Logger;
 use PhpSlides\Traits\FileHandler;
@@ -43,6 +44,6 @@ final class view
 		$file_uri = Application::$viewsDir . $file;
 		header('Content-Type: text/html');
 
-		return \psl($file_uri, ...$props);
+		return component($file_uri, ...$props);
 	}
 }

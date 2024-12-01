@@ -1,7 +1,7 @@
 <?php
 $code_values = htmlspecialchars(
 	implode('', array_values($codeSnippet['parsedCode'])),
-	ENT_NOQUOTES
+	ENT_NOQUOTES,
 );
 $code_keys = json_encode(array_keys($codeSnippet['parsedCode']));
 $sid = session_id();
@@ -17,11 +17,7 @@ $sid = session_id();
 
 <script>
    document.head.innerHTML = ''
-   document.title = 'Parse Error - <?php echo str_replace(
-   	__ROOT__,
-   	'/',
-   	$message
-   ); ?>'
+   document.title = 'Parse Error - <?php echo $message; ?>'
 </script>
 
 <style type="text/css" media="all">
@@ -121,16 +117,14 @@ header span {
 <body>
    <header>
       <h3>Parse Error</h3>
-      <span><?php echo str_replace(__ROOT__, '/', $message); ?></span>
+      <span><?php echo $message; ?></span>
    </header>
 
    <div class="container">
       <span class="h">Source File »</span>
 
       <div class="code-wrapper">
-         <span><b>File: </b><?php echo str_replace(__ROOT__, '/', $file) .
-         	':' .
-         	$line; ?></span>
+         <span><b>File: </b><?php echo $file . ':' . $line; ?></span>
          <pre><code class="language-php"><?php echo $code_values; ?></code></pre>
       </div>
    </div>
@@ -192,25 +186,25 @@ header span {
    		? 'https://'
    		: 'http://';
 
-   $sid = session_id();
-   $host = $protocol . $_SERVER['HTTP_HOST'] . "/hot-reload-$sid";
+   $addr =
+   	\PhpSlides\Foundation\Application::$REMOTE_ADDR .
+   	"/hot-reload-a$sid/worker";
    $phpslides_version = \PhpSlides\Foundation\Application::PHPSLIDES_VERSION;
 
    if (getenv('HOT_RELOAD') == 'true'): ?>
    <script>
       /**
        * PHPSLIDES HOT RELOAD GENERATED
+       *
        * @version <?php echo $phpslides_version; ?>
+       * @author Dave Conco <info@dconco.dev>
+       * @copyright 2023 - 2024 Dave Conco
        */
-       setInterval(function() {
-           fetch('<?php echo $host; ?>', { method: 'POST' })
-               .then(response => response.text())
-               .then(data => {
-                   if (data === 'reload') {
-                       window.location.reload()
-                   }
-               });
-       }, 1000);
+      new Worker('<?php echo $addr; ?>').addEventListener('message', (event) => {
+   		if (event.data === 'reload') {
+      		window.location.reload();
+		   }
+	   })
    </script>
    <?php endif;
    ?>
