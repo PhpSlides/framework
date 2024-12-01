@@ -83,13 +83,13 @@ class Api extends Controller implements ApiInterface
 	 * @param string $url The Base URL of the route.
 	 * @param string|array|null $controller The controller handling the route.
 	 * @param ?string $controller The request method the route is going to accept,
-	 * if null is given, then it's consider dynamic, accepts all methods.
+	 * if null is given, then it's consider optional, accepts all methods.
 	 * @return self
 	 */
 	public function route(
 		string $url,
 		string|array|null $controller = null,
-		?string $req_method = null
+		?string $req_method = null,
 	): self {
 		$define = $this->define;
 
@@ -109,7 +109,7 @@ class Api extends Controller implements ApiInterface
 			'r_method' => $req_method,
 			'controller' =>
 				$define['controller'] ??
-				(is_array($controller) ? $controller[0] : $controller)
+				(is_array($controller) ? $controller[0] : $controller),
 		];
 
 		if ($define !== null && $controller !== null) {
@@ -154,7 +154,7 @@ class Api extends Controller implements ApiInterface
 	{
 		$this->define = [
 			'url' => $url,
-			'controller' => $controller
+			'controller' => $controller,
 		];
 
 		return $this;
@@ -180,7 +180,7 @@ class Api extends Controller implements ApiInterface
 					self::$version .
 					'/' .
 					trim($define['url'], '/') .
-					'/'
+					'/',
 			);
 
 			/**
@@ -188,7 +188,7 @@ class Api extends Controller implements ApiInterface
 			 */
 			$full_url = array_map(
 				fn($route) => $base . ltrim($route, '/'),
-				$routes
+				$routes,
 			);
 
 			$rest_url = array_map(function ($uri) {

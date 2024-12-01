@@ -31,7 +31,7 @@ class MapRoute extends Controller implements MapInterface
 		 *   ----------------------------------------------
 		 */
 		self::$request_uri = strtolower(
-			preg_replace("/(^\/)|(\/$)/", '', Application::$request_uri)
+			preg_replace("/(^\/)|(\/$)/", '', Application::$request_uri),
 		);
 		self::$request_uri = empty(self::$request_uri) ? '/' : self::$request_uri;
 
@@ -128,7 +128,7 @@ class MapRoute extends Controller implements MapInterface
 			// checks if the requested method is of the given route
 			if (
 				!in_array($_SERVER['REQUEST_METHOD'], self::$method) &&
-				!in_array('dynamic', self::$method)
+				!in_array('optional', self::$method)
 			) {
 				http_response_code(405);
 				exit('Method Not Allowed');
@@ -138,7 +138,7 @@ class MapRoute extends Controller implements MapInterface
 				'method' => $_SERVER['REQUEST_METHOD'],
 				'route' => self::$route,
 				'params_value' => $req_value,
-				'params' => $req
+				'params' => $req,
 			];
 		}
 
@@ -168,7 +168,7 @@ class MapRoute extends Controller implements MapInterface
 		) {
 			if (
 				!in_array($_SERVER['REQUEST_METHOD'], self::$method) &&
-				!in_array('dynamic', self::$method)
+				!in_array('optional', self::$method)
 			) {
 				http_response_code(405);
 				exit('Method Not Allowed');
@@ -178,7 +178,7 @@ class MapRoute extends Controller implements MapInterface
 
 			return [
 				'method' => $_SERVER['REQUEST_METHOD'],
-				'route' => self::$route
+				'route' => self::$route,
 			];
 		} else {
 			return false;

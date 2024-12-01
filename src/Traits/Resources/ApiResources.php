@@ -19,7 +19,7 @@ trait ApiResources
 	{
 		$match = new MapRoute();
 		self::$map_info = $match->match(
-			self::$route['r_method'] ?? 'dynamic',
+			self::$route['r_method'] ?? 'optional',
 			self::$route['url'] ?? '',
 		);
 
