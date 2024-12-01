@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace PhpSlides\Formatter;
 
@@ -17,7 +17,7 @@ trait Validate
 	 * If an array is passed, an array of validated values is returned.
 	 */
 	protected function validate(
-		bool|float|int|string|array $data
+		bool|float|int|string|array $data,
 	): bool|float|int|string|array {
 		// If the data is an array, validate each item recursively
 		if (is_array($data)) {
@@ -45,13 +45,17 @@ trait Validate
 	 * @return bool|float|int|string The validated and sanitized value, converted back to its original type.
 	 */
 	private function realValidate(
-		bool|float|int|string $value
+		bool|float|int|string $value,
 	): bool|float|int|string {
 		// Convert the value to string for sanitation
 		$validatedValue = (string) $value;
 
 		// Sanitize the string to prevent potential HTML injection issues
-		$sanitizedValue = htmlspecialchars(trim($validatedValue), ENT_NOQUOTES);
+		$sanitizedValue = htmlspecialchars(
+			trim($validatedValue),
+			ENT_QUOTES,
+			'UTF-8',
+		);
 
 		// Convert the sanitized string back to its original type based on the initial value's type
 		switch (gettype($value)) {

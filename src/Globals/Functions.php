@@ -29,7 +29,7 @@ const ABSOLUTE_PATH = 1;
  *   |
  *    -----------------------------------------------------------
  */
-function psl(string $filename, mixed ...$props): mixed
+function component(string $filename, mixed ...$props): mixed
 {
 	$loaded = (new ViewLoader())->load($filename, ...$props);
 	return $loaded->getLoad();

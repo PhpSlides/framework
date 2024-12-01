@@ -17,7 +17,7 @@ $sid = session_id();
 
 <script>
    document.head.innerHTML = ''
-   document.title = 'Parse Error - <?php echo ltrim($message, './'); ?>'
+   document.title = 'Parse Error - <?php echo $message; ?>'
 </script>
 
 <style type="text/css" media="all">
@@ -117,16 +117,14 @@ header span {
 <body>
    <header>
       <h3>Parse Error</h3>
-      <span><?php echo ltrim($message, './'); ?></span>
+      <span><?php echo $message; ?></span>
    </header>
 
    <div class="container">
       <span class="h">Source File »</span>
 
       <div class="code-wrapper">
-         <span><b>File: </b><?php echo ltrim($file, './') .
-         	':' .
-         	$line; ?></span>
+         <span><b>File: </b><?php echo $file . ':' . $line; ?></span>
          <pre><code class="language-php"><?php echo $code_values; ?></code></pre>
       </div>
    </div>

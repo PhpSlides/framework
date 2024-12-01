@@ -5,7 +5,7 @@ namespace PhpSlides\Formatter\Views;
 /**
  * Trait to format includes elements in PhpSlides view files.
  *
- * This trait modifies the custom `<!INCLUDE>` syntax in PhpSlides view files to PHP `psl()` function calls,
+ * This trait modifies the custom `<!INCLUDE>` syntax in PhpSlides view files to PHP `component()` function calls,
  * handling the inclusion of files and passing attributes as parameters.
  */
 trait FormatIncludes
@@ -25,7 +25,7 @@ trait FormatIncludes
 	 * Replaces all includes elements in the view file contents.
 	 *
 	 * This method scans the contents for custom `<!INCLUDE>` or `<!INCLUDES>` elements,
-	 * extracts the `path` and other attributes, and converts them into PHP `psl()`
+	 * extracts the `path` and other attributes, and converts them into PHP `component()`
 	 * function calls with the appropriate parameters.
 	 */
 	protected function includes()
@@ -65,11 +65,11 @@ trait FormatIncludes
 				// Return the formatted PHP include statement
 				if (!empty($param)) {
 					return '<' .
-						"?php print_r(psl(__DIR__ . '/$path', $param)) ?" .
+						"?php print_r(component(__DIR__ . '/$path', $param)) ?" .
 						'>';
 				}
 
-				return '<' . "?php print_r(psl(__DIR__ . '/$path')) ?" . '>';
+				return '<' . "?php print_r(component(__DIR__ . '/$path')) ?" . '>';
 			},
 			$this->contents
 		);
