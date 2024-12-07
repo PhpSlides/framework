@@ -227,6 +227,23 @@ class MapRoute extends Controller implements MapInterface
 		self::$method;
 		self::$request_uri;
 
+		if (is_array(self::$route))
+		{
+			foreach (self::$route as $value)
+			{
+				if (str_starts_with('pattern:', $value))
+				{
+					$matched = $this->validatePattern($value);
+
+					if ($matched)
+					{
+						return $matched;
+					}
+				}
+			}
+			return false;
+		}
+
 		return $this->validatePattern(self::$route);
 	}
 
