@@ -39,6 +39,27 @@ class MapRoute extends Controller implements MapInterface
 		 ? $route
 		 : strtolower(preg_replace("/(^\/)|(\/$)/", '', $route));
 
+		//  Firstly, resolve route with pattern
+		if (is_array(self::$route))
+		{
+			foreach (self::$route as $value)
+			{
+				if (str_starts_with('pattern:', $value))
+				{
+					$pattern = true;
+				}
+			}
+
+			if ($pattern === true)
+			{
+				return $this->pattern();
+			}
+		}
+		else if (str_starts_with('pattern:', self::$route))
+		{
+			return $this->pattern();
+		}
+
 		// will store all the parameters value in this array
 		$req = [];
 		$req_value = [];
@@ -53,7 +74,7 @@ class MapRoute extends Controller implements MapInterface
 		}
 
 		// if the route does not contain any param call routing();
-		if (empty($paramMatches[0] ?? []) || is_array(self::$route))
+		if (empty($paramMatches) || is_array(self::$route))
 		{
 			/**
 			 *   ------------------------------------------------------
@@ -136,7 +157,7 @@ class MapRoute extends Controller implements MapInterface
 			// checks if the requested method is of the given route
 			if (
 			!in_array($_SERVER['REQUEST_METHOD'], self::$method) &&
-			!in_array('optional', self::$method)
+			!in_array('*', self::$method)
 			)
 			{
 				http_response_code(405);
@@ -182,14 +203,12 @@ class MapRoute extends Controller implements MapInterface
 		{
 			if (
 			!in_array($_SERVER['REQUEST_METHOD'], self::$method) &&
-			!in_array('optional', self::$method)
+			!in_array('*', haystack: self::$method)
 			)
 			{
 				http_response_code(405);
 				exit('Method Not Allowed');
 			}
-
-			$method = implode('|', self::$method);
 
 			return [
 			 'method' => $_SERVER['REQUEST_METHOD'],
@@ -200,5 +219,37 @@ class MapRoute extends Controller implements MapInterface
 		{
 			return false;
 		}
+	}
+
+	private function pattern (): array|bool
+	{
+		self::$route;
+		self::$method;
+		self::$request_uri;
+
+		return $this->validatePattern(self::$route);
+	}
+
+	private function validatePattern (string $pattern): array|bool
+	{
+		$pattern = trim(substr($pattern, 8));
+
+		if (fnmatch($pattern, self::$request_uri))
+		{
+			if (
+			!in_array($_SERVER['REQUEST_METHOD'], self::$method) &&
+			!in_array('*', self::$method)
+			)
+			{
+				http_response_code(405);
+				exit('Method Not Allowed');
+			}
+
+			return [
+			 'method' => $_SERVER['REQUEST_METHOD'],
+			 'route' => self::$route,
+			];
+		}
+		return false;
 	}
 }

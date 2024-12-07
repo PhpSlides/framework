@@ -103,7 +103,6 @@ trait RouteResources
 
 		// will store all the parameters value in this array
 		$req = [];
-		$req_value = [];
 
 		// will store all the parameters names in this array
 		$paramKey = [];
