@@ -1,7 +1,7 @@
 <?php
 $code_values = htmlspecialchars(
-	implode('', array_values($codeSnippet['parsedCode'])),
-	ENT_NOQUOTES,
+ implode('', array_values($codeSnippet['parsedCode'])),
+ ENT_NOQUOTES,
 );
 $code_keys = json_encode(array_keys($codeSnippet['parsedCode']));
 $sid = session_id();
@@ -16,12 +16,13 @@ $sid = session_id();
 </head>
 
 <script>
-   document.head.innerHTML = ''
-   document.title = 'Parse Error - <?php echo $message; ?>'
+document.head.innerHTML = ''
+document.title = 'Parse Error - <?php echo $message; ?>'
 </script>
 
 <style type="text/css" media="all">
-<?php echo file_get_contents(__DIR__ . '/src/highlight.min.css'); ?>
+<?php echo file_get_contents(__DIR__ . '/src/highlight.min.css');
+?>
 </style>
 
 <style type="text/css" media="all">
@@ -133,11 +134,12 @@ header span {
       <span class="h">Call Stack »</span>
 
       <div class="code-wrapper">
-         <?php foreach ($trace as $key => $value) {
-         	$key = $key + 1;
-         	$_file = $value['file'] ?? 'Unknown';
-         	$_line = $value['line'] ?? 1;
-         	echo "<span>$key. {$_file}:{$_line}</span>";
+         <?php foreach ($trace as $key => $value)
+         {
+            $key = $key + 1;
+            $_file = $value['file'] ?? 'Unknown';
+            $_line = $value['line'] ?? 1;
+            echo "<span>$key. {$_file}:{$_line}</span>";
          } ?>
       </div>
    </div>
@@ -145,66 +147,66 @@ header span {
    <script>
    <?php echo file_get_contents(__DIR__ . '/src/highlight.min.js'); ?>
    </script>
-   
+
    <script>
-      document.addEventListener('DOMContentLoaded', (event) => {
-         document.querySelectorAll('pre code').forEach((block) => {
-            hljs.highlightBlock(block);
-            addLineNumbers(block);
-            highlightSpecificLines(block, [<?php echo $line; ?>]); // Highlight lines 2 and 3
-         });
+   document.addEventListener('DOMContentLoaded', (event) => {
+      document.querySelectorAll('pre code').forEach((block) => {
+         hljs.highlightElement(block);
+         addLineNumbers(block);
+         highlightSpecificLines(block, [<?php echo $line; ?>]); // Highlight lines 2 and 3
       });
-      
-      function addLineNumbers(block) {
-         const codeLines = <?php echo $code_keys . ";\n"; ?>
-         const lines = block.innerHTML.split('\n');
-         
-         block.innerHTML = lines.map((line, index) => {
-            if (codeLines[index] != undefined) {
-             return `<span class="hljs-line-numbers">${codeLines[index]+1}</span>${line}`;
-            }
-         }).join('\n');
-      }
-      
-      function highlightSpecificLines(block, linesToHighlight) {
-         const codeLines = <?php echo $code_keys . ";\n"; ?>
-         const lines = block.innerHTML.split('\n');
-         
-         block.innerHTML = lines.map((line, index) => {
-             if (linesToHighlight.includes(codeLines[index]+1)) {
-                 return `<span class="highlighted-line">${line}</span>`;
-             }
-             return line;
-         }).join('\n');
-      }
+   });
+
+   function addLineNumbers(block) {
+      const codeLines = <?php echo $code_keys . ";\n"; ?>
+      const lines = block.innerHTML.split('\n');
+
+      block.innerHTML = lines.map((line, index) => {
+         if (codeLines[index] != undefined) {
+            return `<span class="hljs-line-numbers">${codeLines[index] + 1}</span>${line}`;
+         }
+      }).join('\n');
+   }
+
+   function highlightSpecificLines(block, linesToHighlight) {
+      const codeLines = <?php echo $code_keys . ";\n"; ?>
+      const lines = block.innerHTML.split('\n');
+
+      block.innerHTML = lines.map((line, index) => {
+         if (linesToHighlight.includes(codeLines[index] + 1)) {
+            return `<span class="highlighted-line">${line}</span>`;
+         }
+         return line;
+      }).join('\n');
+   }
    </script>
 
    <?php
    $protocol =
-   	(!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ||
-   	$_SERVER['SERVER_PORT'] == 443
-   		? 'https://'
-   		: 'http://';
+    (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ||
+    $_SERVER['SERVER_PORT'] == 443
+     ? 'https://'
+     : 'http://';
 
    $addr =
-   	\PhpSlides\Foundation\Application::$REMOTE_ADDR .
-   	"/hot-reload-a$sid/worker";
+    \PhpSlides\Foundation\Application::$REMOTE_ADDR .
+    "/hot-reload-a$sid/worker";
    $phpslides_version = \PhpSlides\Foundation\Application::PHPSLIDES_VERSION;
 
    if (getenv('HOT_RELOAD') == 'true'): ?>
    <script>
-      /**
-       * PHPSLIDES HOT RELOAD GENERATED
-       *
-       * @version <?php echo $phpslides_version; ?>
-       * @author Dave Conco <info@dconco.dev>
-       * @copyright 2023 - 2024 Dave Conco
-       */
-      new Worker('<?php echo $addr; ?>').addEventListener('message', (event) => {
-   		if (event.data === 'reload') {
-      		window.location.reload();
-		   }
-	   })
+   /**
+    * PHPSLIDES HOT RELOAD GENERATED
+    *
+    * @version <?php echo $phpslides_version; ?>
+    * @author Dave Conco < info@dconco.dev>
+    * @copyright 2023 - 2024 Dave Conco
+    */
+   new Worker('<?php echo $addr; ?>').addEventListener('message', (event) => {
+      if (event.data === 'reload') {
+         window.location.reload();
+      }
+   })
    </script>
    <?php endif;
    ?>

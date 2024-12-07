@@ -24,8 +24,8 @@ class Application extends Controller implements ApplicationInterface
 {
 	use Logger, DBLogger
 	{
-			Logger::log insteadof DBLogger;
-			DBLogger::log as db_log;
+		  Logger::log insteadof DBLogger;
+		  DBLogger::log as db_log;
 	}
 
 	/**
@@ -169,6 +169,7 @@ class Application extends Controller implements ApplicationInterface
 
 				return "(function start() {'use strict';fetch('$addr',{method:'POST'}).then(e=>e.text()).then(e=>'reload'===e&&postMessage(e)).finally(()=>setTimeout(start,1000))})()";
 			});
+			Render::WebRoute();
 		}
 
 		try
