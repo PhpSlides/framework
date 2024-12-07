@@ -140,16 +140,9 @@ class Api extends Controller implements ApiInterface
 	 * @param ?string ...$guards String parameters of registered guards.
 	 * @return self
 	 */
-	public function withGuard (?string ...$guards): self
+	public function withGuard (?string ...$guards = null): self
 	{
-		if (!$guards[0])
-		{
-			$this->guards = null;
-		}
-		else
-		{
-			$this->guards = $guards;
-		}
+		$this->guards = (empty($guards)) ? null : $guards;
 		return $this;
 	}
 
