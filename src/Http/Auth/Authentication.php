@@ -15,10 +15,10 @@ trait Authentication
      *
      * @return void
      */
-    private static function getAuthorizationHeader(): void
+    private static function getAuthorizationHeader (): void
     {
         $headers = getallheaders();
-        self::$authorizationHeader = isset($headers['Authorization']) ? $headers['Authorization'] : null;
+        self::$authorizationHeader = $headers['Authorization'] ?? null;
     }
 
     /**
@@ -30,14 +30,15 @@ trait Authentication
      * The username and password are returned as an associative array, or null if the 
      * authorization header is not found or does not contain Basic credentials.
      *
-     * @return array|null Returns an associative array with 'username' and 'password' or null if not found.
+     * @return ?array Returns an associative array with 'username' and 'password' or null if not found.
      */
-    public static function BasicAuthCredentials(): ?array
+    public static function BasicAuthCredentials (): ?array
     {
         self::getAuthorizationHeader();
 
         // Check if the Authorization header is set and starts with "Basic"
-        if (self::$authorizationHeader && strpos(self::$authorizationHeader, 'Basic ') === 0) {
+        if (self::$authorizationHeader && strpos(self::$authorizationHeader, 'Basic ') === 0)
+        {
             // Remove "Basic " from the header to extract base64 encoded credentials
             $base64Credentials = substr(self::$authorizationHeader, 6);
 
@@ -45,12 +46,13 @@ trait Authentication
             $decodedCredentials = base64_decode($base64Credentials, true);
 
             // Check if decoding was successful
-            if ($decodedCredentials === false) {
+            if ($decodedCredentials === false)
+            {
                 return null; // Return null if decoding fails
             }
 
             // Split the decoded string into username and password
-            [$username, $password] = explode(':', $decodedCredentials, 2);
+            [ $username, $password ] = explode(':', $decodedCredentials, 2);
 
             // Return the credentials as an associative array
             return [
@@ -69,14 +71,15 @@ trait Authentication
      * This method checks the `Authorization` header for the Bearer authentication scheme
      * and returns the token if found.
      *
-     * @return string|null Returns the token as a string, or null if not found.
+     * @return ?string Returns the token as a string, or null if not found.
      */
-    public static function BearerToken(): ?string
+    public static function BearerToken (): ?string
     {
         self::getAuthorizationHeader();
 
         // Check if the Authorization header is set and starts with "Bearer"
-        if (self::$authorizationHeader && strpos(self::$authorizationHeader, 'Bearer ') === 0) {
+        if (self::$authorizationHeader && strpos(self::$authorizationHeader, 'Bearer ') === 0)
+        {
             // Extract the token by removing "Bearer " from the header
             return substr(self::$authorizationHeader, 7);
         }

@@ -17,21 +17,27 @@ use PhpSlides\Controller\Controller;
 use PhpSlides\Interface\ApplicationInterface;
 
 /**
+ * Class Application
+ * 
  * The Application class is the foundation of the PhpSlides project
  * and provides methods to configure and initialize the PhpSlides application.
+ * 
+ * @author dconco <info@dconco.dev>
+ * @version 1.4.0
+ * @package PhpSlides\Foundation
  */
 class Application extends Controller implements ApplicationInterface
 {
 	use Logger, DBLogger
 	{
-			Logger::log insteadof DBLogger;
-			DBLogger::log as db_log;
+		 Logger::log insteadof DBLogger;
+		 DBLogger::log as db_log;
 	}
 
 	/**
 	 * The version of the PhpSlides application.
 	 */
-	public const PHPSLIDES_VERSION = '1.3.10';
+	public const PHPSLIDES_VERSION = '1.4.0';
 
 	/**
 	 * @var string $REMOTE_ADDR The remote address of the client making the request.
@@ -44,7 +50,6 @@ class Application extends Controller implements ApplicationInterface
 	 *
 	 *   @static $log
 	 *   @var bool $log
-	 *   @return bool
 	 */
 	public static bool $log;
 
@@ -54,7 +59,6 @@ class Application extends Controller implements ApplicationInterface
 	 *
 	 *   @static $db_log
 	 *   @var bool $db_log
-	 *   @return bool
 	 */
 	public static bool $db_log;
 
@@ -169,6 +173,7 @@ class Application extends Controller implements ApplicationInterface
 
 				return "(function start() {'use strict';fetch('$addr',{method:'POST'}).then(e=>e.text()).then(e=>'reload'===e&&postMessage(e)).finally(()=>setTimeout(start,1000))})()";
 			});
+			Render::WebRoute();
 		}
 
 		try

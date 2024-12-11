@@ -16,14 +16,17 @@ trait Validate
 	 * @return bool|float|int|string|array Returns the validated data, maintaining its original type(s).
 	 * If an array is passed, an array of validated values is returned.
 	 */
-	protected function validate(
-		bool|float|int|string|array $data,
+	protected function validate (
+	 bool|float|int|string|array $data,
 	): bool|float|int|string|array {
 		// If the data is an array, validate each item recursively
-		if (is_array($data)) {
-			return array_map(function ($item) {
+		if (is_array($data))
+		{
+			return array_map(function ($item)
+			{
 				// Recursively validate each array element
-				if (is_array($item)) {
+				if (is_array($item))
+				{
 					return $this->validate($item); // If item is array, call validate on it
 				}
 				return $this->realValidate($item); // Otherwise, validate the individual item
@@ -44,36 +47,32 @@ trait Validate
 	 *
 	 * @return bool|float|int|string The validated and sanitized value, converted back to its original type.
 	 */
-	private function realValidate(
-		bool|float|int|string $value,
+	private function realValidate (
+	 bool|float|int|string $value,
 	): bool|float|int|string {
 		// Convert the value to string for sanitation
 		$validatedValue = (string) $value;
 
 		// Sanitize the string to prevent potential HTML injection issues
 		$sanitizedValue = htmlspecialchars(
-			trim($validatedValue),
-			ENT_QUOTES,
-			'UTF-8',
+		 trim($validatedValue),
+		 ENT_QUOTES,
+		 'UTF-8',
 		);
+		$type = gettype($value);
 
 		// Convert the sanitized string back to its original type based on the initial value's type
-		switch (gettype($value)) {
-			case 'integer':
-				$convertedValue = (int) $sanitizedValue;
-				break;
-			case 'double':
-				$convertedValue = (float) $sanitizedValue;
-				break;
-			case 'boolean':
-				$convertedValue = (bool) $sanitizedValue;
-				break;
-			default:
-				// Default is string type (value remains a string)
-				$convertedValue = $sanitizedValue;
-		}
+		$convertedValue = (is_bool($value) || $type === 'boolean')
+		 ? (bool) $sanitizedValue
+		 : ((is_double($value) || is_float($value) || $type === 'double')
+		 ? (float) $sanitizedValue
+		  : ((is_numeric($value) || is_int($value) || $type === 'integer')
+		 ? ((is_bool((int) $value))
+		  ? (bool) $sanitizedValue
+		 : ((is_double((int) $value) || is_float((int) $value))
+		  ? (float) $sanitizedValue : (int) $sanitizedValue))
+		  : $sanitizedValue));
 
-		// Return the converted value
 		return $convertedValue;
 	}
 }
