@@ -2,7 +2,6 @@
 
 use PhpSlides\Route;
 use PhpSlides\Exception;
-use PhpSlides\Http\Request;
 use PhpSlides\Loader\ViewLoader;
 use PhpSlides\Loader\FileLoader;
 use PhpSlides\Foundation\Application;
@@ -305,7 +304,7 @@ function ExceptionHandler(Throwable $exception)
 	// Log the detailed error message
 	error_log($detailedMessage);
 
-	if ((new Request())->isAjax()) {
+	if (Exception::$IS_API === true) {
 		echo json_encode([
 			'exception' => $message,
 			'file' => $file,

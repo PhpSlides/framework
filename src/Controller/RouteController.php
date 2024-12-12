@@ -19,6 +19,7 @@ class RouteController
 	 *    |
 	 *    `config_file` allows you to write configurations in `phpslides.config.json` file.
 	 *
+	 *    @throw Exception
 	 *    @return array|bool an `array` data retrieve from json data gotten from the config files
 	 *    |
 	 *    ----------------------------------------------------------------------------------
@@ -33,10 +34,16 @@ class RouteController
 			$config_file = file_get_contents($file_path);
 			$config_file = json_decode($config_file, true);
 
+			if (json_last_error() !== JSON_ERROR_NONE) {
+				throw new Exception(
+					'JSON syntax error in your PhpSlides configuration file.',
+				);
+			}
+
 			return $config_file;
 		} else {
 			throw new Exception(
-				'URL request failed. Configuration file for PhpSlides is not found in the root of your project'
+				'URL request failed. Configuration file for PhpSlides is not found in the root of your project',
 			);
 		}
 	}
@@ -50,12 +57,12 @@ class RouteController
 	protected static function routing(
 		array|string $route,
 		mixed $callback,
-		string $method = '*'
+		string $method = '*',
 	) {
 		$uri = [];
 		$str_route = '';
 		$reqUri = strtolower(
-			preg_replace("/(^\/)|(\/$)/", '', Application::$request_uri)
+			preg_replace("/(^\/)|(\/$)/", '', Application::$request_uri),
 		);
 		$reqUri = empty($reqUri) ? '/' : $reqUri;
 
@@ -99,7 +106,7 @@ class RouteController
 	protected static function controller(
 		object|string $class,
 		string $method,
-		array|null $param = null
+		array|null $param = null,
 	) {
 		return ClassController::__class($class, $method, $param);
 	}
@@ -129,7 +136,7 @@ class RouteController
 			) {
 				throw new Exception(
 					"No controller method found as '$method'. Try using __invoke method.",
-					1
+					1,
 				);
 			}
 		}

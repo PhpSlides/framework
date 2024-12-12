@@ -15,16 +15,15 @@ trait ApiResources
 
 	protected static ?array $apiMap = null;
 
-	protected function __route (): void
+	protected function __route(): void
 	{
 		$match = new MapRoute();
 		self::$map_info = $match->match(
-		 self::$route['r_method'] ?? '*',
-		 self::$route['url'] ?? '',
+			self::$route['r_method'] ?? '*',
+			self::$route['url'] ?? '',
 		);
 
-		if (self::$map_info)
-		{
+		if (self::$map_info) {
 			$this->__api_guards(self::$route['guards'] ?? null);
 
 			print_r($this->__routeSelection());
@@ -33,7 +32,7 @@ trait ApiResources
 		}
 	}
 
-	protected function __routeSelection (?Request $request = null)
+	protected function __routeSelection(?Request $request = null)
 	{
 		$info = self::$map_info;
 		$route = self::$route ?? self::$apiMap;
@@ -41,18 +40,16 @@ trait ApiResources
 		$method = $_SERVER['REQUEST_METHOD'];
 		$controller = $route['controller'] ?? '';
 
-		if (!class_exists($controller))
-		{
+		if (!class_exists($controller)) {
 			throw new Exception(
-			 "Api controller class `$controller` does not exist.",
+				"Api controller class `$controller` does not exist.",
 			);
 		}
 		$params = $info['params'] ?? null;
 
-		if (!class_exists($controller))
-		{
+		if (!class_exists($controller)) {
 			throw new Exception(
-			 "Api controller class does not exist: `$controller`",
+				"Api controller class does not exist: `$controller`",
 			);
 		}
 		$cc = new $controller();
@@ -60,14 +57,12 @@ trait ApiResources
 		$r_method = '';
 		$method = strtoupper($_SERVER['REQUEST_METHOD']);
 
-		if (isset($route['c_method']))
-		{
+		if (isset($route['c_method'])) {
 			$r_method = $route['c_method'];
 			goto EXECUTE;
 		}
 
-		switch ($method)
-		{
+		switch ($method) {
 			case 'GET':
 				global $r_method;
 				$r_method = $params === null ? 'index' : 'show';
@@ -94,8 +89,7 @@ trait ApiResources
 		}
 
 		EXECUTE:
-		if ($request === null)
-		{
+		if ($request === null) {
 			$request = new Request($params);
 		}
 
@@ -105,43 +99,37 @@ trait ApiResources
 		return $response;
 	}
 
-	protected function __api_guards (?array $guards): bool
+	protected function __api_guards(?array $guards): bool
 	{
+		Exception::$IS_API = true;
 		header('Content-type: application/json');
 
-		if (!$guards)
-		{
+		if (!$guards) {
 			return true;
 		}
 
 		$params = self::$map_info['params'] ?? null;
 		$request = new Request($params);
 
-		for ($i = 0; $i < count((array) $guards); $i++)
-		{
+		for ($i = 0; $i < count((array) $guards); $i++) {
 			$registered_guards = (new FileLoader())
-			 ->load(__DIR__ . '/../../Config/guards.php')
-			 ->getLoad();
+				->load(__DIR__ . '/../../Config/guards.php')
+				->getLoad();
 
-			if (array_key_exists($guards[$i], $registered_guards))
-			{
+			if (array_key_exists($guards[$i], $registered_guards)) {
 				$guard = $registered_guards[$guards[$i]];
-			}
-			else
-			{
+			} else {
 				throw new Exception(
-				 'No Registered AuthGuard as `' . $guards[$i] . '`',
+					'No Registered AuthGuard as `' . $guards[$i] . '`',
 				);
 			}
 
-			if (!class_exists($guard))
-			{
+			if (!class_exists($guard)) {
 				throw new Exception("AuthGuard class does not exist: `{$guard}`");
 			}
 			$cl = new $guard($request);
 
-			if ($cl->authorize() !== true)
-			{
+			if ($cl->authorize() !== true) {
 				self::log();
 				exit();
 			}
@@ -149,30 +137,28 @@ trait ApiResources
 		return true;
 	}
 
-	protected function __api_map (?Request $request = null): void
+	protected function __api_map(?Request $request = null): void
 	{
 		$map = self::$apiMap;
 		$base_url = $map['base_url'] ?? '';
 		$controller = $map['controller'] ?? '';
 
-		foreach ($map as $route => $method)
-		{
+		foreach ($map as $route => $method) {
 			$r_method = $method[0] ?? 'GET';
 			$c_method = $method[1] ?? '';
 			$guards = $method[2] ?? null;
 			$url = $base_url . trim($route, '/');
 
 			self::$apiMap = [
-			 'controller' => $controller,
-			 'c_method' => trim($c_method, '@'),
-			 'url' => $base_url,
+				'controller' => $controller,
+				'c_method' => trim($c_method, '@'),
+				'url' => $base_url,
 			];
 
 			$match = new MapRoute();
 			self::$map_info = $match->match($r_method, $url);
 
-			if (self::$map_info)
-			{
+			if (self::$map_info) {
 				$this->__api_guards($guards);
 
 				print_r($this->__routeSelection());
