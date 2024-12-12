@@ -32,7 +32,7 @@ class Connection
 	 *
 	 * @return void
 	 */
-	static function connect()
+	static function connect ()
 	{
 		// Set connection parameters from environment variables
 		static::$port = getenv('DB_PORT') ?: 3306;
@@ -44,11 +44,11 @@ class Connection
 
 		// Construct DSN (Data Source Name) for the database connection
 		DB::$dsn = sprintf(
-			'%s:host=%s;port=%s;dbname=%s',
-			static::$db_type,
-			static::$host,
-			static::$port,
-			static::$db_name
+		 '%s:host=%s;port=%s;dbname=%s',
+		 static::$db_type,
+		 static::$host,
+		 static::$port,
+		 static::$db_name
 		);
 
 		// Set the user and password for the database connection
@@ -65,18 +65,18 @@ class Connection
 	 *
 	 * @return void
 	 */
-	static function reconnect()
+	static function reconnect ()
 	{
 		// Disconnect the current database connection
 		DB::disconnect();
 
 		// Recreate the DSN and reconnect with the new parameters
 		DB::$dsn = sprintf(
-			'%s:host=%s;port=%s;dbname=%s',
-			static::$db_type,
-			static::$host,
-			static::$port,
-			static::$db_name
+		 '%s:host=%s;port=%s;dbname=%s',
+		 static::$db_type,
+		 static::$host,
+		 static::$port,
+		 static::$db_name
 		);
 	}
 
@@ -89,7 +89,7 @@ class Connection
 	 *
 	 * @return void
 	 */
-	static function init()
+	static function init ()
 	{
 		DB::$host = static::$host ?? getenv('DB_HOST') ?: 3306;
 		DB::$user = static::$user ?? getenv('DB_USER') ?: 'root';

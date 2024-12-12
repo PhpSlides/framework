@@ -29,7 +29,7 @@ abstract class Database extends MeekroORM
      * table. It ensures that the class is configured for ORM operations, 
      * including setting up the table name.
      */
-    public function __construct()
+    public function __construct ()
     {
         static::static();
     }
