@@ -34,7 +34,7 @@ trait FormatPslTags
 	{
 		// Regular expression to match any PHP opening and closing tags
 		$formattedContents = preg_replace_callback(
-			'/<' . '\?' . '\s+([^?]*)\?' . '>/s',
+			'/<' . '\?' . '\s+([\s\S]*?)\s*\?' . '>/s',
 			function ($matches) {
 				// Trim the content inside the PHP tags, removing trailing semicolons
 				$val = trim($matches[1]);
