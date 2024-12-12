@@ -198,33 +198,42 @@ class Forge extends Database
 
 				if ($constraint['PRIMARY'])
 				{
-					$key = implode(', ', $constraint['PRIMARY']);
+					$key = implode(', ', (array) $constraint['PRIMARY']);
 					$query[] = $table_already_exists
 					 ? "ADD PRIMARY KEY ($key)"
 					 : "PRIMARY KEY ($key)";
 				}
 
-				if ($constraint['UNIQUE'])
+				if ($constraint['INDEX'])
 				{
-					$key = implode(', ', $constraint['UNIQUE']);
+					$key = implode(', ', (array) $constraint['INDEX']);
+
+					if ($constraint['UNIQUE'])
+					{
+						$query[] = $table_already_exists
+						 ? "ADD UNIQUE INDEX ($key)"
+						 : "UNIQUE INDEX ($key)";
+					}
+					else
+					{
+						$query[] = $table_already_exists
+						 ? "ADD INDEX ($key)"
+						 : "INDEX ($key)";
+					}
+				}
+				elseif ($constraint['UNIQUE'])
+				{
+					$key = implode(', ', (array) $constraint['UNIQUE']);
 					$query[] = $table_already_exists
 					 ? "ADD UNIQUE ($key)"
 					 : "UNIQUE ($key)";
 				}
 
-				if ($constraint['INDEX'])
-				{
-					$key = implode(', ', $constraint['INDEX']);
-					$query[] = $table_already_exists
-					 ? "ADD INDEX ($key)"
-					 : "INDEX ($key)";
-				}
-
 				if ($constraint['OTHERS'])
 				{
 					$key = $table_already_exists
-					 ? 'ADD ' . implode(', ', $constraint['OTHERS'])
-					 : implode(', ', $constraint['OTHERS']);
+					 ? 'ADD ' . implode(', ', (array) $constraint['OTHERS'])
+					 : implode(', ', (array) $constraint['OTHERS']);
 					$query[] = (string) $key;
 				}
 
@@ -265,7 +274,7 @@ class Forge extends Database
 				 */
 				if ($table_already_exists)
 				{
-					DB::query("ALTER TABLE $table_name $query");
+					DB::query("ALTER TABLE %b %l", $table_name, $query);
 					static::log(
 					 'INFO',
 					 "Altered Table `$table_name` and adds column `$only_columns`",
@@ -273,7 +282,7 @@ class Forge extends Database
 				}
 				else
 				{
-					DB::query("CREATE TABLE $table_name ($query)");
+					DB::query("CREATE TABLE %b (%l)", $table_name, $query);
 					static::log(
 					 'INFO',
 					 "Created Table `$table_name` in `$db_name` Database",
