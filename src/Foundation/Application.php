@@ -18,26 +18,25 @@ use PhpSlides\Interface\ApplicationInterface;
 
 /**
  * Class Application
- * 
+ *
  * The Application class is the foundation of the PhpSlides project
  * and provides methods to configure and initialize the PhpSlides application.
- * 
+ *
  * @author dconco <info@dconco.dev>
  * @version 1.4.0
  * @package PhpSlides\Foundation
  */
 class Application extends Controller implements ApplicationInterface
 {
-	use Logger, DBLogger
-	{
-		 Logger::log insteadof DBLogger;
-		 DBLogger::log as db_log;
+	use Logger, DBLogger {
+		Logger::log insteadof DBLogger;
+		DBLogger::log as db_log;
 	}
 
 	/**
 	 * The version of the PhpSlides application.
 	 */
-	public const PHPSLIDES_VERSION = '1.4.0';
+	public const PHPSLIDES_VERSION = '1.4.1';
 
 	/**
 	 * @var string $REMOTE_ADDR The remote address of the client making the request.
@@ -103,30 +102,25 @@ class Application extends Controller implements ApplicationInterface
 	 *
 	 * @return self Returns an instance of the Application class.
 	 */
-	private static function configure (): void
+	private static function configure(): void
 	{
-		if (php_sapi_name() == 'cli-server')
-		{
+		if (php_sapi_name() == 'cli-server') {
 			self::$request_uri = urldecode(
-			 parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),
+				parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),
 			);
 			self::$basePath = '';
-		}
-		else
-		{
+		} else {
 			self::$request_uri = urldecode(
-			 parse_url(
-			  $_REQUEST['uri'] ?? $_SERVER['REQUEST_URI'],
-			  PHP_URL_PATH,
-			 ),
+				parse_url(
+					$_REQUEST['uri'] ?? $_SERVER['REQUEST_URI'],
+					PHP_URL_PATH,
+				),
 			);
 			self::$basePath = '../../';
 		}
 
 		$req = new Request();
-		$protocol = $req->isHttps()
-		? 'https://'
-		: 'http://';
+		$protocol = $req->isHttps() ? 'https://' : 'http://';
 
 		self::$REMOTE_ADDR = $protocol . $req->server('HTTP_HOST');
 	}
@@ -136,7 +130,7 @@ class Application extends Controller implements ApplicationInterface
 	 *
 	 * @return void
 	 */
-	private static function paths (): void
+	private static function paths(): void
 	{
 		self::$configsDir = self::$basePath . 'src/configs/';
 		self::$viewsDir = self::$basePath . 'src/resources/views/';
@@ -149,7 +143,7 @@ class Application extends Controller implements ApplicationInterface
 	 *
 	 * @return void
 	 */
-	public function create (): void
+	public function create(): void
 	{
 		self::configure();
 		self::paths();
@@ -163,11 +157,9 @@ class Application extends Controller implements ApplicationInterface
 
 		$sid = session_id();
 
-		if (getenv('HOT_RELOAD') == 'true')
-		{
-			Route::post("/hot-reload-a$sid", fn () => (new HotReload())->reload());
-			Route::get("/hot-reload-a$sid/worker", function () use ($sid): string
-			{
+		if (getenv('HOT_RELOAD') == 'true') {
+			Route::post("/hot-reload-a$sid", fn() => (new HotReload())->reload());
+			Route::get("/hot-reload-a$sid/worker", function () use ($sid): string {
 				$addr = self::$REMOTE_ADDR . "/hot-reload-a$sid";
 				header('Content-Type: application/javascript');
 
@@ -176,14 +168,10 @@ class Application extends Controller implements ApplicationInterface
 			Render::WebRoute();
 		}
 
-		try
-		{
+		try {
 			Connection::init();
 			DB::query('SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA');
-		}
-		catch ( \Exception $e )
-		{
-			//static::db_log('WARNING', $e->getMessage());
+		} catch (\Exception $e) {
 			Database::$_connect_error = $e->getMessage();
 			goto EXECUTION;
 		}
@@ -191,11 +179,10 @@ class Application extends Controller implements ApplicationInterface
 		new Autoloader();
 
 		EXECUTION:
-		try
-		{
+		try {
 			$loader
-			 ->load(__DIR__ . '/../Globals/Functions.php')
-			 ->load(__DIR__ . '/../Config/config.php');
+				->load(__DIR__ . '/../Globals/Functions.php')
+				->load(__DIR__ . '/../Config/config.php');
 
 			$config_file = self::config_file();
 			$charset = $config_file['charset'] ?? 'UTF-8';
@@ -204,11 +191,13 @@ class Application extends Controller implements ApplicationInterface
 			header("Content-Type: text/html; charset=$charset");
 
 			Route::config();
-		}
-		catch ( \Exception $e )
-		{
+		} catch (\Exception $e) {
 			http_response_code(500);
-			Logger::log();
+			static::log();
+
+			if (function_exists('ExceptionHandler')) {
+				call_user_func('ExceptionHandler', $e);
+			}
 		}
 	}
 }

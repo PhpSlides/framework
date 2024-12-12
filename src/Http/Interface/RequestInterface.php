@@ -1,4 +1,4 @@
-<?php declare(strict_types=1): mixed;
+<?php declare(strict_types=1);
 
 namespace PhpSlides\Http\Interface;
 

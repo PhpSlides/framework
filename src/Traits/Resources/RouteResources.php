@@ -369,7 +369,7 @@ trait RouteResources
 
 		if (in_array($reqUri, $uri) || $reqUri === $str_route)
 		{
-			if (strtoupper($_SERVER['REQUEST_METHOD']) !== 'GET' || strtoupper($_SERVER['REQUEST_METHOD']) !== 'VIEWwwwww')
+			if (strtoupper($_SERVER['REQUEST_METHOD']) !== 'GET' && strtoupper($_SERVER['REQUEST_METHOD']) !== 'VIEW')
 			{
 				http_response_code(405);
 				self::log();
