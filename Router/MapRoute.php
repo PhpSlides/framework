@@ -172,7 +172,7 @@ class MapRoute extends Controller implements MapInterface
 		$reqUri = str_replace('/', '\\/', $reqUri);
 
 		// now matching route with regex
-		if (preg_match("/$reqUri/", self::$route)) {
+		if (preg_match("/$reqUri/", self::$route . '$')) {
 			// checks if the requested method is of the given route
 			if (
 				!in_array($_SERVER['REQUEST_METHOD'], self::$method) &&

@@ -33,22 +33,20 @@ trait FormatBracketInterpolation
 	protected function bracket_interpolation()
 	{
 		// Replace bracket interpolation {{! ... !}}
-		$formattedContents = preg_replace_callback(
-			'/{{!\s*(.*?)\s*!}}/',
-			function ($matches) {
-				return '';
-			},
-			$this->contents
+		$formattedContents = preg_replace(
+			'/\{\{!\s*.*?\s*!\}\}/s',
+			'',
+			$this->contents,
 		);
 
 		// Replace bracket interpolation {{ ... }}
 		$formattedContents = preg_replace_callback(
-			'/{{\s*(.*?)\s*}}/',
+			'/\{\{\s*(.*?)\s*\}\}/s',
 			function ($matches) {
 				$val = trim($matches[1], ';');
 				return '<' . '?php print_r(' . $val . '); ?' . '>';
 			},
-			$formattedContents
+			$formattedContents,
 		);
 
 		$this->contents = $formattedContents;
