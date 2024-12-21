@@ -110,11 +110,11 @@ class Request extends Application implements RequestInterface
 	 * it will return the value of that header; otherwise, it returns all headers as an object.
 	 *
 	 * @param ?string $name The header name to retrieve. If omitted, returns all headers.
-	 * @return mixed The headers, or a specific header value if `$name` is provided.
+	 * @return mixed The header, or a specific header value if `$name` is provided.
 	 */
-	public function headers (?string $name = null)
+	public function header (?string $name = null)
 	{
-		$headers = getallheaders();
+		$headers = getallheaders() ?: apache_request_headers();
 
 		if (!$name)
 		{
@@ -360,7 +360,7 @@ class Request extends Application implements RequestInterface
 	public function ip (): string
 	{
 		// Check for forwarded IP addresses from proxies or load balancers
-		if ($_SERVER['HTTP_X_FORWARDED_FOR'] !== null)
+		if (isset($_SERVER['HTTP_X_FORWARDED_FOR']))
 		{
 			return $_SERVER['HTTP_X_FORWARDED_FOR'];
 		}
@@ -465,11 +465,11 @@ class Request extends Application implements RequestInterface
 	/**
 	 * Retrieves the time when the request was made.
 	 *
-	 * @return string The request time as a Unix timestamp.
+	 * @return int The request time as a Unix timestamp.
 	 */
-	public function requestTime (): string
+	public function requestTime (): int
 	{
-		return (string) $_SERVER['REQUEST_TIME'];
+		return (int) $_SERVER['REQUEST_TIME'];
 	}
 
 	/**
@@ -481,7 +481,7 @@ class Request extends Application implements RequestInterface
 	 */
 	public function contentType (): ?string
 	{
-		return $this->headers('Content-Type');
+		return $this->header('Content-Type') ?? $_SERVER['CONTENT_TYPE'] ?? null;
 	}
 
 	/**
@@ -493,13 +493,13 @@ class Request extends Application implements RequestInterface
 	 */
 	public function contentLength (): ?int
 	{
-		return $_SERVER['CONTENT_LENGTH'] !== null
+		return isset($_SERVER['CONTENT_LENGTH'])
 		 ? (int) $_SERVER['CONTENT_LENGTH']
 		 : null;
 	}
 
 	public function csrf ()
 	{
-		return $this->headers('X-CSRF-TOKEN') ?: $this->headers('X-Csrf-Token');
+		return $this->header('X-CSRF-TOKEN') ?: $this->header('X-Csrf-Token');
 	}
 }

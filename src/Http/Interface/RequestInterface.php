@@ -36,7 +36,7 @@ interface RequestInterface
 	 * @param ?string $name Optional header name to retrieve a specific header.
 	 * @return mixed The headers, or a specific header value if $name is provided.
 	 */
-	public function headers (?string $name = null);
+	public function header (?string $name = null);
 
 	/**
 	 * Retrieves authentication credentials from the request.
@@ -197,7 +197,7 @@ interface RequestInterface
 	 *
 	 * @return int The request time as a Unix timestamp.
 	 */
-	public function requestTime (): string;
+	public function requestTime (): int;
 
 	/**
 	 * Returns the content type of the request.

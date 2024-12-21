@@ -17,8 +17,14 @@ trait Authorization
      */
     private static function getAuthorizationHeader (): void
     {
-        $headers = getallheaders();
+        $headers = getallheaders() ?? apache_request_headers();
         self::$authorizationHeader = $headers['Authorization'] ?? $_SERVER['HTTP_AUTHORIZATION'] ?? null;
+    }
+
+    private static function getApiKey (): void
+    {
+        $headers = getallheaders() ?? apache_request_headers();
+        self::$authorizationHeader = $headers['Api-Key'] ?? $_SERVER['HTTP_API_KEY'] ?? null;
     }
 
     /**
@@ -32,7 +38,7 @@ trait Authorization
      *
      * @return ?array Returns an associative array with 'username' and 'password' or null if not found.
      */
-    public static function BasicAuthCredentials (): ?array
+    protected static function BasicAuthCredentials (): ?array
     {
         self::getAuthorizationHeader();
 
@@ -73,7 +79,7 @@ trait Authorization
      *
      * @return ?string Returns the token as a string, or null if not found.
      */
-    public static function BearerToken (): ?string
+    protected static function BearerToken (): ?string
     {
         self::getAuthorizationHeader();
 
@@ -94,11 +100,13 @@ trait Authorization
      * This method checks the `Authorization` header for the API Key authentication scheme
      * and returns the key if found.
      *
+     * @param string $key The name of the header to check for the API key.
      * @return ?string Returns the API key as a string, or null if not found.
      */
-    public static function ApiKey (): ?string
+    protected static function ApiKey (string $key = 'Api-Key'): ?string
     {
-        self::getAuthorizationHeader();
+        self::getApiKey();
+        return json_encode(getallheaders());
 
         // Check if the Authorization header is set and starts with "Api-Key"
         if (self::$authorizationHeader && strpos(self::$authorizationHeader, 'Api-Key ') === 0)
