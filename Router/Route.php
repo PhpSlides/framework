@@ -6,7 +6,7 @@
  * It also imports the necessary classes and interfaces.
  *
  * @package Router
- * @version ^1.2.2
+ * @version ^1.4.1
  * @since 1.0.0
  * @link https://github.com/PhpSlides/phpslides
  * @author Dave Conco <info@dconco.dev>
@@ -28,12 +28,12 @@ use PhpSlides\Interface\RouteInterface;
  *
  *   Create route & api that accept different methods and render to the client area
  *
- *   @author Dave Conco <concodave@gmail.com>
- *   @link https://github.com/dconco/php_slides
+ *   @author Dave Conco <info@dconco.dev>
+ *   @link https://github.com/PhpSlides/phpslides
  *   @category api, router, php router, php
- *   @copyright 2023 - 2024 Dave Conco
+ *   @copyright 2024 Dave Conco
  *   @package PhpSlides
- *   @version ^1.0.0
+ *   @version ^1.4.1
  *   @return self
  * |
  *

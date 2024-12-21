@@ -47,7 +47,7 @@ abstract class SqlFormat
 	protected function format(array $constraint): array
 	{
 		$column = $this->column_types;
-		$definition = "{$column['COLUMN_NAME']} ";
+		$definition = "`{$column['COLUMN_NAME']}` ";
 
 		if ($column['TYPE']) {
 			$definition .= $column['TYPE'];
@@ -67,7 +67,7 @@ abstract class SqlFormat
 
 		if ($column['CHARACTER']) {
 			$definition .= " CHARACTER SET {$this->trimQuote(
-				$column['CHARACTER']
+				$column['CHARACTER'],
 			)}";
 		}
 
@@ -84,7 +84,10 @@ abstract class SqlFormat
 		if ($column['DEFAULT'] !== null) {
 			$types = ['NULL', '0', 'TRUE', 'FALSE', 'CURRENT_TIMESTAMP'];
 
-			if (in_array($column['DEFAULT'], $types)) {
+			if (
+				in_array($column['DEFAULT'], $types) ||
+				is_numeric($column['DEFAULT'])
+			) {
 				$definition .= " DEFAULT {$column['DEFAULT']}";
 			} else {
 				$definition .= " DEFAULT '{$this->trimQuote($column['DEFAULT'])}'";
