@@ -3,9 +3,7 @@
 namespace PhpSlides\Http;
 
 use stdClass;
-use PhpSlides\Formatter\Validate;
 use PhpSlides\Foundation\Application;
-use PhpSlides\Http\Auth\Authorization;
 use PhpSlides\Http\Interface\RequestInterface;
 
 /**
@@ -16,8 +14,8 @@ use PhpSlides\Http\Interface\RequestInterface;
  */
 class Request extends Application implements RequestInterface
 {
-	use Authorization;
-	use Validate;
+	use \PhpSlides\Http\Auth\Authorization;
+	use \PhpSlides\Formatter\Validate;
 
 	/**
 	 * @var ?array The URL parameters.
@@ -143,9 +141,19 @@ class Request extends Application implements RequestInterface
 		$cl = new stdClass();
 		$cl->basic = self::BasicAuthCredentials();
 		$cl->bearer = self::BearerToken();
-		$cl->apiKey = self::ApiKey();
 
 		return $cl;
+	}
+
+	/**
+	 * Validates the API key from the request headers.
+	 *
+	 * @param string $key The name of the header containing the API key. Default is 'Api-Key'.
+	 * @return bool Returns true if the API key is valid, false otherwise.
+	 */
+	public function apiKey (string $key = 'Api-Key')
+	{
+		return $this->validate(self::RequestApiKey($key));
 	}
 
 	/**

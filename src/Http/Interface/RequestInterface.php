@@ -46,6 +46,14 @@ interface RequestInterface
 	public function auth (): stdClass;
 
 	/**
+	 * Validates the API key from the request headers.
+	 *
+	 * @param string $key The name of the header containing the API key. Default is 'Api-Key'.
+	 * @return bool Returns true if the API key is valid, false otherwise.
+	 */
+	public function apiKey (string $key = 'Api-Key');
+
+	/**
 	 * Get the request body and if no parameter is specified,
 	 * Parses and returns the body of the request as an associative array.
 	 *

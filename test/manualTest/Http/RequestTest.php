@@ -61,6 +61,11 @@ class Request extends HttpRequest
       print_r($this->auth());
    }
 
+   function testApiKey ()
+   {
+      print_r($this->apiKey());
+   }
+
    function testBody ()
    {
       print_r($this->body());
@@ -155,7 +160,8 @@ $req = new Request();
 // $req->testUrlParam();
 // $req->testUrlQuery();
 // $req->testHeader();
-$req->testAuth();
+// $req->testAuth();
+// $req->testApiKey();
 // $req->testBody();
 // $req->testGet();
 // $req->testPost();

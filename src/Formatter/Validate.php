@@ -11,14 +11,14 @@ trait Validate
 	 * and sanitization to each item in the array or to the single provided value.
 	 * It also ensures that each item is validated according to its type.
 	 *
-	 * @param bool|float|int|string|array $data The data to validate. Can be a single value or an array of values.
+	 * @param bool|float|int|string|array|null $data The data to validate. Can be a single value or an array of values.
 	 *
-	 * @return bool|float|int|string|array Returns the validated data, maintaining its original type(s).
+	 * @return bool|float|int|string|array|null Returns the validated data, maintaining its original type(s).
 	 * If an array is passed, an array of validated values is returned.
 	 */
 	protected function validate (
-	 bool|float|int|string|array $data,
-	): bool|float|int|string|array {
+	 bool|float|int|string|array|null $data,
+	): bool|float|int|string|array|null {
 		// If the data is an array, validate each item recursively
 		if (is_array($data))
 		{
@@ -43,13 +43,18 @@ trait Validate
 	 * This method converts the value to a string, sanitizes it using `htmlspecialchars`, and then converts it
 	 * back to its original type (boolean, integer, float, or string) based on the input type.
 	 *
-	 * @param bool|float|int|string $value The value to be validated and sanitized.
+	 * @param bool|float|int|string|null $value The value to be validated and sanitized.
 	 *
-	 * @return bool|float|int|string The validated and sanitized value, converted back to its original type.
+	 * @return bool|float|int|string|null The validated and sanitized value, converted back to its original type.
 	 */
 	private function realValidate (
-	 bool|float|int|string $value,
-	): bool|float|int|string {
+	 bool|float|int|string|null $value,
+	): bool|float|int|string|null {
+		if (!$value)
+		{
+			return null;
+		}
+
 		// Convert the value to string for sanitation
 		$validatedValue = (string) $value;
 

@@ -21,12 +21,6 @@ trait Authorization
         self::$authorizationHeader = $headers['Authorization'] ?? $_SERVER['HTTP_AUTHORIZATION'] ?? null;
     }
 
-    private static function getApiKey (): void
-    {
-        $headers = getallheaders() ?? apache_request_headers();
-        self::$authorizationHeader = $headers['Api-Key'] ?? $_SERVER['HTTP_API_KEY'] ?? null;
-    }
-
     /**
      * Get Basic Authentication credentials from the Authorization header.
      *
@@ -94,28 +88,20 @@ trait Authorization
         return null;
     }
 
+
     /**
-     * Get API Key from the Authorization header.
+     * Retrieves the value of the specified API key from the request headers.
      *
-     * This method checks the `Authorization` header for the API Key authentication scheme
-     * and returns the key if found.
+     * This method attempts to find the API key in the following order:
+     * 1. From the headers returned by `getallheaders()`.
+     * 2. From the headers returned by `apache_request_headers()`.
+     * 3. From the `$_SERVER` superglobal with the key prefixed by "HTTP_".
      *
-     * @param string $key The name of the header to check for the API key.
-     * @return ?string Returns the API key as a string, or null if not found.
+     * @param string $key The name of the API key to retrieve.
+     * @return string|null The value of the API key if found, or null if not found.
      */
-    protected static function ApiKey (string $key = 'Api-Key'): ?string
+    protected static function RequestApiKey (string $key)
     {
-        self::getApiKey();
-        return json_encode(getallheaders());
-
-        // Check if the Authorization header is set and starts with "Api-Key"
-        if (self::$authorizationHeader && strpos(self::$authorizationHeader, 'Api-Key ') === 0)
-        {
-            // Extract the API key by removing "Api-Key " from the header
-            return substr(self::$authorizationHeader, 8);
-        }
-
-        // Return null if no API key is found
-        return null;
+        return getallheaders()[$key] ?? apache_request_headers()[$key] ?? $_SERVER["HTTP_$key"] ?? null;
     }
 }
