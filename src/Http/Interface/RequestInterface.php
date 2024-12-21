@@ -20,7 +20,7 @@ interface RequestInterface
 	 * and if not specified it'll return an object intries of all key & values
 	 * @return mixed The URL parameters.
 	 */
-	public function urlParam (?string $key = null): mixed;
+	public function urlParam (?string $key = null);
 
 	/**
 	 * Parses and returns the query string parameters from the URL.
@@ -28,7 +28,7 @@ interface RequestInterface
 	 * @param ?string $name Get a particular query and if not specified, it'll list all queries as an object
 	 * @return mixed The parsed query parameters.
 	 */
-	public function urlQuery (?string $name = null): mixed;
+	public function urlQuery (?string $name = null);
 
 	/**
 	 * Retrieves headers from the request.
@@ -36,7 +36,7 @@ interface RequestInterface
 	 * @param ?string $name Optional header name to retrieve a specific header.
 	 * @return mixed The headers, or a specific header value if $name is provided.
 	 */
-	public function headers (?string $name = null): mixed;
+	public function headers (?string $name = null);
 
 	/**
 	 * Retrieves authentication credentials from the request.
@@ -52,7 +52,7 @@ interface RequestInterface
 	 * @param ?string $name The particular request body to get
 	 * @return mixed The request body data, or null if parsing fails.
 	 */
-	public function body (?string $name = null): mixed;
+	public function body (?string $name = null);
 
 	/**
 	 * Retrieves a GET parameter by key.
@@ -61,7 +61,7 @@ interface RequestInterface
 	 * @param ?string $key The key of the GET parameter.
 	 * @return mixed The parameter value, or null if not set.
 	 */
-	public function get (?string $key = null): mixed;
+	public function get (?string $key = null);
 
 	/**
 	 * Retrieves a POST parameter by key.
@@ -70,7 +70,7 @@ interface RequestInterface
 	 * @param string $key The key of the POST parameter.
 	 * @return mixed The parameter values, or null if not set.
 	 */
-	public function post (?string $key = null): mixed;
+	public function post (?string $key = null);
 
 	/**
 	 * Retrieves a request parameter by key from all input sources.
@@ -79,7 +79,7 @@ interface RequestInterface
 	 * @param ?string $key The key of the request parameter.
 	 * @return mixed The parameter value, or null if not set.
 	 */
-	public function request (?string $key = null): mixed;
+	public function request (?string $key = null);
 
 	/**
 	 * Retrieves file data from the request by name.
@@ -95,7 +95,7 @@ interface RequestInterface
 	 * @param ?string $key Optional cookie key.
 	 * @return mixed The cookie value, all cookies as an object, or null if key is provided but not found.
 	 */
-	public function cookie (?string $key = null): mixed;
+	public function cookie (?string $key = null);
 
 	/**
 	 * Retrieves a session value by key, or all session if no key is provided.
@@ -103,7 +103,7 @@ interface RequestInterface
 	 * @param ?string $key Optional cookie key.
 	 * @return mixed The cookie value, all cookies as an object, or null if key is provided but not found.
 	 */
-	public function session (?string $key = null): mixed;
+	public function session (?string $key = null);
 
 	/**
 	 * Retrieves the HTTP method used for the request.
@@ -175,7 +175,7 @@ interface RequestInterface
 	 * @param string $key The key of the server parameter.
 	 * @return mixed The server parameter value, or null if not set.
 	 */
-	public function server (?string $key = null): mixed;
+	public function server (?string $key = null);
 
 	/**
 	 * Checks if the request method matches a given method.
@@ -197,7 +197,7 @@ interface RequestInterface
 	 *
 	 * @return int The request time as a Unix timestamp.
 	 */
-	public function requestTime (): int;
+	public function requestTime (): string;
 
 	/**
 	 * Returns the content type of the request.
@@ -216,4 +216,6 @@ interface RequestInterface
 	 * @return int|null The content length, or null if not set.
 	 */
 	public function contentLength (): ?int;
+
+	public function csrf ();
 }

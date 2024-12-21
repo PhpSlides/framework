@@ -2,7 +2,7 @@
 
 namespace PhpSlides\Http\Auth;
 
-trait Authentication
+trait Authorization
 {
     // Static variable to store the authorization header
     private static ?string $authorizationHeader = null;
@@ -18,7 +18,7 @@ trait Authentication
     private static function getAuthorizationHeader (): void
     {
         $headers = getallheaders();
-        self::$authorizationHeader = $headers['Authorization'] ?? null;
+        self::$authorizationHeader = $headers['Authorization'] ?? $_SERVER['HTTP_AUTHORIZATION'] ?? null;
     }
 
     /**
@@ -85,6 +85,29 @@ trait Authentication
         }
 
         // Return null if no Bearer token is found
+        return null;
+    }
+
+    /**
+     * Get API Key from the Authorization header.
+     *
+     * This method checks the `Authorization` header for the API Key authentication scheme
+     * and returns the key if found.
+     *
+     * @return ?string Returns the API key as a string, or null if not found.
+     */
+    public static function ApiKey (): ?string
+    {
+        self::getAuthorizationHeader();
+
+        // Check if the Authorization header is set and starts with "Api-Key"
+        if (self::$authorizationHeader && strpos(self::$authorizationHeader, 'Api-Key ') === 0)
+        {
+            // Extract the API key by removing "Api-Key " from the header
+            return substr(self::$authorizationHeader, 8);
+        }
+
+        // Return null if no API key is found
         return null;
     }
 }

@@ -5,18 +5,18 @@ namespace PhpSlides\Http;
 use stdClass;
 use PhpSlides\Formatter\Validate;
 use PhpSlides\Foundation\Application;
-use PhpSlides\Http\Auth\Authentication;
+use PhpSlides\Http\Auth\Authorization;
 use PhpSlides\Http\Interface\RequestInterface;
 
 /**
  * Class Request
  *
- * Handles HTTP request data including URL parameters, query strings, headers, authentication, body data, and more.
+ * Handles HTTP request data including URL parameters, query strings, headers, authorization, body data, and more.
  * This class provides an abstraction for interacting with the HTTP request in a structured way.
  */
 class Request extends Application implements RequestInterface
 {
-	use Authentication;
+	use Authorization;
 	use Validate;
 
 	/**
@@ -45,7 +45,7 @@ class Request extends Application implements RequestInterface
 	 * @param ?string $key If specified, retrieves the value of the given parameter key.
 	 * @return mixed The URL parameters or a specific parameter value.
 	 */
-	public function urlParam (?string $key = null): mixed
+	public function urlParam (?string $key = null)
 	{
 		if (!$key)
 		{
@@ -63,7 +63,7 @@ class Request extends Application implements RequestInterface
 	 * @param ?string $name If specified, returns a specific query parameter by name.
 	 * @return mixed parsed query parameters or a specific parameter value.
 	 */
-	public function urlQuery (?string $name = null): mixed
+	public function urlQuery (?string $name = null)
 	{
 		if (php_sapi_name() == 'cli-server')
 		{
@@ -112,7 +112,7 @@ class Request extends Application implements RequestInterface
 	 * @param ?string $name The header name to retrieve. If omitted, returns all headers.
 	 * @return mixed The headers, or a specific header value if `$name` is provided.
 	 */
-	public function headers (?string $name = null): mixed
+	public function headers (?string $name = null)
 	{
 		$headers = getallheaders();
 
@@ -143,6 +143,7 @@ class Request extends Application implements RequestInterface
 		$cl = new stdClass();
 		$cl->basic = self::BasicAuthCredentials();
 		$cl->bearer = self::BearerToken();
+		$cl->apiKey = self::ApiKey();
 
 		return $cl;
 	}
@@ -156,7 +157,7 @@ class Request extends Application implements RequestInterface
 	 * @param ?string $name The name of the body parameter to retrieve.
 	 * @return mixed The body data or null if parsing fails.
 	 */
-	public function body (?string $name = null): mixed
+	public function body (?string $name = null)
 	{
 		$data = json_decode(file_get_contents('php://input'), true);
 
@@ -181,7 +182,7 @@ class Request extends Application implements RequestInterface
 	 * @param ?string $key The key of the GET parameter.
 	 * @return mixed The parameter value, or null if not set.
 	 */
-	public function get (?string $key = null): mixed
+	public function get (?string $key = null)
 	{
 		if (!$key)
 		{
@@ -203,7 +204,7 @@ class Request extends Application implements RequestInterface
 	 * @param ?string $key The key of the POST parameter.
 	 * @return mixed The parameter value, or null if not set.
 	 */
-	public function post (?string $key = null): mixed
+	public function post (?string $key = null)
 	{
 		if (!$key)
 		{
@@ -227,7 +228,7 @@ class Request extends Application implements RequestInterface
 	 * @param ?string $key The key of the request parameter.
 	 * @return mixed The parameter value, or null if not set.
 	 */
-	public function request (?string $key = null): mixed
+	public function request (?string $key = null)
 	{
 		if (!$key)
 		{
@@ -278,7 +279,7 @@ class Request extends Application implements RequestInterface
 	 * @param ?string $key The key of the cookie.
 	 * @return mixed The cookie value, or null if not set.
 	 */
-	public function cookie (?string $key = null): mixed
+	public function cookie (?string $key = null)
 	{
 		if (!$key)
 		{
@@ -296,7 +297,7 @@ class Request extends Application implements RequestInterface
 	 * @param ?string $key The key of the session value.
 	 * @return mixed The session value, or null if not set.
 	 */
-	public function session (?string $key = null): mixed
+	public function session (?string $key = null)
 	{
 		// Start the session if it's not already started
 		session_status() < 2 && session_start();
@@ -430,7 +431,7 @@ class Request extends Application implements RequestInterface
 	 * @param string $key The key of the server parameter.
 	 * @return mixed The server parameter value, or null if not set.
 	 */
-	public function server (?string $key = null): mixed
+	public function server (?string $key = null)
 	{
 		if (!$key)
 		{
@@ -464,11 +465,11 @@ class Request extends Application implements RequestInterface
 	/**
 	 * Retrieves the time when the request was made.
 	 *
-	 * @return int The request time as a Unix timestamp.
+	 * @return string The request time as a Unix timestamp.
 	 */
-	public function requestTime (): int
+	public function requestTime (): string
 	{
-		return $_SERVER['REQUEST_TIME'];
+		return (string) $_SERVER['REQUEST_TIME'];
 	}
 
 	/**
@@ -495,5 +496,10 @@ class Request extends Application implements RequestInterface
 		return $_SERVER['CONTENT_LENGTH'] !== null
 		 ? (int) $_SERVER['CONTENT_LENGTH']
 		 : null;
+	}
+
+	public function csrf ()
+	{
+		return $this->headers('X-CSRF-TOKEN') ?: $this->headers('X-Csrf-Token');
 	}
 }
