@@ -2,7 +2,6 @@
 
 use PhpSlides\Route;
 use PhpSlides\Foundation\Render;
-use PhpSlides\Foundation\Application;
 
 include_once __DIR__ . '/../../autoload.php';
 include_once __DIR__ . '/../../../src/Globals/Functions.php';

@@ -28,7 +28,9 @@ use PhpSlides\Interface\ApplicationInterface;
  */
 class Application extends Controller implements ApplicationInterface
 {
-	use Logger, DBLogger
+	use Configuration;
+	use Logger;
+	use DBLogger
 	{
 			Logger::log insteadof DBLogger;
 			DBLogger::log as db_log;
@@ -37,7 +39,7 @@ class Application extends Controller implements ApplicationInterface
 	/**
 	 * The version of the PhpSlides application.
 	 */
-	public const PHPSLIDES_VERSION = '1.4.3';
+	public const PHPSLIDES_VERSION = '1.4.4';
 
 	/**
 	 * @var string $REMOTE_ADDR The remote address of the client making the request.
@@ -63,12 +65,6 @@ class Application extends Controller implements ApplicationInterface
 	public static bool $db_log;
 
 	/**
-	 * @var string $basePath
-	 * The base path of the application.
-	 */
-	public static string $basePath;
-
-	/**
 	 * @var string $configsDir
 	 * The directory path for configuration files.
 	 */
@@ -92,11 +88,6 @@ class Application extends Controller implements ApplicationInterface
 	 */
 	public static string $scriptsDir;
 
-	/**
-	 * @var string $request_uri
-	 * The request Uri
-	 */
-	public static string $request_uri;
 
 	/**
 	 * Configure the application with the base path.
@@ -211,7 +202,7 @@ class Application extends Controller implements ApplicationInterface
 			http_response_code(200);
 			header("Content-Type: text/html; charset=$charset");
 
-			Route::config();
+			self::config();
 		}
 		catch ( \Exception $e )
 		{
