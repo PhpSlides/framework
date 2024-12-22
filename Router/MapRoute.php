@@ -18,6 +18,8 @@ use PhpSlides\Interface\MapInterface;
  */
 class MapRoute extends Controller implements MapInterface
 {
+	use \PhpSlides\Formatter\Validate;
+
 	/**
 	 * @var string|array $route The route(s) to be mapped.
 	 */
@@ -62,25 +64,30 @@ class MapRoute extends Controller implements MapInterface
 		 *   ----------------------------------------------
 		 */
 		self::$request_uri = strtolower(
-			preg_replace("/(^\/)|(\/$)/", '', Application::$request_uri),
+		 preg_replace("/(^\/)|(\/$)/", '', Application::$request_uri),
 		);
 		self::$request_uri = empty(self::$request_uri) ? '/' : self::$request_uri;
 
 		self::$route = is_array($route)
-			? $route
-			: strtolower(preg_replace("/(^\/)|(\/$)/", '', $route));
+		 ? $route
+		 : strtolower(preg_replace("/(^\/)|(\/$)/", '', $route));
 
 		//  Firstly, resolve route with pattern
-		if (is_array(self::$route)) {
-			foreach (self::$route as $value) {
-				if (str_starts_with($value, 'pattern:')) {
-					if ($p = $this->pattern()) {
+		if (is_array(self::$route))
+		{
+			foreach (self::$route as $value)
+			{
+				if (str_starts_with($value, 'pattern:'))
+				{
+					if ($p = $this->pattern())
+					{
 						return $p;
 					}
-					$pattern = true;
 				}
 			}
-		} elseif (str_starts_with(self::$route, 'pattern:')) {
+		}
+		elseif (str_starts_with(self::$route, 'pattern:'))
+		{
 			return $this->pattern();
 		}
 
@@ -92,16 +99,18 @@ class MapRoute extends Controller implements MapInterface
 		$paramKey = [];
 
 		// finding if there is any {?} parameter in $route
-		if (is_string(self::$route)) {
+		if (is_string(self::$route))
+		{
 			preg_match_all('/(?<={).+?(?=})/', self::$route, $paramMatches);
 		}
 
 		// if the route does not contain any param call routing();
 		if (
-			empty($paramMatches) ||
-			empty($paramMatches[0] ?? []) ||
-			is_array(self::$route)
-		) {
+		empty($paramMatches) ||
+		empty($paramMatches[0] ?? []) ||
+		is_array(self::$route)
+		)
+		{
 			/**
 			 *   ------------------------------------------------------
 			 *   |   Check if $callback is a callable function
@@ -113,7 +122,8 @@ class MapRoute extends Controller implements MapInterface
 		}
 
 		// setting parameters names
-		foreach ($paramMatches[0] as $key) {
+		foreach ($paramMatches[0] as $key)
+		{
 			$paramKey[] = $key;
 		}
 
@@ -124,8 +134,10 @@ class MapRoute extends Controller implements MapInterface
 		$indexNum = [];
 
 		// storing index number, where {?} parameter is required with the help of regex
-		foreach ($uri as $index => $param) {
-			if (preg_match('/{.*}/', $param)) {
+		foreach ($uri as $index => $param)
+		{
+			if (preg_match('/{.*}/', $param))
+			{
 				$indexNum[] = $index;
 			}
 		}
@@ -141,20 +153,33 @@ class MapRoute extends Controller implements MapInterface
 		 *   |   Running for each loop to set the exact index number with reg expression this will help in matching route
 		 *   ----------------------------------------------------------------------------------
 		 */
-		foreach ($indexNum as $key => $index) {
+		foreach ($indexNum as $key => $index)
+		{
 			/**
 			 *   --------------------------------------------------------------------------------
 			 *   |   In case if req uri with param index is empty then return because URL is not valid for this route
 			 *   --------------------------------------------------------------------------------
 			 */
 
-			if (empty($reqUri[$index])) {
+			if (empty($reqUri[$index]))
+			{
 				return false;
 			}
 
 			// setting params with params names
-			$req[$paramKey[$key]] = htmlspecialchars($reqUri[$index]);
-			$req_value[] = htmlspecialchars($reqUri[$index]);
+			if (str_contains($paramKey[$key], ':'))
+			{
+				$param_name = trim((string) explode(':', $paramKey[$key], 2)[0]);
+				$param_types = trim((string) explode(':', $paramKey[$key], 2)[1]);
+				$param_types = explode('|', $param_types);
+				$param_value = $reqUri[$index];
+
+				if ((count($param_types) === 1 && str_starts_with($param_types[0], '?')) || in_array('null', $param_types))
+					print_r($param_types);
+			}
+
+			$req[$paramKey[$key]] = static::validate($reqUri[$index]);
+			$req_value[] = static::validate($reqUri[$index]);
 
 			// this is to create a regex for comparing route address
 			$reqUri[$index] = '{.*}';
@@ -172,21 +197,23 @@ class MapRoute extends Controller implements MapInterface
 		$reqUri = str_replace('/', '\\/', $reqUri);
 
 		// now matching route with regex
-		if (preg_match("/$reqUri/", self::$route . '$')) {
+		if (preg_match("/$reqUri/", self::$route . '$'))
+		{
 			// checks if the requested method is of the given route
 			if (
-				!in_array($_SERVER['REQUEST_METHOD'], self::$method) &&
-				!in_array('*', self::$method)
-			) {
+			!in_array($_SERVER['REQUEST_METHOD'], self::$method) &&
+			!in_array('*', self::$method)
+			)
+			{
 				http_response_code(405);
 				exit('Method Not Allowed');
 			}
 
 			return [
-				'method' => $_SERVER['REQUEST_METHOD'],
-				'route' => self::$route,
-				'params_value' => $req_value,
-				'params' => $req,
+			 'method' => $_SERVER['REQUEST_METHOD'],
+			 'route' => self::$route,
+			 'params_value' => $req_value,
+			 'params' => $req,
 			];
 		}
 
@@ -203,40 +230,48 @@ class MapRoute extends Controller implements MapInterface
 	 *
 	 * @return bool|array Returns an array with 'method' and 'route' keys if a match is found, otherwise false.
 	 */
-	private function match_routing(): bool|array
+	private function match_routing (): bool|array
 	{
 		$uri = [];
 		$str_route = '';
 
-		if (is_array(self::$route)) {
-			for ($i = 0; $i < count(self::$route); $i++) {
+		if (is_array(self::$route))
+		{
+			for ($i = 0; $i < count(self::$route); $i++)
+			{
 				$each_route = preg_replace("/(^\/)|(\/$)/", '', self::$route[$i]);
 
 				empty($each_route)
-					? array_push($uri, strtolower('/'))
-					: array_push($uri, strtolower($each_route));
+				 ? array_push($uri, strtolower('/'))
+				 : array_push($uri, strtolower($each_route));
 			}
-		} else {
+		}
+		else
+		{
 			$str_route = empty(self::$route) ? '/' : self::$route;
 		}
 
 		if (
-			in_array(self::$request_uri, $uri) ||
-			self::$request_uri === $str_route
-		) {
+		in_array(self::$request_uri, $uri) ||
+		self::$request_uri === $str_route
+		)
+		{
 			if (
-				!in_array($_SERVER['REQUEST_METHOD'], self::$method) &&
-				!in_array('*', haystack: self::$method)
-			) {
+			!in_array($_SERVER['REQUEST_METHOD'], self::$method) &&
+			!in_array('*', self::$method)
+			)
+			{
 				http_response_code(405);
 				exit('Method Not Allowed');
 			}
 
 			return [
-				'method' => $_SERVER['REQUEST_METHOD'],
-				'route' => self::$route,
+			 'method' => $_SERVER['REQUEST_METHOD'],
+			 'route' => self::$route,
 			];
-		} else {
+		}
+		else
+		{
 			return false;
 		}
 	}
@@ -251,14 +286,18 @@ class MapRoute extends Controller implements MapInterface
 	 *
 	 * @return array|bool The matched pattern as an array if found, or false if no match is found.
 	 */
-	private function pattern(): array|bool
+	private function pattern (): array|bool
 	{
-		if (is_array(self::$route)) {
-			foreach (self::$route as $value) {
-				if (str_starts_with('pattern:', $value)) {
+		if (is_array(self::$route))
+		{
+			foreach (self::$route as $value)
+			{
+				if (str_starts_with('pattern:', $value))
+				{
 					$matched = $this->validatePattern($value);
 
-					if ($matched) {
+					if ($matched)
+					{
 						return $matched;
 					}
 				}
@@ -275,22 +314,24 @@ class MapRoute extends Controller implements MapInterface
 	 * @param string $pattern The pattern to validate.
 	 * @return array|bool Returns an array with the request method and route if the pattern matches, otherwise false.
 	 */
-	private function validatePattern(string $pattern): array|bool
+	private function validatePattern (string $pattern): array|bool
 	{
 		$pattern = preg_replace("/(^\/)|(\/$)/", '', trim(substr($pattern, 8)));
 
-		if (fnmatch($pattern, self::$request_uri)) {
+		if (fnmatch($pattern, self::$request_uri))
+		{
 			if (
-				!in_array($_SERVER['REQUEST_METHOD'], self::$method) &&
-				!in_array('*', self::$method)
-			) {
+			!in_array($_SERVER['REQUEST_METHOD'], self::$method) &&
+			!in_array('*', self::$method)
+			)
+			{
 				http_response_code(405);
 				exit('Method Not Allowed');
 			}
 
 			return [
-				'method' => $_SERVER['REQUEST_METHOD'],
-				'route' => self::$route,
+			 'method' => $_SERVER['REQUEST_METHOD'],
+			 'route' => self::$route,
 			];
 		}
 		return false;
