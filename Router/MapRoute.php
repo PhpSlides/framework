@@ -18,7 +18,8 @@ use PhpSlides\Interface\MapInterface;
  */
 class MapRoute extends Controller implements MapInterface
 {
-	use \PhpSlides\Formatter\Validate;
+	use Utils\Validate;
+	use Utils\Routes\StrictTypes;
 
 	/**
 	 * @var string|array $route The route(s) to be mapped.
@@ -211,7 +212,7 @@ class MapRoute extends Controller implements MapInterface
 					$param_types = explode('|', $param_types);
 					$param_value = $value[1];
 
-
+					static::matchType($param_types, $param_value);
 				}
 			}
 

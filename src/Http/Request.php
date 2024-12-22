@@ -14,8 +14,8 @@ use PhpSlides\Http\Interface\RequestInterface;
  */
 class Request extends Application implements RequestInterface
 {
+	use \PhpSlides\Utils\Validate;
 	use \PhpSlides\Http\Auth\Authorization;
-	use \PhpSlides\Formatter\Validate;
 
 	/**
 	 * @var ?array The URL parameters.

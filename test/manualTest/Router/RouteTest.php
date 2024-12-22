@@ -3,6 +3,7 @@
 use PhpSlides\Route;
 use PhpSlides\Http\Request;
 use PhpSlides\Foundation\Render;
+use PhpSlides\Foundation\Application;
 
 include_once __DIR__ . '/../../autoload.php';
 include_once __DIR__ . '/../../../src/Globals/Functions.php';
@@ -14,7 +15,7 @@ Route::get(route: $dir, callback: function ()
 	return 'Hello World';
 });
 
-Route::map(GET, "$dir/user/{id: INT}")->action(function (Request $req)
+Route::map(GET, "$dir/user/{id: INT|STRING}")->action(function (Request $req)
 {
 	echo "<br>";
 	return $req->urlParam();

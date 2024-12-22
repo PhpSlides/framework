@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Formatter;
+namespace PhpSlides\Utils;
 
 trait Validate
 {
