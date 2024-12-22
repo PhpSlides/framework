@@ -14,13 +14,10 @@ Route::get(route: $dir, callback: function ()
 	return 'Hello World';
 });
 
-Route::map(GET, "$dir/user/{id: INT|STRING}")->action(function (Request $req)
+Route::map(GET, "$dir/user/{id: INT|BOOLEAN}")->action(function (Request $req)
 {
 	echo "<br>";
 	return $req->urlParam();
-})->handleInvalidParameterType(function ($ss)
-{
-	return "Invalid parameter type: $ss";
 });
 
 

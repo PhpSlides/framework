@@ -416,7 +416,7 @@ class Route extends Controller implements RouteInterface
 
 		if ($this->handleInvalidParameterType !== null)
 		{
-			$GLOBALS['__registered_routes'][$route_index]['invalidParameterType'] = $this->handleInvalidParameterType;
+			$GLOBALS['__registered_routes'][$route_index]['handleInvalidParameterType'] = $this->handleInvalidParameterType;
 		}
 
 		if (self::$method !== null)

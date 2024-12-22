@@ -23,22 +23,66 @@ trait StrictTypes
     * @param string $haystack
     * @return void
     */
-   protected static function matchType (array $types, string $haystack)
+   protected static function matchType (array $types, string $haystack): bool
    {
       $typeofHaystack = self::typeOfString($haystack);
 
       foreach ($types as $type)
       {
+         $type = $type == 'INTEGER' ? 'INT' : strtoupper(trim($type));
+
+         if (!in_array($type, self::$types))
+         {
+            throw new Exception("$type is not recognized as a URL parameter type");
+         }
+
+         if (strtoupper($type) === $typeofHaystack)
+         {
+            return true;
+         }
       }
 
-      print_r((Application::$handleInvalidParameterType)($typeofHaystack));
       http_response_code(400);
-      $requested = implode(', ', $types);
-      throw new Exception("Invalid request parameter type. {{$requested}} requested, but got {{$typeofHaystack}}");
+      if (Application::$handleInvalidParameterType)
+      {
+         print_r((Application::$handleInvalidParameterType)($typeofHaystack));
+         exit;
+      }
+      else
+      {
+         $requested = implode(', ', $types);
+         throw new Exception("Invalid request parameter type. {{$requested}} requested, but got {{$typeofHaystack}}");
+      }
    }
 
    private static function typeOfString (string $string)
    {
-      return gettype($string);
+      if (is_numeric($string))
+      {
+         if (strpos($string, '.') !== false)
+         {
+            return 'FLOAT';
+         }
+         else
+         {
+            return 'INT';
+         }
+      }
+      else if (is_array(json_decode($string, true)))
+      {
+         return 'JSON';
+      }
+      else if (is_array($string))
+      {
+         return 'ARRAY';
+      }
+      else if (is_bool($string) || $string === 'true' || $string === 'false')
+      {
+         return 'BOOLEAN';
+      }
+      else
+      {
+         return 'STRING';
+      }
    }
 }

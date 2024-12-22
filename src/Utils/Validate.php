@@ -69,14 +69,9 @@ trait Validate
 		// Convert the sanitized string back to its original type based on the initial value's type
 		$convertedValue = (is_bool($value) || $type === 'boolean')
 		 ? (bool) $sanitizedValue
-		 : ((is_double($value) || is_float($value) || $type === 'double')
-		 ? (float) $sanitizedValue
 		  : ((is_numeric($value) || is_int($value) || $type === 'integer')
-		 ? ((is_bool((int) $value))
-		  ? (bool) $sanitizedValue
-		 : ((is_double((int) $value) || is_float((int) $value))
-		  ? (float) $sanitizedValue : (int) $sanitizedValue))
-		  : $sanitizedValue));
+		 ? ((is_double($value) || is_float($value) || $type === 'double' || strpos((string) $value, '.') !== false)
+		 ? (float) $sanitizedValue : (int) $sanitizedValue) : $sanitizedValue);
 
 		return $convertedValue;
 	}
