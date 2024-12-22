@@ -120,7 +120,16 @@ class Application extends Controller implements ApplicationInterface
 			  PHP_URL_PATH,
 			 ),
 			);
-			self::$basePath = '../../';
+
+			$find = '/src/routes/render.php';
+			$self = $_SERVER['PHP_SELF'];
+
+			self::$basePath = (strrpos($self, $find)) ? substr_replace(
+			 $self,
+			 '/',
+			 strrpos($self, $find),
+			 strlen($find),
+			 ) : '../../';
 		}
 
 		$req = new Request();
