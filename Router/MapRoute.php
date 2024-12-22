@@ -93,6 +93,7 @@ class MapRoute extends Controller implements MapInterface
 
 		// will store all the parameters value in this array
 		$req = [];
+		$unvalidate_req = [];
 		$req_value = [];
 
 		// will store all the parameters names in this array
@@ -166,25 +167,17 @@ class MapRoute extends Controller implements MapInterface
 				return false;
 			}
 
-			// setting params with params names
+
 			if (str_contains($paramKey[$key], ':'))
-			{
-				$param_name = trim((string) explode(':', $paramKey[$key], 2)[0]);
-				$param_types = trim((string) explode(':', $paramKey[$key], 2)[1]);
-				$param_types = explode('|', $param_types);
-				$param_value = $reqUri[$index];
+				$unvalidate_req[] = [ $paramKey[$key], $reqUri[$index] ];
 
-				if ((count($param_types) === 1 && str_starts_with($param_types[0], '?')) || in_array('null', $param_types))
-					print_r($param_types);
-			}
-
+			// setting params with params names
 			$req[$paramKey[$key]] = static::validate($reqUri[$index]);
 			$req_value[] = static::validate($reqUri[$index]);
 
 			// this is to create a regex for comparing route address
 			$reqUri[$index] = '{.*}';
 		}
-
 		// converting array to string
 		$reqUri = implode('/', $reqUri);
 
@@ -207,6 +200,19 @@ class MapRoute extends Controller implements MapInterface
 			{
 				http_response_code(405);
 				exit('Method Not Allowed');
+			}
+
+			if (!empty($unvalidate_req))
+			{
+				foreach ($unvalidate_req as $value)
+				{
+					$param_name = trim((string) explode(':', $value[0], 2)[0]);
+					$param_types = trim((string) explode(':', $value[0], 2)[1]);
+					$param_types = explode('|', $param_types);
+					$param_value = $value[1];
+
+
+				}
 			}
 
 			return [

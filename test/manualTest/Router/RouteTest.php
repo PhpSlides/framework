@@ -14,7 +14,7 @@ Route::get(route: $dir, callback: function ()
 	return 'Hello World';
 });
 
-Route::map(GET, "$dir/user/{id: int|null}")->action(function (Request $req)
+Route::map(GET, "$dir/user/{id: INT}")->action(function (Request $req)
 {
 	echo "<br>";
 	return $req->urlParam();
