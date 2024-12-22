@@ -3,6 +3,7 @@
 namespace PhpSlides\Foundation;
 
 use DB;
+use Closure;
 use PhpSlides\Route;
 use PhpSlides\Http\Request;
 use PhpSlides\Forgery\Forge;
@@ -87,6 +88,8 @@ class Application extends Controller implements ApplicationInterface
 	 * The directory path for script resources (e.g., JavaScript files).
 	 */
 	public static string $scriptsDir;
+
+	public static ?Closure $handleInvalidParameterType;
 
 
 	/**

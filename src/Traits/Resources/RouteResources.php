@@ -2,11 +2,13 @@
 
 namespace PhpSlides\Traits\Resources;
 
+use Closure;
 use PhpSlides\view;
 use PhpSlides\MapRoute;
 use PhpSlides\Exception;
 use PhpSlides\Http\Request;
 use PhpSlides\Loader\FileLoader;
+use PhpSlides\Foundation\Application;
 
 trait RouteResources
 {
@@ -28,6 +30,8 @@ trait RouteResources
 
 	protected static ?string $file = null;
 
+	protected static ?Closure $handleInvalidParameterType = null;
+
 	protected static array|bool $map_info = false;
 
 	/**
@@ -39,7 +43,7 @@ trait RouteResources
 	 */
 	protected static string $request_uri;
 
-	protected static function __map(): void
+	protected static function __map (): void
 	{
 		$route = self::$map['route'] ?? '';
 		$method = self::$map['method'] ?? '';
@@ -48,24 +52,33 @@ trait RouteResources
 		$match = new MapRoute();
 		self::$map_info = $match->match($method, $route);
 
-		if (self::$map_info) {
+		if (self::$map_info)
+		{
 			$static->__guards(self::$guards ?? null);
 
-			if (self::$use !== null) {
+			if (self::$use !== null)
+			{
 				$static->__use();
 			}
 
-			if (self::$file !== null) {
+			if (self::$file !== null)
+			{
 				$static->__file();
 			}
 
-			if (self::$action !== null) {
+			if (self::$action !== null)
+			{
 				$static->__action();
 			}
 		}
 	}
 
-	protected static function __any(?Request $request = null): void
+	protected static function __handleInvalidParameterType (): void
+	{
+		Application::$handleInvalidParameterType = self::$handleInvalidParameterType;
+	}
+
+	protected static function __any (?Request $request = null): void
 	{
 		$route = self::$any['route'] ?? self::$method['route'];
 		$method = self::$any['method'] ?? self::$method['method'];
@@ -82,14 +95,15 @@ trait RouteResources
 		 * --------------------------------------------------------------
 		 */
 
-		if ((is_array($route) && in_array('*', $route)) || $route === '*') {
+		if ((is_array($route) && in_array('*', $route)) || $route === '*')
+		{
 			http_response_code(404);
 
 			$GLOBALS['request'] = $request;
 			print_r(
-				is_callable($callback)
-					? $callback($request ?? new Request())
-					: $callback,
+			 is_callable($callback)
+			  ? $callback($request ?? new Request())
+			  : $callback,
 			);
 
 			self::log();
@@ -103,12 +117,14 @@ trait RouteResources
 		$paramKey = [];
 
 		// finding if there is any {?} parameter in $route
-		if (is_string($route)) {
+		if (is_string($route))
+		{
 			preg_match_all('/(?<={).+?(?=})/', $route, $paramMatches);
 		}
 
 		// if the route does not contain any param call routing();
-		if (empty($paramMatches[0] ?? []) || is_array($route)) {
+		if (empty($paramMatches[0] ?? []) || is_array($route))
+		{
 			/**
 			 *   ------------------------------------------------------
 			 *   Check if $callback is a callable function
@@ -118,40 +134,48 @@ trait RouteResources
 			 */
 			$callback = self::routing($route, $callback, $method);
 
-			if ($callback) {
-				if (self::$guards !== null) {
+			if ($callback)
+			{
+				if (self::$guards !== null)
+				{
 					(new static())->__guards(self::$guards ?? null);
 				}
 
 				if (
-					is_array($callback) &&
-					(preg_match('/(Controller)/', $callback[0], $matches) &&
-						count($matches) > 1)
-				) {
+				is_array($callback) &&
+				(preg_match('/(Controller)/', $callback[0], $matches) &&
+				count($matches) > 1)
+				)
+				{
 					print_r(
-						self::controller(
-							$callback[0],
-							count($callback) > 1 ? $callback[1] : '',
-						),
+					 self::controller(
+					  $callback[0],
+					  count($callback) > 1 ? $callback[1] : '',
+					 ),
 					);
-				} else {
+				}
+				else
+				{
 					$GLOBALS['request'] = new Request();
 					print_r(
-						is_callable($callback)
-							? $callback($request ?? new Request())
-							: $callback,
+					 is_callable($callback)
+					  ? $callback($request ?? new Request())
+					  : $callback,
 					);
 				}
 
 				self::log();
 				exit();
-			} else {
+			}
+			else
+			{
 				return;
 			}
 		}
 
 		// setting parameters names
-		foreach ($paramMatches[0] as $key) {
+		foreach ($paramMatches[0] as $key)
+		{
 			$paramKey[] = $key;
 		}
 
@@ -162,12 +186,15 @@ trait RouteResources
 		 *   ----------------------------------------------
 		 */
 
-		if (!empty(self::$request_uri)) {
+		if (!empty(self::$request_uri))
+		{
 			$route = strtolower(preg_replace("/(^\/)|(\/$)/", '', $route));
 			$reqUri = strtolower(
-				preg_replace("/(^\/)|(\/$)/", '', self::$request_uri),
+			 preg_replace("/(^\/)|(\/$)/", '', self::$request_uri),
 			);
-		} else {
+		}
+		else
+		{
 			$reqUri = '/';
 		}
 
@@ -178,8 +205,10 @@ trait RouteResources
 		$indexNum = [];
 
 		// storing index number, where {?} parameter is required with the help of regex
-		foreach ($uri as $index => $param) {
-			if (preg_match('/{.*}/', $param)) {
+		foreach ($uri as $index => $param)
+		{
+			if (preg_match('/{.*}/', $param))
+			{
 				$indexNum[] = $index;
 			}
 		}
@@ -196,21 +225,23 @@ trait RouteResources
 		 *   Running for each loop to set the exact index number with reg expression this will help in matching route
 		 *   ----------------------------------------------------------------------------------
 		 */
-		foreach ($indexNum as $key => $index) {
+		foreach ($indexNum as $key => $index)
+		{
 			/**
 			 *   --------------------------------------------------------------------------------
 			 *   In case if req uri with param index is empty then return because URL is not valid for this route
 			 *   --------------------------------------------------------------------------------
 			 */
 
-			if (empty($reqUri[$index])) {
+			if (empty($reqUri[$index]))
+			{
 				return;
 			}
 
 			// setting params with params names
 			$req[$paramKey[$key]] = htmlspecialchars(
-				$reqUri[$index],
-				ENT_NOQUOTES,
+			 $reqUri[$index],
+			 ENT_NOQUOTES,
 			);
 			$req_value[] = htmlspecialchars($reqUri[$index], ENT_NOQUOTES);
 
@@ -230,39 +261,45 @@ trait RouteResources
 		$reqUri = str_replace('/', '\\/', $reqUri);
 
 		// now matching route with regex
-		if (preg_match("/$reqUri/", $route . '$')) {
+		if (preg_match("/$reqUri/", $route . '$'))
+		{
 			// checks if the requested method is of the given route
 			if (
-				strtoupper($_SERVER['REQUEST_METHOD']) !== strtoupper($method) &&
-				$method !== '*'
-			) {
+			strtoupper($_SERVER['REQUEST_METHOD']) !== strtoupper($method) &&
+			$method !== '*'
+			)
+			{
 				http_response_code(405);
 				self::log();
 				exit('Method Not Allowed');
 			}
 
-			if (self::$guards !== null) {
+			if (self::$guards !== null)
+			{
 				(new static())->__guards(self::$guards ?? null);
 			}
 
 			if (
-				is_array($callback) &&
-				(preg_match('/(Controller)/', $callback[0], $matches) &&
-					count($matches) > 1)
-			) {
+			is_array($callback) &&
+			(preg_match('/(Controller)/', $callback[0], $matches) &&
+			count($matches) > 1)
+			)
+			{
 				print_r(
-					self::controller(
-						$callback[0],
-						count($callback) > 1 ? $callback[1] : '',
-						$req,
-					),
+				 self::controller(
+				  $callback[0],
+				  count($callback) > 1 ? $callback[1] : '',
+				  $req,
+				 ),
 				);
-			} else {
+			}
+			else
+			{
 				$GLOBALS['request'] = new Request($req);
 				print_r(
-					is_callable($callback)
-						? $callback(new Request($req))
-						: $callback,
+				 is_callable($callback)
+				  ? $callback(new Request($req))
+				  : $callback,
 				);
 			}
 
@@ -271,22 +308,26 @@ trait RouteResources
 		}
 	}
 
-	protected static function __redirect(): void
+	protected static function __redirect (): void
 	{
 		$route = self::$redirect['route'];
 		$new_url = self::$redirect['new_url'];
 		$code = self::$redirect['code'];
 
-		if (!empty(self::$request_uri)) {
+		if (!empty(self::$request_uri))
+		{
 			$route = preg_replace("/(^\/)|(\/$)/", '', $route);
 			$new_url = preg_replace("/(^\/)|(\/$)/", '', $new_url);
 			$reqUri = preg_replace("/(^\/)|(\/$)/", '', self::$request_uri);
-		} else {
+		}
+		else
+		{
 			$reqUri = '/';
 			$new_url = preg_replace("/(^\/)|(\/$)/", '', $new_url);
 		}
 
-		if (strtolower($reqUri) === strtolower($route)) {
+		if (strtolower($reqUri) === strtolower($route))
+		{
 			http_response_code($code);
 			self::log();
 
@@ -295,12 +336,12 @@ trait RouteResources
 		}
 	}
 
-	protected static function __method(?Request $request = null): void
+	protected static function __method (?Request $request = null): void
 	{
 		self::__any($request);
 	}
 
-	protected static function __view(?Request $request = null): void
+	protected static function __view (?Request $request = null): void
 	{
 		$route = self::$view['route'];
 		$view = self::$view['view'];
@@ -314,28 +355,34 @@ trait RouteResources
 		$uri = [];
 		$str_route = '';
 		$reqUri = strtolower(
-			preg_replace("/(^\/)|(\/$)/", '', self::$request_uri),
+		 preg_replace("/(^\/)|(\/$)/", '', self::$request_uri),
 		);
 		$reqUri = empty($reqUri) ? '/' : $reqUri;
 
-		if (is_array($route)) {
-			for ($i = 0; $i < count($route); $i++) {
+		if (is_array($route))
+		{
+			for ($i = 0; $i < count($route); $i++)
+			{
 				$each_route = preg_replace("/(^\/)|(\/$)/", '', $route[$i]);
 
 				empty($each_route)
-					? array_push($uri, '/')
-					: array_push($uri, strtolower($each_route));
+				 ? array_push($uri, '/')
+				 : array_push($uri, strtolower($each_route));
 			}
-		} else {
+		}
+		else
+		{
 			$str_route = strtolower(preg_replace("/(^\/)|(\/$)/", '', $route));
 			$str_route = empty($str_route) ? '/' : $str_route;
 		}
 
-		if (in_array($reqUri, $uri) || $reqUri === $str_route) {
+		if (in_array($reqUri, $uri) || $reqUri === $str_route)
+		{
 			if (
-				strtoupper($_SERVER['REQUEST_METHOD']) !== 'GET' &&
-				strtoupper($_SERVER['REQUEST_METHOD']) !== 'VIEW'
-			) {
+			strtoupper($_SERVER['REQUEST_METHOD']) !== 'GET' &&
+			strtoupper($_SERVER['REQUEST_METHOD']) !== 'VIEW'
+			)
+			{
 				http_response_code(405);
 				self::log();
 				exit('Method Not Allowed');
@@ -351,33 +398,40 @@ trait RouteResources
 		}
 	}
 
-	protected function __guards(?array $guards): bool
+	protected function __guards (?array $guards): bool
 	{
-		if (!$guards) {
+		if (!$guards)
+		{
 			return true;
 		}
 		$params = self::$map_info['params'] ?? null;
 		$request = new Request($params);
 
-		for ($i = 0; $i < count((array) $guards); $i++) {
+		for ($i = 0; $i < count((array) $guards); $i++)
+		{
 			$registered_guards = (new FileLoader())
-				->load(__DIR__ . '/../../Config/guards.php')
-				->getLoad();
+			 ->load(__DIR__ . '/../../Config/guards.php')
+			 ->getLoad();
 
-			if (array_key_exists($guards[$i], $registered_guards)) {
+			if (array_key_exists($guards[$i], $registered_guards))
+			{
 				$guard = $registered_guards[$guards[$i]];
-			} else {
+			}
+			else
+			{
 				throw new Exception(
-					'No Registered AuthGuard as `' . $guards[$i] . '`',
+				 'No Registered AuthGuard as `' . $guards[$i] . '`',
 				);
 			}
 
-			if (!class_exists($guard)) {
+			if (!class_exists($guard))
+			{
 				throw new Exception("AuthGuard class does not exist: `{$guard}`");
 			}
 			$cl = new $guard($request);
 
-			if ($cl->authorize() !== true) {
+			if ($cl->authorize() !== true)
+			{
 				self::log();
 				exit();
 			}
@@ -385,14 +439,16 @@ trait RouteResources
 		return true;
 	}
 
-	protected function __file(?Request $request = null): void
+	protected function __file (?Request $request = null): void
 	{
 		$file = self::$file;
 
-		if (array_key_exists('params', self::$map_info)) {
+		if (array_key_exists('params', self::$map_info))
+		{
 			$GLOBALS['request'] = new Request(self::$map_info['params']);
 		}
-		if ($request) {
+		if ($request)
+		{
 			$GLOBALS['request'] = $request;
 		}
 
@@ -401,26 +457,30 @@ trait RouteResources
 		exit();
 	}
 
-	protected function __use(?Request $request = null): void
+	protected function __use (?Request $request = null): void
 	{
 		$controller = self::$use;
 
-		if (!preg_match('/(?=.*Controller)(?=.*::)/', $controller)) {
+		if (!preg_match('/(?=.*Controller)(?=.*::)/', $controller))
+		{
 			throw new Exception(
-				'Parameter $controller must match Controller named rule.',
+			 'Parameter $controller must match Controller named rule.',
 			);
 		}
 
-		[$c_name, $c_method] = explode('::', $controller);
+		[ $c_name, $c_method ] = explode('::', $controller);
 
 		$cc = 'App\\Http\\Controller\\' . $c_name;
 
-		if (class_exists($cc)) {
+		if (class_exists($cc))
+		{
 			$params = self::$map_info['params'] ?? null;
 
 			$cc = new $cc();
 			print_r($cc->$c_method($request ?? new Request($params)));
-		} else {
+		}
+		else
+		{
 			throw new Exception("No class controller found as: '$cc'");
 		}
 
@@ -428,18 +488,23 @@ trait RouteResources
 		exit();
 	}
 
-	protected function __action(?Request $request = null): void
+	protected function __action (?Request $request = null): void
 	{
 		$action = self::$action;
 		$params = self::$map_info['params'] ?? null;
 
-		if (is_callable($action)) {
+		if (is_callable($action))
+		{
 			$a = $action($request ?? new Request($params));
 			print_r($a);
-		} elseif (preg_match('/(?=.*Controller)(?=.*::)/', $action)) {
+		}
+		elseif (preg_match('/(?=.*Controller)(?=.*::)/', $action))
+		{
 			self::$use = $action;
 			$this->__use($request);
-		} else {
+		}
+		else
+		{
 			$GLOBALS['request'] = $request ?? new Request($params);
 			print_r($action);
 		}

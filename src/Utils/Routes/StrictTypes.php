@@ -3,6 +3,7 @@
 namespace PhpSlides\Utils\Routes;
 
 use PhpSlides\Exception;
+use PhpSlides\Foundation\Application;
 
 trait StrictTypes
 {
@@ -30,6 +31,7 @@ trait StrictTypes
       {
       }
 
+      print_r((Application::$handleInvalidParameterType)($typeofHaystack));
       http_response_code(400);
       $requested = implode(', ', $types);
       throw new Exception("Invalid request parameter type. {{$requested}} requested, but got {{$typeofHaystack}}");

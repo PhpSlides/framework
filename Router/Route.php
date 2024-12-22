@@ -15,6 +15,7 @@
 
 namespace PhpSlides;
 
+use Closure;
 use PhpSlides\Traits\FileHandler;
 use PhpSlides\Controller\Controller;
 use PhpSlides\Interface\RouteInterface;
@@ -44,6 +45,8 @@ class Route extends Controller implements RouteInterface
 	private mixed $action = null;
 
 	private ?string $use = null;
+
+	private ?Closure $handleInvalidParameterType = null;
 
 	private ?string $file = null;
 
@@ -176,6 +179,21 @@ class Route extends Controller implements RouteInterface
 		{
 			$this->file = $file;
 		}
+		return $this;
+	}
+
+	/**
+	 * Sets a closure to handle invalid parameter types.
+	 *
+	 * This method allows you to define a custom closure that will be executed
+	 * when an invalid parameter type is encountered.
+	 *
+	 * @param Closure $closure The closure to handle invalid parameter types.
+	 * @return self Returns the current instance for method chaining.
+	 */
+	public function handleInvalidParameterType (Closure $closure): self
+	{
+		$this->handleInvalidParameterType = $closure;
 		return $this;
 	}
 
@@ -394,6 +412,11 @@ class Route extends Controller implements RouteInterface
 		if ($this->file !== null)
 		{
 			$GLOBALS['__registered_routes'][$route_index]['file'] = $this->file;
+		}
+
+		if ($this->handleInvalidParameterType !== null)
+		{
+			$GLOBALS['__registered_routes'][$route_index]['invalidParameterType'] = $this->handleInvalidParameterType;
 		}
 
 		if (self::$method !== null)
