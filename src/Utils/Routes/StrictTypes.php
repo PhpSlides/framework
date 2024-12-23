@@ -28,16 +28,20 @@ trait StrictTypes
 	protected static function matchType (
 	 array $types,
 	 string $haystack,
-	): int|bool|float|array|string|null {
+	 ): int|bool|float|array|string|null {
 		$typeOfHaystack = self::typeOfString($haystack);
 
 		foreach ($types as $type)
 		{
 			$type = $type === 'INTEGER' ? 'INT' : strtoupper(trim($type));
 
-			self::matches($type, $haystack);
+			$s = self::matches($type, $haystack);
+			if (is_array($s))
+			{
+				[ $haystack, $typeOfHaystack ] = $s;
+			}
 
-			if (!in_array($type, self::$types))
+			if (!in_array($typeOfHaystack, self::$types))
 			{
 				throw new Exception(
 				 "{{$type}} is not recognized as a URL parameter type",
@@ -95,23 +99,39 @@ trait StrictTypes
 
 	private static function matches ($type, $haystack)
 	{
-		if (preg_match('/ARRAY<(.+)>/', $type, $matches))
-		{
-			$eachTypes = trim((string) explode(',', $matches[1]));
-			$typeOfHaystack = self::typeOfString($haystack);
+		$typeOfHaystack = self::typeOfString((string) $haystack);
 
-			if (strtoupper($matches[1]) === $typeOfHaystack)
+		if (preg_match('/ARRAY<(.+)>/', $type, $matches) && $typeOfHaystack === 'ARRAY')
+		{
+			$haystack = json_decode($haystack, true);
+			$eachArrayTypes = explode(',', $matches[1]);
+
+			foreach ($eachArrayTypes as $key => $eachArrayType)
 			{
-				print_r(match ($typeOfHaystack)
+				$haystack2 = $haystack[$key];
+				$eachTypes = preg_split('/\|(?![^<]*>)/', trim($eachArrayType));
+				$typeOfHaystack2 = self::typeOfString((string) $haystack2);
+
+				if (is_null(self::matchType($eachTypes, (string) $haystack2)))
 				{
-						'INT' => (int) $haystack,
-						'BOOL' => (bool) $haystack,
-						'FLOAT' => (float) $haystack,
-						'ARRAY' => json_decode($haystack, true),
-						default => $haystack,
-				});
-				exit;
+					http_response_code(400);
+
+					if (Application::$handleInvalidParameterType)
+					{
+						print_r((Application::$handleInvalidParameterType)($typeOfHaystack2));
+						exit();
+					}
+					else
+					{
+						$requested = implode(', ', $eachTypes);
+						throw new Exception(
+						 "Invalid request parameter type. {{$requested}} requested on array index $key, but got {{$typeOfHaystack2}}",
+						);
+					}
+				}
 			}
+
+			return [ $haystack2, $typeOfHaystack2 ];
 		}
 	}
 
@@ -146,9 +166,9 @@ trait StrictTypes
 		{
 			return match (gettype($jd))
 			{
-				  'object' => 'JSON',
-				  'array' => 'ARRAY',
-				  default => 'STRING'
+					'object' => 'JSON',
+					'array' => 'ARRAY',
+					default => 'STRING'
 			};
 		}
 		else
