@@ -1,6 +1,6 @@
 <?php
 
 /**
- * Start the PhpSlides Application 
+ * Start the PhpSlides Application
  */
-(new \PhpSlides\Foundation\Application())->create();
+(new \PhpSlides\Src\Foundation\Application())->create();

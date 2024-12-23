@@ -189,9 +189,9 @@ header span {
      : 'http://';
 
    $addr =
-    \PhpSlides\Foundation\Application::$REMOTE_ADDR .
+    \PhpSlides\Src\Foundation\Application::$REMOTE_ADDR .
     "/hot-reload-a$sid/worker";
-   $phpslides_version = \PhpSlides\Foundation\Application::PHPSLIDES_VERSION;
+   $phpslides_version = \PhpSlides\Src\Foundation\Application::PHPSLIDES_VERSION;
 
    if (getenv('HOT_RELOAD') == 'true'): ?>
    <script>

@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Http;
+namespace PhpSlides\Src\Http;
 
 use PhpSlides\Exception;
-use PhpSlides\Controller\Controller;
-use PhpSlides\Http\Interface\ApiInterface;
+use PhpSlides\Src\Controller\Controller;
+use PhpSlides\Src\Http\Interface\ApiInterface;
 
 /**
  * The Api class provides a fluent interface to define API routes,

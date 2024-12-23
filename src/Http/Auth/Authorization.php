@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Http\Auth;
+namespace PhpSlides\Src\Http\Auth;
 
 trait Authorization
 {

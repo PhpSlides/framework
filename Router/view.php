@@ -1,12 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides;
+namespace PhpSlides\Router;
 
 use component;
-use PhpSlides\Exception;
-use PhpSlides\Logger\Logger;
-use PhpSlides\Traits\FileHandler;
-use PhpSlides\Foundation\Application;
+use PhpSlides\Src\Foundation\Application;
 
 /**
  * --------------------------------------------------------------
@@ -19,8 +16,6 @@ use PhpSlides\Foundation\Application;
  */
 final class view
 {
-	use Logger, FileHandler;
-
 	/**
 	 * --------------------------------------------------------------
 	 * Render Views and Parse Public URL in Views

@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpSlides\Formatter\Views;
+namespace PhpSlides\Src\Formatter\Views;
 
 /**
  * Trait to handle properties for view files.
@@ -43,7 +43,7 @@ trait HandleProperties
 		}
 
 		// Initialize the PHP code snippet for assigning properties
-		$code = '<' . '?php $s = new \PhpSlides\Props(); ';
+		$code = '<' . '?php $s = new \PhpSlides\Src\Props(); ';
 
 		// Loop through each provided property
 		foreach ($props as $key => $value) {

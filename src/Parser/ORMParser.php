@@ -1,9 +1,9 @@
 <?php
 
-namespace PhpSlides\Parser;
+namespace PhpSlides\Src\Parser;
 
 use DB;
-use PhpSlides\Forgery\Forge;
+use PhpSlides\Src\Forgery\Forge;
 
 /**
  * ORMParser is responsible for parsing a given class name into database-specific

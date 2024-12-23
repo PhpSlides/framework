@@ -1,7 +1,7 @@
 <?php
 
 use Dotenv\Dotenv;
-use PhpSlides\Foundation\Application;
+use PhpSlides\Src\Foundation\Application;
 
 $basePath = Application::$basePath === '' ? 'app/../' : Application::$basePath;
 

@@ -1,6 +1,6 @@
 <?php
 
-use PhpSlides\Web\JWT;
+use PhpSlides\Src\Web\JWT;
 
 include_once __DIR__ . '/../autoload.php';
 include_once __DIR__ . '/../../src/Globals/Functions.php';

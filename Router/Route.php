@@ -13,12 +13,13 @@
  * @license MIT
  */
 
-namespace PhpSlides;
+namespace PhpSlides\Router;
 
 use Closure;
-use PhpSlides\Traits\FileHandler;
-use PhpSlides\Controller\Controller;
-use PhpSlides\Interface\RouteInterface;
+use PhpSlides\Exception;
+use PhpSlides\Src\Traits\FileHandler;
+use PhpSlides\Src\Controller\Controller;
+use PhpSlides\Router\Interface\RouteInterface;
 
 /**
  *   -------------------------------------------------------------------------------
@@ -46,9 +47,11 @@ class Route extends Controller implements RouteInterface
 
 	private ?string $use = null;
 
-	private ?Closure $handleInvalidParameterType = null;
-
 	private ?string $file = null;
+
+	private ?array $mapRoute = null;
+
+	private ?Closure $handleInvalidParameterType = null;
 
 	private static array $routes;
 
@@ -64,7 +67,6 @@ class Route extends Controller implements RouteInterface
 
 	private static ?array $map = null;
 
-
 	/**
 	 *   ------------------------------------------------------------------------
 	 *
@@ -78,15 +80,15 @@ class Route extends Controller implements RouteInterface
 	 *
 	 *   ------------------------------------------------------------------------
 	 */
-	public static function any (
-	 array|string $route,
-	 mixed $callback,
-	 string $method = '*',
+	public static function any(
+		array|string $route,
+		mixed $callback,
+		string $method = '*',
 	): self {
 		self::$any = [
-		 'route' => $route,
-		 'method' => $method,
-		 'callback' => $callback,
+			'route' => $route,
+			'method' => $method,
+			'callback' => $callback,
 		];
 
 		self::$route[] = $route;
@@ -101,11 +103,11 @@ class Route extends Controller implements RouteInterface
 	 * @param string $method Request method
 	 * @param string|array $route Route parameter
 	 */
-	public static function map (string $method, string|array $route): self
+	public static function map(string $method, string|array $route): self
 	{
 		self::$map = [
-		 'method' => $method,
-		 'route' => $route,
+			'method' => $method,
+			'route' => $route,
 		];
 		self::$route[] = $route;
 		return new self();
@@ -117,22 +119,41 @@ class Route extends Controller implements RouteInterface
 	 *
 	 * @param string $name Set the name of the route
 	 */
-	public function name (string $name): self
+	public function name(string $name): self
 	{
-		if (is_array(end(self::$route)))
-		{
-			for ($i = 0; $i < count(end(self::$route)); $i++)
-			{
+		if (is_array(end(self::$route))) {
+			for ($i = 0; $i < count(end(self::$route)); $i++) {
 				add_route_name("$name::$i", end(self::$route)[$i]);
 				self::$routes["$name::$i"] = end(self::$route)[$i];
 			}
-		}
-		else
-		{
+		} else {
 			add_route_name($name, end(self::$route));
 			self::$routes[$name] = end(self::$route);
 		}
 
+		return $this;
+	}
+
+	/**
+	 * Route Mapping
+	 *
+	 * @param string $route
+	 * @param Closure $callback
+	 */
+	public function route(string $route, Closure $callback): self
+	{
+		$route = rtrim('/', self::$map['route']) . '/' . ltrim('/', $route);
+
+		if (self::$map) {
+			$this->mapRoute = [
+				'route' => $route,
+				'method' => self::$map['method'],
+				'callback' => $callback,
+			];
+		} else {
+			throw new Exception('There is no map to route.');
+		}
+		self::$route[] = $route;
 		return $this;
 	}
 
@@ -142,10 +163,9 @@ class Route extends Controller implements RouteInterface
 	 *
 	 * @param mixed $callback
 	 */
-	public function action (mixed $callback): self
+	public function action(mixed $callback): self
 	{
-		if (self::$map)
-		{
+		if (self::$map) {
 			$this->action = $callback;
 		}
 		return $this;
@@ -160,8 +180,7 @@ class Route extends Controller implements RouteInterface
 	 */
 	public function use(string $controller): self
 	{
-		if (self::$map)
-		{
+		if (self::$map) {
 			$this->use = $controller;
 		}
 		return $this;
@@ -173,10 +192,9 @@ class Route extends Controller implements RouteInterface
 	 *
 	 * @param string $file
 	 */
-	public function file (string $file): self
+	public function file(string $file): self
 	{
-		if (self::$map)
-		{
+		if (self::$map) {
 			$this->file = $file;
 		}
 		return $this;
@@ -191,7 +209,7 @@ class Route extends Controller implements RouteInterface
 	 * @param Closure $closure The closure to handle invalid parameter types.
 	 * @return self Returns the current instance for method chaining.
 	 */
-	public function handleInvalidParameterType (Closure $closure): self
+	public function handleInvalidParameterType(Closure $closure): self
 	{
 		$this->handleInvalidParameterType = $closure;
 		return $this;
@@ -203,10 +221,9 @@ class Route extends Controller implements RouteInterface
 	 * @param string ...$guards String parameters of registered guards.
 	 * @return self
 	 */
-	public function withGuard (string ...$guards): self
+	public function withGuard(string ...$guards): self
 	{
-		if (self::$map || self::$method || self::$view)
-		{
+		if (self::$map || self::$method || self::$view) {
 			$this->guards = $guards;
 		}
 		return $this;
@@ -227,11 +244,11 @@ class Route extends Controller implements RouteInterface
 	 *
 	 *   ---------------------------------------------------------------------------
 	 */
-	public static function view (array|string $route, string $view): self
+	public static function view(array|string $route, string $view): self
 	{
 		self::$view = [
-		 'route' => $route,
-		 'view' => $view,
+			'route' => $route,
+			'view' => $view,
 		];
 
 		self::$route[] = $route;
@@ -251,15 +268,15 @@ class Route extends Controller implements RouteInterface
 	 *
 	 * ---------------------------------------------------------------
 	 */
-	public static function redirect (
-	 string $route,
-	 string $new_url,
-	 int $code = 302,
+	public static function redirect(
+		string $route,
+		string $new_url,
+		int $code = 302,
 	): self {
 		self::$redirect = [
-		 'route' => $route,
-		 'new_url' => $new_url,
-		 'code' => $code,
+			'route' => $route,
+			'new_url' => $new_url,
+			'code' => $code,
 		];
 
 		self::$route[] = $route;
@@ -275,12 +292,12 @@ class Route extends Controller implements RouteInterface
 	 *
 	 *   --------------------------------------------------------------
 	 */
-	public static function get (array|string $route, $callback): self
+	public static function get(array|string $route, $callback): self
 	{
 		self::$method = [
-		 'route' => $route,
-		 'method' => 'GET',
-		 'callback' => $callback,
+			'route' => $route,
+			'method' => 'GET',
+			'callback' => $callback,
 		];
 
 		self::$route[] = $route;
@@ -296,12 +313,12 @@ class Route extends Controller implements RouteInterface
 	 *
 	 *   --------------------------------------------------------------
 	 */
-	public static function post (array|string $route, $callback): self
+	public static function post(array|string $route, $callback): self
 	{
 		self::$method = [
-		 'route' => $route,
-		 'method' => 'POST',
-		 'callback' => $callback,
+			'route' => $route,
+			'method' => 'POST',
+			'callback' => $callback,
 		];
 
 		self::$route[] = $route;
@@ -317,12 +334,12 @@ class Route extends Controller implements RouteInterface
 	 *
 	 *   --------------------------------------------------------------
 	 */
-	public static function put (array|string $route, $callback): self
+	public static function put(array|string $route, $callback): self
 	{
 		self::$method = [
-		 'route' => $route,
-		 'method' => 'PUT',
-		 'callback' => $callback,
+			'route' => $route,
+			'method' => 'PUT',
+			'callback' => $callback,
 		];
 
 		self::$route[] = $route;
@@ -338,12 +355,12 @@ class Route extends Controller implements RouteInterface
 	 *
 	 *   --------------------------------------------------------------
 	 */
-	public static function patch (array|string $route, $callback): self
+	public static function patch(array|string $route, $callback): self
 	{
 		self::$method = [
-		 'route' => $route,
-		 'method' => 'PATCH',
-		 'callback' => $callback,
+			'route' => $route,
+			'method' => 'PATCH',
+			'callback' => $callback,
 		];
 
 		self::$route[] = $route;
@@ -359,74 +376,71 @@ class Route extends Controller implements RouteInterface
 	 *
 	 *   --------------------------------------------------------------
 	 */
-	public static function delete (array|string $route, $callback): self
+	public static function delete(array|string $route, $callback): self
 	{
 		self::$method = [
-		 'route' => $route,
-		 'method' => 'DELETE',
-		 'callback' => $callback,
+			'route' => $route,
+			'method' => 'DELETE',
+			'callback' => $callback,
 		];
 
 		self::$route[] = $route;
 		return new self();
 	}
 
-	public function __destruct ()
+	public function __destruct()
 	{
 		$route_index = end(self::$route);
 		$route_index = is_array($route_index) ? $route_index[0] : $route_index;
 
-		if (self::$map !== null)
-		{
+		if (self::$map !== null) {
 			$GLOBALS['__registered_routes'][$route_index]['map'] = self::$map;
 		}
 
-		if ($this->guards !== null)
-		{
+		if ($this->guards !== null) {
 			$GLOBALS['__registered_routes'][$route_index]['guards'] =
-			 $this->guards;
+				$this->guards;
 		}
 
-		if (self::$redirect !== null)
-		{
+		if (self::$redirect !== null) {
 			$GLOBALS['__registered_routes'][$route_index]['redirect'] =
-			 self::$redirect;
+				self::$redirect;
 		}
 
-		if ($this->action !== null)
-		{
+		if ($this->action !== null) {
 			$GLOBALS['__registered_routes'][$route_index]['action'] =
-			 $this->action;
+				$this->action;
 		}
 
-		if (self::$any !== null)
-		{
+		if ($this->mapRoute !== null) {
+			$GLOBALS['__registered_routes'][$route_index]['mapRoute'] =
+				$this->mapRoute;
+		}
+
+		if (self::$any !== null) {
 			$GLOBALS['__registered_routes'][$route_index]['any'] = self::$any;
 		}
 
-		if ($this->use !== null)
-		{
+		if ($this->use !== null) {
 			$GLOBALS['__registered_routes'][$route_index]['use'] = $this->use;
 		}
 
-		if ($this->file !== null)
-		{
+		if ($this->file !== null) {
 			$GLOBALS['__registered_routes'][$route_index]['file'] = $this->file;
 		}
 
-		if ($this->handleInvalidParameterType !== null)
-		{
-			$GLOBALS['__registered_routes'][$route_index]['handleInvalidParameterType'] = $this->handleInvalidParameterType;
+		if ($this->handleInvalidParameterType !== null) {
+			$GLOBALS['__registered_routes'][$route_index][
+				'handleInvalidParameterType'
+			] = $this->handleInvalidParameterType;
 		}
 
-		if (self::$method !== null)
-		{
+		if (self::$method !== null) {
 			$GLOBALS['__registered_routes'][$route_index]['method'] =
-			 self::$method;
+				self::$method;
 		}
 
-		if (self::$view !== null)
-		{
+		if (self::$view !== null) {
 			$GLOBALS['__registered_routes'][$route_index]['view'] = self::$view;
 		}
 	}

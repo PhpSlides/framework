@@ -1,9 +1,9 @@
 <?php
 
-namespace PhpSlides\Parser;
+namespace PhpSlides\Src\Parser;
 
-use PhpSlides\Logger\DBLogger;
-use PhpSlides\Formatter\SqlFormat;
+use PhpSlides\Src\Logger\DBLogger;
+use PhpSlides\Src\Formatter\SqlFormat;
 
 /**
  * SqlParser is responsible for parsing SQL column definitions and constraints.
@@ -51,7 +51,7 @@ class SqlParser extends SqlFormat
 		'GENERATED' => null,
 		'VIRTUAL' => null,
 		'PERSISTENT' => null,
-		'OTHERS' => null
+		'OTHERS' => null,
 	];
 
 	/**
@@ -74,7 +74,7 @@ class SqlParser extends SqlFormat
 		string $column_name,
 		string $path,
 		array $constraint,
-		?string $table_name
+		?string $table_name,
 	) {
 		$code = file($path);
 		$this->column_types['COLUMN_NAME'] = $column_name;
@@ -96,7 +96,7 @@ class SqlParser extends SqlFormat
 			} else {
 				self::log(
 					'WARNING',
-					"`$type` key does not exist in `$column_name` column type"
+					"`$type` key does not exist in `$column_name` column type",
 				);
 			}
 		}

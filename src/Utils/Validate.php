@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Utils;
+namespace PhpSlides\Src\Utils;
 
 trait Validate
 {
@@ -16,17 +16,14 @@ trait Validate
 	 * @return bool|float|int|string|array|null Returns the validated data, maintaining its original type(s).
 	 * If an array is passed, an array of validated values is returned.
 	 */
-	protected function validate (
-	 bool|float|int|string|array|null $data,
+	protected function validate(
+		bool|float|int|string|array|null $data,
 	): bool|float|int|string|array|null {
 		// If the data is an array, validate each item recursively
-		if (is_array($data))
-		{
-			return array_map(function ($item)
-			{
+		if (is_array($data)) {
+			return array_map(function ($item) {
 				// Recursively validate each array element
-				if (is_array($item))
-				{
+				if (is_array($item)) {
 					return $this->validate($item); // If item is array, call validate on it
 				}
 				return $this->realValidate($item); // Otherwise, validate the individual item
@@ -47,11 +44,10 @@ trait Validate
 	 *
 	 * @return bool|float|int|string|null The validated and sanitized value, converted back to its original type.
 	 */
-	private function realValidate (
-	 bool|float|int|string|null $value,
+	private function realValidate(
+		bool|float|int|string|null $value,
 	): bool|float|int|string|null {
-		if (!$value)
-		{
+		if (!$value) {
 			return null;
 		}
 
@@ -60,18 +56,24 @@ trait Validate
 
 		// Sanitize the string to prevent potential HTML injection issues
 		$sanitizedValue = htmlspecialchars(
-		 trim($validatedValue),
-		 ENT_QUOTES,
-		 'UTF-8',
+			trim($validatedValue),
+			ENT_QUOTES,
+			'UTF-8',
 		);
 		$type = gettype($value);
 
 		// Convert the sanitized string back to its original type based on the initial value's type
-		$convertedValue = (is_bool($value) || $type === 'boolean')
-		 ? (bool) $sanitizedValue
-		  : ((is_numeric($value) || is_int($value) || $type === 'integer')
-		 ? ((is_double($value) || is_float($value) || $type === 'double' || strpos((string) $value, '.') !== false)
-		 ? (float) $sanitizedValue : (int) $sanitizedValue) : $sanitizedValue);
+		$convertedValue =
+			is_bool($value) || $type === 'boolean'
+				? (bool) $sanitizedValue
+				: (is_numeric($value) || is_int($value) || $type === 'integer'
+					? (is_double($value) ||
+					is_float($value) ||
+					$type === 'double' ||
+					strpos((string) $value, '.') !== false
+						? (float) $sanitizedValue
+						: (int) $sanitizedValue)
+					: $sanitizedValue);
 
 		return $convertedValue;
 	}

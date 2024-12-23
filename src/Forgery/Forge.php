@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Forgery;
+namespace PhpSlides\Src\Forgery;
 
 use DB;
-use PhpSlides\Parser\SqlParser;
-use PhpSlides\Foundation\Application;
+use PhpSlides\Src\Parser\SqlParser;
+use PhpSlides\Src\Foundation\Application;
 
 class Forge extends Database
 {
@@ -16,36 +16,32 @@ class Forge extends Database
 	 * Replace every uppercase letter with underscore(_)
 	 * And the letter follows it. All falls in lowercase
 	 */
-	public function __construct ()
+	public function __construct()
 	{
-		foreach (glob(Application::$basePath . 'App/Forgery/*') as $value)
-		{
+		foreach (glob(Application::$basePath . 'App/Forgery/*') as $value) {
 			$value = ltrim($value, './');
 			$db_name = str_replace('App/Forgery/', '', $value);
 			$sdb_name = $db_name;
 
 			# Ignoring Database
 			if (
-			str_starts_with($db_name, 'ignore-') ||
-			str_contains($db_name, '.')
-			)
-			{
+				str_starts_with($db_name, 'ignore-') ||
+				str_contains($db_name, '.')
+			) {
 				$db_name = str_replace('ignore-', '', $db_name);
 				$db_name = self::format($db_name);
 
 				static::log('WARNING', "Ignored Database `$db_name`.");
 			}
 			# Drop Database
-			elseif (str_starts_with($db_name, 'drop-'))
-			{
+			elseif (str_starts_with($db_name, 'drop-')) {
 				$db_name = str_replace('drop-', '', $db_name);
 				$db_name = self::format($db_name);
 
 				static::dropDB($db_name);
 			}
 			# Proceed in creating Database
-			else
-			{
+			else {
 				$db_name = self::format($db_name);
 
 				static::createDB($db_name);
@@ -54,50 +50,47 @@ class Forge extends Database
 		}
 	}
 
-	protected static function table ($db_name)
+	protected static function table($db_name)
 	{
 		$table_name = '';
 
-		try
-		{
+		try {
 			DB::useDB(self::format($db_name));
 			$all_class = [];
 
-			foreach (glob(Application::$basePath . "App/Forgery/$db_name/*") as $value)
-			{
+			foreach (
+				glob(Application::$basePath . "App/Forgery/$db_name/*")
+				as $value
+			) {
 				$value = ltrim($value, './');
 				$all_names = explode('/', $value);
 				$table_name = end($all_names);
 				$class = str_replace(
-				 'App\\',
-				 '',
-				 implode('\\', $all_names) . '\\' . $table_name,
+					'App\\',
+					'',
+					implode('\\', $all_names) . '\\' . $table_name,
 				);
 
 				# Drop Table
-				if (str_starts_with($table_name, 'drop-'))
-				{
+				if (str_starts_with($table_name, 'drop-')) {
 					$table_name = str_replace('drop-', '', $table_name);
 					$table_name = self::format($table_name);
 					$db_name = self::format($db_name);
 
 					static::dropTable($db_name, $table_name);
 					continue;
-				}
-				elseif (
-				str_starts_with($table_name, 'ignore-') ||
-				str_contains($table_name, '.')
-				)
-				{
+				} elseif (
+					str_starts_with($table_name, 'ignore-') ||
+					str_contains($table_name, '.')
+				) {
 					$table_name = str_replace('ignore-', '', $table_name);
 					$table_name = self::format($table_name);
 					$db_name = self::format($db_name);
 
-					if ($table_name != 'options.sql')
-					{
+					if ($table_name != 'options.sql') {
 						static::log(
-						 'WARNING',
-						 "Ignored Table `$table_name` in `$db_name` Database.",
+							'WARNING',
+							"Ignored Table `$table_name` in `$db_name` Database.",
 						);
 					}
 					continue;
@@ -108,13 +101,12 @@ class Forge extends Database
 				$table_already_exists = false;
 
 				$query = DB::query(
-				 'SELECT * FROM information_schema.tables WHERE table_schema=%s AND table_name=%s',
-				 $db_name,
-				 $table_name,
+					'SELECT * FROM information_schema.tables WHERE table_schema=%s AND table_name=%s',
+					$db_name,
+					$table_name,
 				);
 
-				if (!empty($query))
-				{
+				if (!empty($query)) {
 					$table_already_exists = true;
 				}
 
@@ -123,19 +115,18 @@ class Forge extends Database
 				$query = [];
 
 				$constraint = [
-				 'PRIMARY' => null,
-				 'UNIQUE' => null,
-				 'INDEX' => null,
-				 'FOREIGN' => null,
-				 'REFERENCES' => null,
-				 'DELETE' => null,
-				 'UPDATE' => null,
-				 'OTHERS' => null,
+					'PRIMARY' => null,
+					'UNIQUE' => null,
+					'INDEX' => null,
+					'FOREIGN' => null,
+					'REFERENCES' => null,
+					'DELETE' => null,
+					'UPDATE' => null,
+					'OTHERS' => null,
 				];
 
 				$db_columns = [];
-				if ($table_already_exists)
-				{
+				if ($table_already_exists) {
 					$db_columns = array_keys(DB::columnList($table_name));
 				}
 
@@ -143,10 +134,11 @@ class Forge extends Database
 				 * Filter the array, if the column already exists in the database
 				 * then remove it from the array of columns that will be created.
 				 */
-				$filePath = array_filter($filePath, function ($path) use ($table_already_exists, $db_columns, )
-				{
-					if ($table_already_exists)
-					{
+				$filePath = array_filter($filePath, function ($path) use (
+					$table_already_exists,
+					$db_columns,
+				) {
+					if ($table_already_exists) {
 						$column_name = self::get_column_name($path);
 						return in_array($column_name, $db_columns) ? false : true;
 					}
@@ -156,8 +148,7 @@ class Forge extends Database
 				/**
 				 * IF NO COLUMNS TO ADD, MOVE TO THE NEXT TABLE
 				 */
-				if (empty($filePath))
-				{
+				if (empty($filePath)) {
 					continue;
 				}
 
@@ -166,99 +157,81 @@ class Forge extends Database
 				 */
 				$filePath = array_values($filePath);
 
-				$columns = array_map(function ($file)
-				{
-					return [ self::get_column_name($file), $file ];
+				$columns = array_map(function ($file) {
+					return [self::get_column_name($file), $file];
 				}, $filePath);
 
-				$only_columns = array_map(function ($file)
-				{
+				$only_columns = array_map(function ($file) {
 					return self::get_column_name($file);
 				}, $filePath);
 
-				for ($i = 0; $i < count($columns); $i++)
-				{
+				for ($i = 0; $i < count($columns); $i++) {
 					$res = (new SqlParser())->parse(
-					 column_name: $columns[$i][0],
-					 path: $columns[$i][1],
-					 constraint: $constraint,
-					 table_name: $table_name,
+						column_name: $columns[$i][0],
+						path: $columns[$i][1],
+						constraint: $constraint,
+						table_name: $table_name,
 					);
 					$query[] = $res[0];
 					$constraint = $res[1];
 				}
 
-				if ($table_already_exists)
-				{
-					$query = array_map(function ($que)
-					{
+				if ($table_already_exists) {
+					$query = array_map(function ($que) {
 						return "ADD COLUMN $que";
 					}, $query);
 				}
 
-				if ($constraint['PRIMARY'])
-				{
+				if ($constraint['PRIMARY']) {
 					$key = implode(', ', (array) $constraint['PRIMARY']);
 					$query[] = $table_already_exists
-					 ? "ADD PRIMARY KEY ($key)"
-					 : "PRIMARY KEY ($key)";
+						? "ADD PRIMARY KEY ($key)"
+						: "PRIMARY KEY ($key)";
 				}
 
-				if ($constraint['INDEX'])
-				{
+				if ($constraint['INDEX']) {
 					$key = implode(', ', (array) $constraint['INDEX']);
 
-					if ($constraint['UNIQUE'])
-					{
+					if ($constraint['UNIQUE']) {
 						$query[] = $table_already_exists
-						 ? "ADD UNIQUE INDEX ($key)"
-						 : "UNIQUE INDEX ($key)";
-					}
-					else
-					{
+							? "ADD UNIQUE INDEX ($key)"
+							: "UNIQUE INDEX ($key)";
+					} else {
 						$query[] = $table_already_exists
-						 ? "ADD INDEX ($key)"
-						 : "INDEX ($key)";
+							? "ADD INDEX ($key)"
+							: "INDEX ($key)";
 					}
-				}
-				elseif ($constraint['UNIQUE'])
-				{
+				} elseif ($constraint['UNIQUE']) {
 					$key = implode(', ', (array) $constraint['UNIQUE']);
 					$query[] = $table_already_exists
-					 ? "ADD UNIQUE ($key)"
-					 : "UNIQUE ($key)";
+						? "ADD UNIQUE ($key)"
+						: "UNIQUE ($key)";
 				}
 
-				if ($constraint['OTHERS'])
-				{
+				if ($constraint['OTHERS']) {
 					$key = $table_already_exists
-					 ? 'ADD ' . implode(', ', (array) $constraint['OTHERS'])
-					 : implode(', ', (array) $constraint['OTHERS']);
+						? 'ADD ' . implode(', ', (array) $constraint['OTHERS'])
+						: implode(', ', (array) $constraint['OTHERS']);
 					$query[] = (string) $key;
 				}
 
-				if ($constraint['FOREIGN'])
-				{
-					foreach ((array) $constraint['FOREIGN'] as $key)
-					{
+				if ($constraint['FOREIGN']) {
+					foreach ((array) $constraint['FOREIGN'] as $key) {
 						$que = $table_already_exists
-						 ? "ADD FOREIGN KEY ($key)"
-						 : "FOREIGN KEY ($key)";
+							? "ADD FOREIGN KEY ($key)"
+							: "FOREIGN KEY ($key)";
 
-						if (isset($constraint['REFERENCES'][$key]))
-						{
+						if (isset($constraint['REFERENCES'][$key])) {
 							$value = $constraint['REFERENCES'][$key];
 							$que .= " REFERENCES $value";
 						}
 
-						if (isset($constraint['UPDATE'][$key]))
-						{
+						if (isset($constraint['UPDATE'][$key])) {
 							$value = $constraint['UPDATE'][$key];
 							$que .= " ON UPDATE $value";
 						}
 
-						if (isset($constraint['DELETE'][$key]))
-						{
+						if (isset($constraint['DELETE'][$key])) {
 							$value = $constraint['DELETE'][$key];
 							$que .= " ON DELETE $value";
 						}
@@ -272,29 +245,24 @@ class Forge extends Database
 				/**
 				 * IF TABLE ALREADY EXISTS THEN IT'LL UPDATE THE COLUMNS
 				 */
-				if ($table_already_exists)
-				{
-					DB::query("ALTER TABLE %b %l", $table_name, $query);
+				if ($table_already_exists) {
+					DB::query('ALTER TABLE %b %l', $table_name, $query);
 					static::log(
-					 'INFO',
-					 "Altered Table `$table_name` and adds column `$only_columns`",
+						'INFO',
+						"Altered Table `$table_name` and adds column `$only_columns`",
 					);
-				}
-				else
-				{
-					DB::query("CREATE TABLE %b (%l)", $table_name, $query);
+				} else {
+					DB::query('CREATE TABLE %b (%l)', $table_name, $query);
 					static::log(
-					 'INFO',
-					 "Created Table `$table_name` in `$db_name` Database",
+						'INFO',
+						"Created Table `$table_name` in `$db_name` Database",
 					);
 				}
 			}
-		}
-		catch ( \Exception $e )
-		{
+		} catch (\Exception $e) {
 			static::log(
-			 'ERROR',
-			 "Unable to create Table `$table_name` in `$db_name` Database. [Exception]: {$e->getMessage()}",
+				'ERROR',
+				"Unable to create Table `$table_name` in `$db_name` Database. [Exception]: {$e->getMessage()}",
 			);
 			return;
 		}
@@ -307,7 +275,7 @@ class Forge extends Database
 	 * @param string $name The name to format
 	 * @return string The replced name
 	 */
-	protected static function format (string $name): string
+	protected static function format(string $name): string
 	{
 		// Convert the variable to the desired format
 		return strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $name));
@@ -318,7 +286,7 @@ class Forge extends Database
 	 *
 	 * @param string $path The file path to extract the name
 	 */
-	protected static function get_column_name (string $path): string
+	protected static function get_column_name(string $path): string
 	{
 		$name = explode('/', $path);
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpSlides\Formatter\Views;
+namespace PhpSlides\Src\Formatter\Views;
 
 /**
  * Trait to replace PhpSlides default tags in view files.
@@ -43,7 +43,7 @@ trait FormatPslTags
 				// Reformat the PHP content and return it
 				return '<' . '?php ' . $val . ' ?' . '>';
 			},
-			$this->contents
+			$this->contents,
 		);
 
 		// Update the contents with the formatted PHP code blocks

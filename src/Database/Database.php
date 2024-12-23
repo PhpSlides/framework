@@ -1,9 +1,9 @@
 <?php
 
-namespace PhpSlides\Database;
+namespace PhpSlides\Src\Database;
 
 use MeekroORM;
-use PhpSlides\Parser\ORMParser;
+use PhpSlides\Src\Parser\ORMParser;
 
 /**
  * Abstract class for managing database operations with MeekroORM.

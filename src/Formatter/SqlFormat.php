@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpSlides\Formatter;
+namespace PhpSlides\Src\Formatter;
 
 /**
  * Abstract class for formatting SQL column definitions.

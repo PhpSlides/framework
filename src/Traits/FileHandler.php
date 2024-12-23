@@ -1,9 +1,9 @@
 <?php
 
-namespace PhpSlides\Traits;
+namespace PhpSlides\Src\Traits;
 
 use PhpSlides\Exception;
-use PhpSlides\Logger\Logger;
+use PhpSlides\Src\Logger\Logger;
 
 trait FileHandler
 {
@@ -25,7 +25,7 @@ trait FileHandler
 		if (is_file($filename)) {
 			if (!extension_loaded('fileinfo')) {
 				throw new Exception(
-					'Fileinfo extension is not enabled. Please enable it in your php.ini configuration.'
+					'Fileinfo extension is not enabled. Please enable it in your php.ini configuration.',
 				);
 			}
 
