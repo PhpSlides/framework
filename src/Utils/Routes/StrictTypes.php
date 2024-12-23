@@ -95,9 +95,9 @@ trait StrictTypes
 
 	private static function matches ($type, $haystack)
 	{
-		if (preg_match_all('/ARRAY<>/', $type, $matches))
+		if (preg_match('/ARRAY<(.+)>/', $type, $matches))
 		{
-			print_r($matches);
+			$eachTypes = trim((string) explode(',', $matches[1]));
 			$typeOfHaystack = self::typeOfString($haystack);
 
 			if (strtoupper($matches[1]) === $typeOfHaystack)
