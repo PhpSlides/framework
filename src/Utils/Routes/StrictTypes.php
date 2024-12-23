@@ -100,10 +100,13 @@ trait StrictTypes
 		} elseif (ctype_alnum($string)) {
 			return 'ALNUM';
 		} elseif (json_last_error() === JSON_ERROR_NONE) {
-			return match (gettype($jd)) {
-				'object' => 'JSON',
-				'array' => 'ARRAY',
-				default => 'STRING',
+			switch (gettype($jd)) {
+				case 'object':
+				   return 'JSON';
+				case 'array':
+				   return 'ARRAY';
+				default:
+				   return 'STRING';
 			};
 		} else {
 			return 'STRING';
