@@ -10,19 +10,22 @@ include_once __DIR__ . '/../../../src/Globals/Functions.php';
 $dir = '/test/manualTest/Router/RouteTest.php';
 
 Route::get(
-	route: $dir,
-	callback: function () {
-		return 'Hello World';
-	},
+ route: $dir,
+ callback: function ()
+ {
+	 return 'Hello World';
+ },
 );
 
-Route::map(GET, "$dir/user/{id: int|bool|array|alnum}")
-	->action(function (Request $req) {
-		echo '<br>';
-		return $req->urlParam();
-	})
-	->route('/posts/{id: int}', function (Request $req, Closure $accept) {
-		$accept('POST');
-	});
+Route::map(GET, "$dir/user/{id: int|bool|array<array<int>, strin|g>|alnum}")
+ ->action(function (Request $req)
+ {
+	 echo '<br>';
+	 return $req->urlParam();
+ })
+ ->route('/posts/{id: int}', function (Request $req, Closure $accept)
+ {
+	 $accept('POST');
+ });
 
 Render::WebRoute();
