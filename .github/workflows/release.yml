@@ -1,4 +1,4 @@
-name: Configure and Run Tests Before Release
+name: Release
 
 on:
    push:
