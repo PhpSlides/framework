@@ -57,8 +57,7 @@ jobs:
          - name: Push changes to main
            run: |
               git branch -m main
-              git checkout main
-              git pull origin main
-              git push -u origin main
+              git pull origin dev
+              git push
            env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
