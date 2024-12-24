@@ -52,13 +52,14 @@ trait StrictTypes
 			{
 				return match ($typeOfHaystack)
 				{
-						'INT' => (int) $haystack,
-						'BOOL' => (bool) $haystack,
-						'FLOAT' => (float) $haystack,
-						'ARRAY' => json_decode($haystack, true),
-						default => $haystack,
+					 'INT' => (int) $haystack,
+					 'BOOL' => (bool) $haystack,
+					 'FLOAT' => (float) $haystack,
+					 'ARRAY' => json_decode($haystack, true),
+					 default => $haystack,
 				};
 			}
+			print_r($haystack);
 		}
 
 		return null;
@@ -130,7 +131,6 @@ trait StrictTypes
 					}
 				}
 			}
-
 			return [ $haystack2, $typeOfHaystack2 ];
 		}
 	}
@@ -166,9 +166,9 @@ trait StrictTypes
 		{
 			return match (gettype($jd))
 			{
-					'object' => 'JSON',
-					'array' => 'ARRAY',
-					default => 'STRING'
+				  'object' => 'JSON',
+				  'array' => 'ARRAY',
+				  default => 'STRING'
 			};
 		}
 		else
