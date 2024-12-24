@@ -58,18 +58,11 @@ jobs:
 
          - name: Push changes to main
            run: |
-              git config --global user.email "onipededavid208@gmail.com"
-              git config --global user.name "dconco"
-
-              git fetch origin main dev  # Fetch only main and dev branches
+              git fetch origin main dev
               git checkout main
               git config pull.rebase false
-              git pull origin main  # Get latest changes on main
-
-              # Now merge dev into main, allowing unrelated histories if necessary
+              git pull origin main
               git merge origin/dev --allow-unrelated-histories --no-ff
-
-              # Push to main
               git push origin main
            env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
