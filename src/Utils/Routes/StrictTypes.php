@@ -8,15 +8,15 @@ use PhpSlides\Src\Foundation\Application;
 trait StrictTypes
 {
 	private static array $types = [
-	'INT',
-	'BOOL',
-	'JSON',
-	'ALPHA',
-	'ALNUM',
-	'ARRAY',
-	'FLOAT',
-	'STRING',
-	'INTEGER',
+		'INT',
+		'BOOL',
+		'JSON',
+		'ALPHA',
+		'ALNUM',
+		'ARRAY',
+		'FLOAT',
+		'STRING',
+		'INTEGER',
 	];
 
 	/**
@@ -25,43 +25,29 @@ trait StrictTypes
 	 * @param string $haystack
 	 * @return int|bool|float|array|string
 	 */
-	protected static function matchType (
-	 array $types,
-	 string $haystack,
-	 ): int|bool|float|array|string|null {
+	protected static function matchType(array $types, string $haystack): bool
+	{
 		$typeOfHaystack = self::typeOfString($haystack);
 
-		foreach ($types as $type)
-		{
+		foreach ($types as $type) {
 			$type = $type === 'INTEGER' ? 'INT' : strtoupper(trim($type));
 
-			$s = self::matches($type, $haystack);
-			if (is_array($s))
-			{
-				[ $haystack, $typeOfHaystack ] = $s;
+			if (self::matches($type, $haystack)) {
+				return true;
 			}
 
-			if (!in_array($typeOfHaystack, self::$types))
-			{
+			if (!in_array($type, self::$types)) {
 				throw new Exception(
-				 "{{$type}} is not recognized as a URL parameter type",
+					"{{$type}} is not recognized as a URL parameter type",
 				);
 			}
 
-			if (strtoupper($type) === $typeOfHaystack)
-			{
-				return match ($typeOfHaystack)
-				{
-						'INT' => (int) $haystack,
-						'BOOL' => (bool) $haystack,
-						'FLOAT' => (float) $haystack,
-						'ARRAY' => json_decode($haystack, true),
-						default => $haystack,
-				};
+			if (strtoupper($type) === $typeOfHaystack) {
+				return true;
 			}
 		}
 
-		return null;
+		return false;
 	}
 
 	/**
@@ -70,109 +56,103 @@ trait StrictTypes
 	 * @param string $haystack
 	 * @return int|bool|float|array|string
 	 */
-	protected static function matchStrictType (
-	 array $types,
-	 string $haystack,
+	protected static function matchStrictType(
+		array $types,
+		string $haystack,
 	): int|bool|float|array|string {
-		$types = array_map(fn ($t) => strtoupper($t), $types);
-		$typeofHaystack = self::typeOfString($haystack);
+		$types = array_map(fn($t) => strtoupper($t), $types);
+		$typeOfHaystack = self::typeOfString($haystack);
 
-		if (!is_null($s = self::matchType($types, $haystack)))
-		{
-			return $s;
+		if (self::matchType($types, $haystack)) {
+			return match ($typeOfHaystack) {
+				'INT' => (int) $haystack,
+				'BOOL' => (bool) $haystack,
+				'FLOAT' => (float) $haystack,
+				'ARRAY' => json_decode($haystack, true),
+				default => $haystack,
+			};
 		}
 
 		http_response_code(400);
-		if (Application::$handleInvalidParameterType)
-		{
-			print_r((Application::$handleInvalidParameterType)($typeofHaystack));
+		if (Application::$handleInvalidParameterType) {
+			print_r((Application::$handleInvalidParameterType)($typeOfHaystack));
 			exit();
-		}
-		else
-		{
+		} else {
 			$requested = implode(', ', $types);
 			throw new Exception(
-			 "Invalid request parameter type. {{$requested}} requested, but got {{$typeofHaystack}}",
+				"Invalid request parameter type. {{$requested}} requested, but got {{$typeOfHaystack}}",
 			);
 		}
 	}
 
-	private static function matches ($type, $haystack)
+	private static function matches($type, $haystack): bool
 	{
 		$typeOfHaystack = self::typeOfString((string) $haystack);
+		$typeOfHaystack2 = $typeOfHaystack;
+		$haystack2 = $haystack;
 
-		if (preg_match('/ARRAY<(.+)>/', $type, $matches) && $typeOfHaystack === 'ARRAY')
-		{
+		if (
+			preg_match('/ARRAY<(.+)>/', $type, $matches) &&
+			$typeOfHaystack === 'ARRAY'
+		) {
 			$haystack = json_decode($haystack, true);
 			$eachArrayTypes = explode(',', $matches[1]);
 
-			foreach ($eachArrayTypes as $key => $eachArrayType)
-			{
-				$haystack2 = $haystack[$key];
-				$eachTypes = preg_split('/\|(?![^<]*>)/', trim($eachArrayType));
-				$typeOfHaystack2 = self::typeOfString((string) $haystack2);
+			foreach ($eachArrayTypes as $key => $eachArrayType) {
+				$haystack2 = is_array($haystack[$key])
+					? json_encode($haystack[$key])
+					: (string) $haystack[$key];
 
-				if (is_null(self::matchType($eachTypes, (string) $haystack2)))
-				{
+				$eachTypes = preg_split('/\|(?![^<]*>)/', trim($eachArrayType));
+				$typeOfHaystack2 = self::typeOfString($haystack2);
+
+				if (!self::matchType($eachTypes, $haystack2)) {
 					http_response_code(400);
 
-					if (Application::$handleInvalidParameterType)
-					{
-						print_r((Application::$handleInvalidParameterType)($typeOfHaystack2));
+					if (Application::$handleInvalidParameterType) {
+						print_r(
+							(Application::$handleInvalidParameterType)(
+								$typeOfHaystack2,
+							),
+						);
 						exit();
-					}
-					else
-					{
+					} else {
 						$requested = implode(', ', $eachTypes);
 						throw new Exception(
-						 "Invalid request parameter type. {{$requested}} requested on array index $key, but got {{$typeOfHaystack2}}",
+							"Invalid request parameter type. {{$requested}} requested on array index $key, but got {{$typeOfHaystack2}}",
 						);
 					}
 				}
 			}
-
-			return [ $haystack2, $typeOfHaystack2 ];
+			return true;
 		}
+
+		return false;
 	}
 
-	private static function typeOfString (string $string)
+	private static function typeOfString(string $string)
 	{
 		$jd = json_decode($string, false);
 
-		if (is_numeric($string))
-		{
-			if (strpos($string, '.') !== false)
-			{
+		if (is_numeric($string)) {
+			if (strpos($string, '.') !== false) {
 				return 'FLOAT';
-			}
-			else
-			{
+			} else {
 				return 'INT';
 			}
-		}
-		elseif (is_bool($string) || $string === 'true' || $string === 'false')
-		{
+		} elseif (is_bool($string) || $string === 'true' || $string === 'false') {
 			return 'BOOL';
-		}
-		elseif (ctype_alpha($string))
-		{
+		} elseif (ctype_alpha($string)) {
 			return 'ALPHA';
-		}
-		elseif (ctype_alnum($string))
-		{
+		} elseif (ctype_alnum($string)) {
 			return 'ALNUM';
-		}
-		elseif (json_last_error() === JSON_ERROR_NONE)
-		{
-			return match (gettype($jd))
-			{
-					'object' => 'JSON',
-					'array' => 'ARRAY',
-					default => 'STRING'
+		} elseif (json_last_error() === JSON_ERROR_NONE) {
+			return match (gettype($jd)) {
+				'object' => 'JSON',
+				'array' => 'ARRAY',
+				default => 'STRING',
 			};
-		}
-		else
-		{
+		} else {
 			return 'STRING';
 		}
 	}
