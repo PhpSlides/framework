@@ -57,7 +57,7 @@ jobs:
          - name: Push changes to main
            run: |
               git fetch origin
-              git checkout main
+              git checkout -b main
               git config pull.rebase false
               git pull origin main  # Get the latest changes from main
               git merge origin/dev  # Merge the dev branch into main
