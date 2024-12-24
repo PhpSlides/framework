@@ -7,20 +7,13 @@
          backupGlobals="false"
          bootstrap="vendor/autoload.php"
          cacheDirectory=".phpunit.cache"
-         backupStaticProperties="false"
-         backupStaticAttributes="false">
+         backupStaticProperties="false">
     <testsuites>
         <testsuite name="PhpSlides Test Suite">
             <directory>tests/tests</directory>
         </testsuite>
     </testsuites>
 
-    <!-- Configure the logging options -->
-    <logging>
-        <log type="coverage-html" target="build/coverage-html" />
-    </logging>
-
-    <!-- Add any environment variables if needed -->
     <php>
         <env name="APP_NAME" value="PhpSlides"/>
         <env name="APP_VERSION" value="1.4.3"/>

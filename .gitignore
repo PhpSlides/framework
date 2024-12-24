@@ -1,3 +1,7 @@
+# Ignore the build directory
+/build
+
+# Ignore the PHPUnit cache files
 /.phpunit.cache
 
 # Ignore the vendor directory, which contains third-party libraries
