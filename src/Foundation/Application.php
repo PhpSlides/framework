@@ -6,7 +6,6 @@ use DB;
 use Closure;
 use PhpSlides\Router\Route;
 use PhpSlides\Src\Http\Request;
-use PhpSlides\Src\Cli\Configure;
 use PhpSlides\Src\Forgery\Forge;
 use PhpSlides\Src\Logger\Logger;
 use PhpSlides\Src\Logger\DBLogger;
@@ -30,12 +29,12 @@ use PhpSlides\Src\Interface\ApplicationInterface;
  */
 class Application extends Controller implements ApplicationInterface
 {
+	use \PhpSlides\Src\Cli\Configure;
 	use Configuration;
 	use Logger;
-	use DBLogger
-	{
-			Logger::log insteadof DBLogger;
-			DBLogger::log as db_log;
+	use DBLogger {
+		Logger::log insteadof DBLogger;
+		DBLogger::log as db_log;
 	}
 
 	/**
@@ -97,37 +96,32 @@ class Application extends Controller implements ApplicationInterface
 	 *
 	 * @return self Returns an instance of the Application class.
 	 */
-	private static function configure (): void
+	private static function configure(): void
 	{
-		if (php_sapi_name() == 'cli')
-		{
-			Configure::bootstrap();
+		if (php_sapi_name() == 'cli') {
+			static::bootstrap();
 
 			self::$request_uri = '/';
 			self::$basePath = './tests/';
-		}
-		else if (php_sapi_name() == 'cli-server')
-		{
+		} elseif (php_sapi_name() == 'cli-server') {
 			self::$request_uri = urldecode(
-			 parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),
+				parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),
 			);
 			self::$basePath = '';
-		}
-		else
-		{
+		} else {
 			self::$request_uri = urldecode(
-			 parse_url(
-			  $_REQUEST['uri'] ?? $_SERVER['REQUEST_URI'],
-			  PHP_URL_PATH,
-			 ),
+				parse_url(
+					$_REQUEST['uri'] ?? $_SERVER['REQUEST_URI'],
+					PHP_URL_PATH,
+				),
 			);
 
 			$find = '/src/routes/render.php';
 			$self = $_SERVER['PHP_SELF'];
 
 			self::$basePath = strrpos($self, $find)
-			 ? substr_replace($self, '/', strrpos($self, $find), strlen($find))
-			 : '../../';
+				? substr_replace($self, '/', strrpos($self, $find), strlen($find))
+				: '../../';
 		}
 
 		$req = new Request();
@@ -141,7 +135,7 @@ class Application extends Controller implements ApplicationInterface
 	 *
 	 * @return void
 	 */
-	private static function paths (): void
+	private static function paths(): void
 	{
 		self::$configsDir = self::$basePath . 'src/configs/';
 		self::$viewsDir = self::$basePath . 'src/resources/views/';
@@ -154,15 +148,15 @@ class Application extends Controller implements ApplicationInterface
 	 *
 	 * @return void
 	 */
-	public function create (): void
+	public function create(): void
 	{
 		self::configure();
 		self::paths();
 
 		$loader = new FileLoader();
 		$loader
-		 ->load(__DIR__ . '/../Config/env.config.php')
-		 ->load(__DIR__ . '/../Config/config.php');
+			->load(__DIR__ . '/../Config/env.config.php')
+			->load(__DIR__ . '/../Config/config.php');
 
 		session_start();
 
@@ -171,11 +165,9 @@ class Application extends Controller implements ApplicationInterface
 
 		$sid = session_id();
 
-		if (getenv('HOT_RELOAD') == 'true')
-		{
-			Route::post("/hot-reload-a$sid", fn () => (new HotReload())->reload());
-			Route::get("/hot-reload-a$sid/worker", function () use ($sid): string
-			{
+		if (getenv('HOT_RELOAD') == 'true') {
+			Route::post("/hot-reload-a$sid", fn() => (new HotReload())->reload());
+			Route::get("/hot-reload-a$sid/worker", function () use ($sid): string {
 				$addr = self::$REMOTE_ADDR . "/hot-reload-a$sid";
 				header('Content-Type: application/javascript');
 
@@ -184,13 +176,10 @@ class Application extends Controller implements ApplicationInterface
 			Render::WebRoute();
 		}
 
-		try
-		{
+		try {
 			Connection::init();
 			DB::query('SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA');
-		}
-		catch ( \Exception $e )
-		{
+		} catch (\Exception $e) {
 			Database::$_connect_error = $e->getMessage();
 			goto EXECUTION;
 		}
@@ -198,8 +187,7 @@ class Application extends Controller implements ApplicationInterface
 		new Autoloader();
 
 		EXECUTION:
-		try
-		{
+		try {
 			$loader->load(__DIR__ . '/../Globals/Functions.php');
 
 			$config_file = self::config_file();
@@ -209,14 +197,11 @@ class Application extends Controller implements ApplicationInterface
 			header("Content-Type: text/html; charset=$charset");
 
 			self::config();
-		}
-		catch ( \Exception $e )
-		{
+		} catch (\Exception $e) {
 			http_response_code(500);
 			static::log();
 
-			if (function_exists('ExceptionHandler'))
-			{
+			if (function_exists('ExceptionHandler')) {
 				call_user_func('ExceptionHandler', $e);
 			}
 		}
