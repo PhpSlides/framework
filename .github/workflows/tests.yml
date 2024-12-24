@@ -7,7 +7,7 @@ on:
       branches: ["master"]
 
 permissions:
-   contents: read
+   contents: write
 
 jobs:
    test:
@@ -58,6 +58,6 @@ jobs:
            run: |
               git checkout main
               git merge dev --no-ff --no-edit
-              git push -u origin main
+              git push origin main
            env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
