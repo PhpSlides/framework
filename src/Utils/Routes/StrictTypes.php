@@ -2,23 +2,10 @@
 
 namespace PhpSlides\Src\Utils\Routes;
 
-use PhpSlides\Exception;
-use PhpSlides\Src\Foundation\Application;
+use PhpSlides\Src\Utils\Routes\Exception\InvalidTypesException;
 
 trait StrictTypes
 {
-	private static array $types = [
-	'INT',
-	'BOOL',
-	'JSON',
-	'ALPHA',
-	'ALNUM',
-	'ARRAY',
-	'FLOAT',
-	'STRING',
-	'INTEGER',
-	];
-
 	/**
 	 *
 	 * @param string[] $types
@@ -38,18 +25,10 @@ trait StrictTypes
 				return true;
 			}
 
-			if (!in_array($type, self::$types))
-			{
-				throw new Exception(
-				 "{{$type}} is not recognized as a URL parameter type",
-				);
-			}
-
 			if (strtoupper($type) === $typeOfHaystack)
 			{
 				return true;
 			}
-			print_r($haystack);
 		}
 
 		return false;
@@ -72,27 +51,15 @@ trait StrictTypes
 		{
 			return match ($typeOfHaystack)
 			{
-				 'INT' => (int) $haystack,
-				 'BOOL' => (bool) $haystack,
-				 'FLOAT' => (float) $haystack,
-				 'ARRAY' => json_decode($haystack, true),
-				 default => $haystack,
+				  'INT' => (int) $haystack,
+				  'BOOL' => (bool) $haystack,
+				  'FLOAT' => (float) $haystack,
+				  'ARRAY' => json_decode($haystack, true),
+				  default => $haystack,
 			};
 		}
 
-		http_response_code(400);
-		if (Application::$handleInvalidParameterType)
-		{
-			print_r((Application::$handleInvalidParameterType)($typeOfHaystack));
-			exit();
-		}
-		else
-		{
-			$requested = implode(', ', $types);
-			throw new Exception(
-			 "Invalid request parameter type. {{$requested}} requested, but got {{$typeOfHaystack}}",
-			);
-		}
+		throw InvalidTypesException::catchInvalidParameterTypes($types, $typeOfHaystack);
 	}
 
 	private static function matches ($type, $haystack): bool
@@ -120,29 +87,19 @@ trait StrictTypes
 
 				if (!self::matchType($eachTypes, $haystack2))
 				{
-					http_response_code(400);
-
-					if (Application::$handleInvalidParameterType)
-					{
-						print_r(
-						 (Application::$handleInvalidParameterType)(
-						  $typeOfHaystack2,
-						 ),
-						);
-						exit();
-					}
-					else
-					{
-						$requested = implode(', ', $eachTypes);
-						throw new Exception(
-						 "Invalid request parameter type. {{$requested}} requested on array index $key, but got {{$typeOfHaystack2}}",
-						);
-					}
+					$requested = implode(', ', $eachTypes);
+					InvalidTypesException::catchInvalidStrictTypes($eachTypes);
+					throw InvalidTypesException::catchInvalidParameterTypes(
+					 $eachTypes,
+					 $typeOfHaystack2,
+					 "Invalid request parameter type. {{$requested}} requested on array index $key, but got {{$typeOfHaystack2}}",
+					);
 				}
 			}
 			return true;
 		}
 
+		InvalidTypesException::catchInvalidStrictTypes($type);
 		return false;
 	}
 
@@ -177,9 +134,9 @@ trait StrictTypes
 		{
 			return match (gettype($jd))
 			{
-				 'object' => 'JSON',
-				 'array' => 'ARRAY',
-				 default => 'STRING',
+				  'object' => 'JSON',
+				  'array' => 'ARRAY',
+				  default => 'STRING',
 			};
 		}
 		else
