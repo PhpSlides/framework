@@ -56,10 +56,11 @@ jobs:
 
          - name: Push changes to main
            run: |
-              git branch main
+              git fetch origin
+              git checkout main
               git config pull.rebase false
-              git pull origin main
-              git pull origin dev
-              git push origin HEAD
+              git pull origin main  # Get the latest changes from main
+              git merge origin/dev  # Merge the dev branch into main
+              git push origin main  # Push the changes to main
            env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
