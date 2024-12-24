@@ -56,8 +56,8 @@ jobs:
 
          - name: Push changes to main
            run: |
-              git checkout main
+              git checkout -b main
               git merge dev --no-ff --no-edit
-              git push origin main
+              git push -u origin main
            env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
