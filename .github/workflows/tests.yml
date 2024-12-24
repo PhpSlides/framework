@@ -2,9 +2,9 @@ name: Execute Tests
 
 on:
    push:
-      branches: ["master", "dev"]
+      branches: ["dev"]
    pull_request:
-      branches: ["master"]
+      branches: ["dev"]
 
 permissions:
    contents: write
