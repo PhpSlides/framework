@@ -1,7 +1,7 @@
 <phpunit>
     <testsuites>
-        <testsuite name="Manual Tests">
-            <directory>./test/manualTest</directory>
+        <testsuite name="Tests PhpSlides Framework">
+            <directory>./test/PHPUnit</directory>
         </testsuite>
     </testsuites>
     <bootstrap>vendor/autoload.php</bootstrap>
