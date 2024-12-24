@@ -58,11 +58,15 @@ jobs:
 
          - name: Push changes to main
            run: |
-              git fetch origin
-              git checkout -b main
+              git fetch origin main dev  # Fetch only main and dev branches
+              git checkout main
               git config pull.rebase false
-              git pull origin main
+              git pull origin main  # Get latest changes on main
+
+              # Now merge dev into main, allowing unrelated histories if necessary
               git merge origin/dev --allow-unrelated-histories --no-ff
+
+              # Push to main
               git push origin main
            env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
