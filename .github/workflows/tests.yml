@@ -58,6 +58,9 @@ jobs:
 
          - name: Push changes to main
            run: |
+              git config --global user.email "onipededavid208@gmail.com"
+              git config --global user.name "dconco"
+
               git fetch origin main dev  # Fetch only main and dev branches
               git checkout main
               git config pull.rebase false
