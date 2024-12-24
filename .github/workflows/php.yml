@@ -20,6 +20,13 @@ jobs:
     - name: Validate composer.json and composer.lock
       run: composer validate --strict
 
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 8.2
+        extensions: mbstring, intl
+        tools: composer
+    
     - name: Cache Composer packages
       id: composer-cache
       uses: actions/cache@v3
@@ -28,7 +35,7 @@ jobs:
         key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
         restore-keys: |
           ${{ runner.os }}-php-
-
+  
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress
 
