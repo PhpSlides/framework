@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpSlides\Formatter\Views;
+namespace PhpSlides\Src\Formatter\Views;
 
 /**
  * Trait to handle properties for view files.
@@ -17,7 +17,7 @@ trait HandleProperties
 	 * This constructor is a placeholder for any necessary initialization for
 	 * the class using this trait. It currently does not perform any operations.
 	 */
-	public function __construct()
+	public function __construct ()
 	{
 		// code...
 	}
@@ -36,30 +36,38 @@ trait HandleProperties
 	 * `\PhpSlides\Props` class. The final result is a code snippet that injects
 	 * the properties into the view file for later use.
 	 */
-	protected function properties(mixed ...$props)
+	protected function properties (mixed ...$props)
 	{
-		if (empty($props)) {
+		if (empty($props))
+		{
 			return;
 		}
 
 		// Initialize the PHP code snippet for assigning properties
-		$code = '<' . '?php $s = new \PhpSlides\Props(); ';
+		$code = '<' . '?php $s = new \PhpSlides\Src\Props(); ';
 
 		// Loop through each provided property
-		foreach ($props as $key => $value) {
-			if (is_int($key)) {
+		foreach ($props as $key => $value)
+		{
+			if (is_int($key))
+			{
 				// If key is an integer, prefix it with an underscore
 				$key = "_$key";
 			}
 
 			// Handle different types of values (int, bool, array, string)
-			if (is_int($value) || is_bool($value)) {
+			if (is_int($value) || is_bool($value))
+			{
 				$code .= '$s->' . "$key = $value; ";
-			} elseif (is_array($value)) {
+			}
+			elseif (is_array($value))
+			{
 				// Serialize array values
 				$s = serialize($value);
 				$code .= '$s->' . "$key = unserialize('$s'); ";
-			} else {
+			}
+			else
+			{
 				$code .= '$s->' . "$key = '$value'; ";
 			}
 		}

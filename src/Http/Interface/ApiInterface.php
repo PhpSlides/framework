@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpSlides\Http\Interface;
+namespace PhpSlides\Src\Http\Interface;
 
 interface ApiInterface
 {
@@ -24,7 +24,7 @@ interface ApiInterface
 	public function route(
 		string $url,
 		string|array|null $controller = null,
-		?string $req_method = null
+		?string $req_method = null,
 	): self;
 
 	/**

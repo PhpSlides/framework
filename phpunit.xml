@@ -1,0 +1,8 @@
+<phpunit>
+    <testsuites>
+        <testsuite name="Tests PhpSlides Framework">
+            <directory>./test/PHPUnit</directory>
+        </testsuite>
+    </testsuites>
+    <bootstrap>vendor/autoload.php</bootstrap>
+</phpunit>

@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Interface;
+namespace PhpSlides\Router\Interface;
 
 use Closure;
 
@@ -25,31 +25,6 @@ use Closure;
 interface RouteInterface
 {
 	/**
-	 *   ------------------------------------------------------
-	 *   |
-	 *   Get the file extension content-type with mime
-	 *
-	 *   @param string $filename File path or file resources
-	 *   @return bool|string Returns the MIME content type for a file as determined by using information from the magic.mime file.
-	 *   |
-	 *   ------------------------------------------------------
-	 */
-	public static function file_type(string $filename): bool|string;
-
-	/**
-	 *   ---------------------------------------------------------------------------------------------------------
-	 *
-	 *   This function handles getting files request and describe the type of request to handle according to `phpslides.config.json` file in the root of the project,
-	 *   for more security, it disallow users in navigating to wrong paths or files of the project.
-	 *
-	 *
-	 *   This config method must be called before writing any other Route method or codes.
-	 *
-	 *   ---------------------------------------------------------------------------------------------------------
-	 */
-	public static function config(): void;
-
-	/**
 	 *   ------------------------------------------------------------------------
 	 *
 	 *   ANY REQUEST FROM ROUTE
@@ -64,10 +39,10 @@ interface RouteInterface
 	 *
 	 *   ------------------------------------------------------------------------
 	 */
-	public static function any(
-		array|string $route,
-		mixed $callback,
-		string $method = '*'
+	public static function any (
+	 array|string $route,
+	 mixed $callback,
+	 string $method = '*',
 	): self;
 
 	/**
@@ -78,7 +53,7 @@ interface RouteInterface
 	 * @param string $method Can also be used as `$route` param if the `$route` param is not specified
 	 * @param string|array $route Route parameter
 	 */
-	public static function map(string $method, string|array $route): self;
+	public static function map (string $method, string|array $route): self;
 
 	/**
 	 * name METHOD
@@ -86,7 +61,7 @@ interface RouteInterface
 	 *
 	 * @param string $name
 	 */
-	public function name(string $name): self;
+	public function name (string $name): self;
 
 	/**
 	 * Action method
@@ -94,7 +69,7 @@ interface RouteInterface
 	 *
 	 * @param mixed $callback
 	 */
-	public function action(mixed $callback): self;
+	public function action (mixed $callback): self;
 
 	/**
 	 * Controller method
@@ -111,7 +86,7 @@ interface RouteInterface
 	 *
 	 * @param string $file
 	 */
-	public function file(string $file): self;
+	public function file (string $file): self;
 
 	/**
 	 * Applies Authentication Guard to the current route.
@@ -119,7 +94,7 @@ interface RouteInterface
 	 * @param string ...$guards String parameters of registered guards.
 	 * @return self
 	 */
-	public function withGuard(string ...$guards): self;
+	public function withGuard (string ...$guards): self;
 
 	/**
 	 *   ---------------------------------------------------------------------------
@@ -136,7 +111,7 @@ interface RouteInterface
 	 *
 	 *   ---------------------------------------------------------------------------
 	 */
-	public static function view(array|string $route, string $view): self;
+	public static function view (array|string $route, string $view): self;
 
 	/**
 	 *   --------------------------------------------------------------
@@ -151,10 +126,10 @@ interface RouteInterface
 	 *
 	 * ---------------------------------------------------------------
 	 */
-	public static function redirect(
-		string $route,
-		string $new_url,
-		int $code = 302
+	public static function redirect (
+	 string $route,
+	 string $new_url,
+	 int $code = 302,
 	): self;
 
 	/**
@@ -166,7 +141,7 @@ interface RouteInterface
 	 *
 	 *   --------------------------------------------------------------
 	 */
-	public static function get(array|string $route, $callback): self;
+	public static function get (array|string $route, $callback): self;
 
 	/**
 	 *   --------------------------------------------------------------
@@ -177,7 +152,7 @@ interface RouteInterface
 	 *
 	 *   --------------------------------------------------------------
 	 */
-	public static function post(array|string $route, $callback): self;
+	public static function post (array|string $route, $callback): self;
 
 	/**
 	 *   --------------------------------------------------------------
@@ -188,7 +163,7 @@ interface RouteInterface
 	 *
 	 *   --------------------------------------------------------------
 	 */
-	public static function put(array|string $route, $callback): self;
+	public static function put (array|string $route, $callback): self;
 
 	/**
 	 *   --------------------------------------------------------------
@@ -199,7 +174,7 @@ interface RouteInterface
 	 *
 	 *   --------------------------------------------------------------
 	 */
-	public static function patch(array|string $route, $callback): self;
+	public static function patch (array|string $route, $callback): self;
 
 	/**
 	 *   --------------------------------------------------------------
@@ -210,7 +185,7 @@ interface RouteInterface
 	 *
 	 *   --------------------------------------------------------------
 	 */
-	public static function delete(array|string $route, $callback): self;
+	public static function delete (array|string $route, $callback): self;
 
-	public function __destruct();
+	public function __destruct ();
 }

@@ -1,20 +1,21 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Foundation;
+namespace PhpSlides\Src\Foundation;
 
 use DB;
-use PhpSlides\Route;
-use PhpSlides\Http\Request;
-use PhpSlides\Forgery\Forge;
-use PhpSlides\Logger\Logger;
-use PhpSlides\Logger\DBLogger;
-use PhpSlides\Loader\HotReload;
-use PhpSlides\Database\Database;
-use PhpSlides\Loader\Autoloader;
-use PhpSlides\Loader\FileLoader;
-use PhpSlides\Database\Connection;
-use PhpSlides\Controller\Controller;
-use PhpSlides\Interface\ApplicationInterface;
+use Closure;
+use PhpSlides\Router\Route;
+use PhpSlides\Src\Http\Request;
+use PhpSlides\Src\Forgery\Forge;
+use PhpSlides\Src\Logger\Logger;
+use PhpSlides\Src\Logger\DBLogger;
+use PhpSlides\Src\Loader\HotReload;
+use PhpSlides\Src\Database\Database;
+use PhpSlides\Src\Loader\Autoloader;
+use PhpSlides\Src\Loader\FileLoader;
+use PhpSlides\Src\Database\Connection;
+use PhpSlides\Src\Controller\Controller;
+use PhpSlides\Src\Interface\ApplicationInterface;
 
 /**
  * Class Application
@@ -28,15 +29,18 @@ use PhpSlides\Interface\ApplicationInterface;
  */
 class Application extends Controller implements ApplicationInterface
 {
-	use Logger, DBLogger {
-		Logger::log insteadof DBLogger;
-		DBLogger::log as db_log;
+	use Configuration;
+	use Logger;
+	use DBLogger
+	{
+		 Logger::log insteadof DBLogger;
+		 DBLogger::log as db_log;
 	}
 
 	/**
 	 * The version of the PhpSlides application.
 	 */
-	public const PHPSLIDES_VERSION = '1.4.1';
+	public const PHPSLIDES_VERSION = '1.4.3';
 
 	/**
 	 * @var string $REMOTE_ADDR The remote address of the client making the request.
@@ -62,12 +66,6 @@ class Application extends Controller implements ApplicationInterface
 	public static bool $db_log;
 
 	/**
-	 * @var string $basePath
-	 * The base path of the application.
-	 */
-	public static string $basePath;
-
-	/**
 	 * @var string $configsDir
 	 * The directory path for configuration files.
 	 */
@@ -91,32 +89,37 @@ class Application extends Controller implements ApplicationInterface
 	 */
 	public static string $scriptsDir;
 
-	/**
-	 * @var string $request_uri
-	 * The request Uri
-	 */
-	public static string $request_uri;
+	public static ?Closure $handleInvalidParameterType;
 
 	/**
 	 * Configure the application with the base path.
 	 *
 	 * @return self Returns an instance of the Application class.
 	 */
-	private static function configure(): void
+	private static function configure (): void
 	{
-		if (php_sapi_name() == 'cli-server') {
+		if (php_sapi_name() == 'cli-server')
+		{
 			self::$request_uri = urldecode(
-				parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),
+			 parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),
 			);
 			self::$basePath = '';
-		} else {
+		}
+		else
+		{
 			self::$request_uri = urldecode(
-				parse_url(
-					$_REQUEST['uri'] ?? $_SERVER['REQUEST_URI'],
-					PHP_URL_PATH,
-				),
+			 parse_url(
+			  $_REQUEST['uri'] ?? $_SERVER['REQUEST_URI'],
+			  PHP_URL_PATH,
+			 ),
 			);
-			self::$basePath = '../../';
+
+			$find = '/src/routes/render.php';
+			$self = $_SERVER['PHP_SELF'];
+
+			self::$basePath = strrpos($self, $find)
+			 ? substr_replace($self, '/', strrpos($self, $find), strlen($find))
+			 : '../../';
 		}
 
 		$req = new Request();
@@ -130,7 +133,7 @@ class Application extends Controller implements ApplicationInterface
 	 *
 	 * @return void
 	 */
-	private static function paths(): void
+	private static function paths (): void
 	{
 		self::$configsDir = self::$basePath . 'src/configs/';
 		self::$viewsDir = self::$basePath . 'src/resources/views/';
@@ -143,23 +146,28 @@ class Application extends Controller implements ApplicationInterface
 	 *
 	 * @return void
 	 */
-	public function create(): void
+	public function create (): void
 	{
 		self::configure();
 		self::paths();
-		session_start();
 
 		$loader = new FileLoader();
-		$loader->load(__DIR__ . '/../Config/env.config.php');
+		$loader
+		 ->load(__DIR__ . '/../Config/env.config.php')
+		 ->load(__DIR__ . '/../Config/config.php');
+
+		session_start();
 
 		self::$log = getenv('APP_DEBUG') == 'true' ? true : false;
 		self::$db_log = getenv('DB_DEBUG') == 'true' ? true : false;
 
 		$sid = session_id();
 
-		if (getenv('HOT_RELOAD') == 'true') {
-			Route::post("/hot-reload-a$sid", fn() => (new HotReload())->reload());
-			Route::get("/hot-reload-a$sid/worker", function () use ($sid): string {
+		if (getenv('HOT_RELOAD') == 'true')
+		{
+			Route::post("/hot-reload-a$sid", fn () => (new HotReload())->reload());
+			Route::get("/hot-reload-a$sid/worker", function () use ($sid): string
+			{
 				$addr = self::$REMOTE_ADDR . "/hot-reload-a$sid";
 				header('Content-Type: application/javascript');
 
@@ -168,10 +176,13 @@ class Application extends Controller implements ApplicationInterface
 			Render::WebRoute();
 		}
 
-		try {
+		try
+		{
 			Connection::init();
 			DB::query('SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA');
-		} catch (\Exception $e) {
+		}
+		catch ( \Exception $e )
+		{
 			Database::$_connect_error = $e->getMessage();
 			goto EXECUTION;
 		}
@@ -179,10 +190,9 @@ class Application extends Controller implements ApplicationInterface
 		new Autoloader();
 
 		EXECUTION:
-		try {
-			$loader
-				->load(__DIR__ . '/../Globals/Functions.php')
-				->load(__DIR__ . '/../Config/config.php');
+		try
+		{
+			$loader->load(__DIR__ . '/../Globals/Functions.php');
 
 			$config_file = self::config_file();
 			$charset = $config_file['charset'] ?? 'UTF-8';
@@ -190,12 +200,15 @@ class Application extends Controller implements ApplicationInterface
 			http_response_code(200);
 			header("Content-Type: text/html; charset=$charset");
 
-			Route::config();
-		} catch (\Exception $e) {
+			self::config();
+		}
+		catch ( \Exception $e )
+		{
 			http_response_code(500);
 			static::log();
 
-			if (function_exists('ExceptionHandler')) {
+			if (function_exists('ExceptionHandler'))
+			{
 				call_user_func('ExceptionHandler', $e);
 			}
 		}

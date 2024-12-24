@@ -1,32 +1,100 @@
 <?php declare(strict_types=1);
 
-use PhpSlides\Route;
 use PhpSlides\Exception;
-use PhpSlides\Loader\ViewLoader;
-use PhpSlides\Loader\FileLoader;
-use PhpSlides\Foundation\Application;
+use PhpSlides\Router\Route;
+use PhpSlides\Src\Loader\FileLoader;
+use PhpSlides\Src\Loader\ViewLoader;
+use PhpSlides\Src\Foundation\Application;
 
+/**
+ * Sets an environment variable '__DIR__' with the base path of the application.
+ *
+ * This function uses the `putenv` function to set the '__DIR__' environment variable
+ * to the value of `Application::$basePath`.
+ *
+ * @param string $basePath The base path of the application.
+ */
 putenv(sprintf('__DIR__=%s', Application::$basePath));
 
+/**
+ * HTTP GET method constant.
+ *
+ * This constant represents the HTTP GET method, typically used to request data from a specified resource.
+ *
+ * @var string GET
+ */
 const GET = 'GET';
+
+/**
+ * HTTP PUT method constant.
+ *
+ * This constant represents the HTTP PUT method, typically used for updating
+ * resources on a server.
+ *
+ * @var string PUT
+ */
 const PUT = 'PUT';
+
+/**
+ * HTTP POST method constant.
+ *
+ * This constant represents the HTTP POST method.
+ *
+ * @var string POST
+ */
 const POST = 'POST';
+
+/**
+ * HTTP PATCH method constant.
+ *
+ * This constant represents the HTTP PATCH method, which is used to apply partial modifications to a resource.
+ *
+ * @var string PATCH
+ */
 const PATCH = 'PATCH';
+
+/**
+ * HTTP DELETE method constant.
+ *
+ * This constant represents the HTTP DELETE method, typically used to delete a resource.
+ *
+ * @var string DELETE
+ */
 const DELETE = 'DELETE';
+
+/**
+ * Constant representing the remote path type.
+ *
+ * This constant is used to specify that a path is a remote path.
+ *
+ * @var int REMOTE_PATH
+ */
 const REMOTE_PATH = 2;
+
+/**
+ * Constant representing a relative path.
+ *
+ * This constant is used to indicate that a path is relative.
+ *
+ * @var int RELATIVE_PATH
+ */
 const RELATIVE_PATH = 0;
+
+/**
+ * Constant representing an absolute path.
+ *
+ * This constant is used to indicate that a path is absolute.
+ *
+ * @var int ABSOLUTE_PATH
+ */
 const ABSOLUTE_PATH = 1;
 
 /**
- *    -----------------------------------------------------------
- *   |
- *   | Includes view file and returned the formatted view file as string
+ * Loads a component view file and returns its content.
  *
- *   @param string $filename The file which to gets the contents
- *   @param mixed ...$props Properties in which would be available in the file
- *   @return mixed The executed included file received
- *   |
- *    -----------------------------------------------------------
+ * @param string $filename The name of the view file to load.
+ * @param mixed ...$props Additional properties to pass to the view loader.
+ * @return mixed The loaded view content.
  */
 function component(string $filename, mixed ...$props): mixed
 {
@@ -135,30 +203,37 @@ function route(
 }
 
 /**
- * Getting public files
+ * Generates a URL for an asset file based on the given filename and path type.
  *
- * @param string $filename The name of the file to get from public directory
- * @param string $path_type Path to start location which uses either `RELATIVE_PATH`
- * for path `../` OR `ABSOLUTE_PATH` starting with the root directory `/`
- * @return string The file path ABSOLUTE_PATH|RELATIVE_PATH
+ * @param string $filename The name of the asset file.
+ * @param string $path_type The type of path to generate. Can be one of the following:
+ *    - RELATIVE_PATH: Generates a relative path to the asset.
+ *    - ABSOLUTE_PATH: Generates an absolute path to the asset.
+ *    - REMOTE_PATH: Generates a remote path to the asset.
+ *      Defaults to RELATIVE_PATH.
+ *
+ * @return string The generated URL for the asset file.
  */
 function asset(string $filename, string $path_type = RELATIVE_PATH): string
 {
 	$filename = preg_replace('/(::)|::/', '/', $filename);
 	$filename = strtolower(trim($filename, '\/\/'));
 
-	if (php_sapi_name() == 'cli-server') {
-		$root_path = '/';
-	} else {
-		$find = '/src/routes/render.php';
-		$self = $_SERVER['PHP_SELF'];
+	switch (php_sapi_name()) {
+		case 'cli-server':
+			$root_path = '/';
+			break;
+		default:
+			$find = '/src/routes/render.php';
+			$self = $_SERVER['PHP_SELF'];
 
-		$root_path = substr_replace(
-			$self,
-			'/',
-			strrpos($self, $find),
-			strlen($find),
-		);
+			$root_path = substr_replace(
+				$self,
+				'/',
+				strrpos($self, $find),
+				strlen($find),
+			);
+			break;
 	}
 
 	$path = './';
@@ -171,27 +246,27 @@ function asset(string $filename, string $path_type = RELATIVE_PATH): string
 		}
 	}
 
-	switch ($path_type) {
-		case RELATIVE_PATH:
-			return $path . $filename;
-		case ABSOLUTE_PATH:
-			return $root_path . $filename;
-		case REMOTE_PATH:
-			return Application::$REMOTE_ADDR . '/' . $filename;
-		default:
-			return $filename;
-	}
+	return match ($path_type) {
+		RELATIVE_PATH => "$path$filename",
+		ABSOLUTE_PATH => "$root_path$filename",
+		REMOTE_PATH => Application::$REMOTE_ADDR . '/' . $filename,
+		default => $filename,
+	};
 }
 
 /**
- * IMPORTING FILES AS PART OF THE CODE
+ * Imports a file and returns its contents encoded in base64 format.
  *
- * @param $file The file location to import
+ * @param string $file The path to the file to be imported.
+ *
+ * @return string The base64 encoded contents of the file, prefixed with the file's MIME type.
+ *
+ * @throws Exception If the file does not exist.
  */
 function import(string $file)
 {
 	if (!is_file($file)) {
-		throw new Exception('File does not exist: ' . $file);
+		throw new Exception("File does not exist: $file");
 	}
 
 	$file_type = Route::file_type($file);
@@ -202,13 +277,23 @@ function import(string $file)
 }
 
 /**
- * Generate a PayLoad array for JWT authentication.
- * @return array The payload for JWT
+ * Generates a JWT payload array with the given data and timestamps.
+ *
+ * @param array $data The data to include in the payload.
+ * @param string $expires The expiration time of the token in a format accepted by DateTimeImmutable.
+ * @param string $issued_at The issued at time of the token in a format accepted by DateTimeImmutable. Defaults to 'now'.
+ * @param string $issuer The issuer of the token. If not provided, it will be loaded from the JWT configuration.
+ *
+ * @return array{
+ * 	iss: string,
+ * 	iat: int,
+ * 	exp: int
+ * }
  */
 function payload(
 	array $data,
-	int $expires,
-	int $issued_at = 0,
+	string $expires,
+	string $issued_at = 'now',
 	string $issuer = '',
 ): array {
 	$jwt = (new FileLoader())
@@ -218,9 +303,9 @@ function payload(
 	if ($issuer === '') {
 		$issuer = $jwt['issuer'];
 	}
-	if ($issued_at === 0) {
-		$issued_at = time();
-	}
+
+	$expires = (new DateTimeImmutable($expires))->getTimestamp();
+	$issued_at = (new DateTimeImmutable($issued_at))->getTimestamp();
 
 	return array_merge(
 		[
@@ -264,10 +349,10 @@ function Props(?string $name = null)
 	}
 
 	if (is_numeric($name)) {
-		$name = '_' . $name;
+		$name = "_$name";
 	}
 
-	return (new \PhpSlides\Props())->$name;
+	return (new \PhpSlides\Src\Props())->$name;
 }
 
 function ExceptionHandler(Throwable $exception)

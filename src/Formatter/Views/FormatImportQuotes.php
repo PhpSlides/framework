@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpSlides\Formatter\Views;
+namespace PhpSlides\Src\Formatter\Views;
 
 /**
  * Trait to format import quotes in PhpSlides view files.
@@ -16,7 +16,7 @@ trait FormatImportQuotes
      * This constructor is a placeholder for any necessary initialization for
      * the class using this trait. It currently does not perform any operations.
      */
-    public function __construct()
+    public function __construct ()
     {
         // code...
     }
@@ -28,20 +28,20 @@ trait FormatImportQuotes
      * and prepends them with `__DIR__ . '/'` to resolve the paths relative to the 
      * current directory.
      */
-    protected function import_quotes()
+    protected function import_quotes ()
     {
         // Replace single quotes around 'import' statements with __DIR__ prefix
         $formattedContents = str_replace(
             'import(\'',
             'import(__DIR__ . \'/',
-            $this->contents
+            $this->contents,
         );
-        
+
         // Replace double quotes around 'import' statements with __DIR__ prefix
         $formattedContents = str_replace(
             'import("',
             'import(__DIR__ . "/',
-            $formattedContents
+            $formattedContents,
         );
 
         // Update the contents with the formatted import paths

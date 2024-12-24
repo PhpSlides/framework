@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Foundation;
+namespace PhpSlides\Src\Foundation;
 
-use PhpSlides\Controller\Controller;
-use PhpSlides\Foundation\Application;
-use PhpSlides\Traits\Resources\Resources;
+use PhpSlides\Src\Controller\Controller;
+use PhpSlides\Src\Foundation\Application;
+use PhpSlides\Src\Traits\Resources\Resources;
 
 /**
  * Handles the rendering of all registered routes.
@@ -32,6 +32,8 @@ final class Render extends Controller
 		$reg_route = $GLOBALS['__registered_routes'] ?? [];
 
 		foreach ($reg_route as $route) {
+			self::$handleInvalidParameterType =
+				$route['handleInvalidParameterType'] ?? null;
 			self::$redirect = $route['redirect'] ?? null;
 			self::$method = $route['method'] ?? null;
 			self::$guards = $route['guards'] ?? null;
@@ -41,6 +43,12 @@ final class Render extends Controller
 			self::$any = $route['any'] ?? null;
 			self::$use = $route['use'] ?? null;
 			self::$map = $route['map'] ?? null;
+
+			if (self::$handleInvalidParameterType) {
+				self::__handleInvalidParameterType();
+			} else {
+				Application::$handleInvalidParameterType = null;
+			}
 
 			if (self::$map) {
 				self::__map();

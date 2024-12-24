@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpSlides\Database;
+namespace PhpSlides\Src\Database;
 
 use DB;
 

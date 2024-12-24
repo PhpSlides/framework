@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Http\Auth;
+namespace PhpSlides\Src\Http\Auth;
 
-trait Authentication
+trait Authorization
 {
     // Static variable to store the authorization header
     private static ?string $authorizationHeader = null;
@@ -17,8 +17,8 @@ trait Authentication
      */
     private static function getAuthorizationHeader (): void
     {
-        $headers = getallheaders();
-        self::$authorizationHeader = $headers['Authorization'] ?? null;
+        $headers = getallheaders() ?? apache_request_headers();
+        self::$authorizationHeader = $headers['Authorization'] ?? $_SERVER['HTTP_AUTHORIZATION'] ?? null;
     }
 
     /**
@@ -32,7 +32,7 @@ trait Authentication
      *
      * @return ?array Returns an associative array with 'username' and 'password' or null if not found.
      */
-    public static function BasicAuthCredentials (): ?array
+    protected static function BasicAuthCredentials (): ?array
     {
         self::getAuthorizationHeader();
 
@@ -73,7 +73,7 @@ trait Authentication
      *
      * @return ?string Returns the token as a string, or null if not found.
      */
-    public static function BearerToken (): ?string
+    protected static function BearerToken (): ?string
     {
         self::getAuthorizationHeader();
 
@@ -86,5 +86,22 @@ trait Authentication
 
         // Return null if no Bearer token is found
         return null;
+    }
+
+
+    /**
+     * Retrieves the value of the specified API key from the request headers.
+     *
+     * This method attempts to find the API key in the following order:
+     * 1. From the headers returned by `getallheaders()`.
+     * 2. From the headers returned by `apache_request_headers()`.
+     * 3. From the `$_SERVER` superglobal with the key prefixed by "HTTP_".
+     *
+     * @param string $key The name of the API key to retrieve.
+     * @return string|null The value of the API key if found, or null if not found.
+     */
+    protected static function RequestApiKey (string $key)
+    {
+        return getallheaders()[$key] ?? apache_request_headers()[$key] ?? $_SERVER["HTTP_$key"] ?? null;
     }
 }

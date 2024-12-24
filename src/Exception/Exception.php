@@ -2,9 +2,10 @@
 
 namespace PhpSlides;
 
-use PhpSlides\Loader\FileLoader;
+use PhpSlides\Src\Loader\FileLoader;
 use Exception as DefaultException;
 use PhpSlides\Interface\SlidesException;
+
 
 /**
  * The Exception class provides enhanced exception handling for the PhpSlides application.

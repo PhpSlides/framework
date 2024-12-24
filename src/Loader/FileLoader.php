@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpSlides\Loader;
+namespace PhpSlides\Src\Loader;
 
 use PhpSlides\Exception;
 

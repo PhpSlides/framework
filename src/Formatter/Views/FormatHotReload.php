@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Formatter\Views;
+namespace PhpSlides\Src\Formatter\Views;
 
-use PhpSlides\Foundation\Application;
+use PhpSlides\Src\Foundation\Application;
 
 /**
  * Trait to add Hot Reload functionality in PhpSlides view files.
@@ -39,7 +39,7 @@ trait FormatHotReload
 		$sid = session_id();
 		$phpslides_version = Application::PHPSLIDES_VERSION;
 		$host = Application::$REMOTE_ADDR . "/hot-reload-a$sid/worker";
-		
+
 		// Check if HOT_RELOAD is enabled in the environment
 		if (getenv('HOT_RELOAD') == 'true')
 		{

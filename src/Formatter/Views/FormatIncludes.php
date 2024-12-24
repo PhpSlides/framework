@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpSlides\Formatter\Views;
+namespace PhpSlides\Src\Formatter\Views;
 
 /**
  * Trait to format includes elements in PhpSlides view files.
@@ -16,7 +16,7 @@ trait FormatIncludes
 	 * This constructor is a placeholder for any necessary initialization for
 	 * the class using this trait. It currently does not perform any operations.
 	 */
-	public function __construct()
+	public function __construct ()
 	{
 		// code...
 	}
@@ -28,50 +28,53 @@ trait FormatIncludes
 	 * extracts the `path` and other attributes, and converts them into PHP `component()`
 	 * function calls with the appropriate parameters.
 	 */
-	protected function includes()
+	protected function includes ()
 	{
 		// Regular expression pattern for matching the custom <INCLUDE> syntax
 		$pattern = '/<!INCLUDE(S?)\s+([^>]+)\/?\/>/';
 
 		$formattedContents = preg_replace_callback(
-			$pattern,
-			function ($matches) {
-				$attributes = $matches[2]; // Extract the attributes: 'path="hello" name="value" id=1 role=["admin", "user"]'
+		 $pattern,
+		 function ($matches)
+		 {
+			 $attributes = $matches[2]; // Extract the attributes: 'path="hello" name="value" id=1 role=["admin", "user"]'
+ 
+			 $pathPattern = '/path=["|\']([^"]+)["|\']/';
+			 $path = '';
 
-				$pathPattern = '/path=["|\']([^"]+)["|\']/';
-				$path = '';
+			 // Extract the 'path' attribute value using a regular expression
+ 			$attributes = preg_replace_callback(
+			  $pathPattern,
+			  function ($matches)
+			 {
+				 global $path;
+				 $path = $matches[1];
+				 return null;
+			 },
+			  $attributes,
+			 );
 
-				// Extract the 'path' attribute value using a regular expression
-				$attributes = preg_replace_callback(
-					$pathPattern,
-					function ($matches) {
-						global $path;
-						$path = $matches[1];
-						return null;
-					},
-					$attributes
-				);
+			 global $path;
 
-				global $path;
+			 // Format the other attributes into parameters, replacing '=' with ':'
+ 			$param = preg_replace(
+			  '/(["\'])(?:\\.|[^\\1])*?\1(*SKIP)(*F)|\s+/',
+			  ', ',
+			  trim($attributes),
+			 );
+			 $param = trim(str_replace('=', ': ', $param));
 
-				// Format the other attributes into parameters, replacing '=' with ':'
-				$param = preg_replace(
-					'/(["\'])(?:\\.|[^\\1])*?\1(*SKIP)(*F)|\s+/',
-					', ',
-					trim($attributes)
-				);
-				$param = trim(str_replace('=', ': ', $param));
+			 // Return the formatted PHP include statement
+ 			if (!empty($param))
+			 {
+				 return '<' .
+				  "?php print_r(component(__DIR__ . '/$path', $param)) ?" .
+				  '>';
+			 }
 
-				// Return the formatted PHP include statement
-				if (!empty($param)) {
-					return '<' .
-						"?php print_r(component(__DIR__ . '/$path', $param)) ?" .
-						'>';
-				}
-
-				return '<' . "?php print_r(component(__DIR__ . '/$path')) ?" . '>';
-			},
-			$this->contents
+			 return '<' . "?php print_r(component(__DIR__ . '/$path')) ?" . '>';
+		 },
+		 $this->contents,
 		);
 
 		// Update the contents with the formatted include statements

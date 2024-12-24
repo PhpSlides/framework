@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Logger;
+namespace PhpSlides\Src\Logger;
 
 use DateTime;
-use PhpSlides\Foundation\Application;
+use PhpSlides\Src\Foundation\Application;
 
 /**
  * Logger trait for logging HTTP request details.

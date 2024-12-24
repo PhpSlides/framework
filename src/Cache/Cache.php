@@ -1,8 +1,8 @@
 <?php
 
-namespace PhpSlides\Cache;
+namespace PhpSlides\Src\Cache;
 
-use PhpSlides\Foundation\Application;
+use PhpSlides\Src\Foundation\Application;
 
 /**
  * Class Cache

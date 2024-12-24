@@ -13,13 +13,13 @@
  * @license MIT
  */
 
-namespace PhpSlides;
+namespace PhpSlides\Router;
 
+use Closure;
 use PhpSlides\Exception;
-use PhpSlides\Traits\FileHandler;
-use PhpSlides\Controller\Controller;
-use PhpSlides\Foundation\Application;
-use PhpSlides\Interface\RouteInterface;
+use PhpSlides\Src\Traits\FileHandler;
+use PhpSlides\Src\Controller\Controller;
+use PhpSlides\Router\Interface\RouteInterface;
 
 /**
  *   -------------------------------------------------------------------------------
@@ -39,11 +39,8 @@ use PhpSlides\Interface\RouteInterface;
  *
  *   -------------------------------------------------------------------------------
  */
-
 class Route extends Controller implements RouteInterface
 {
-	use FileHandler;
-
 	private ?array $guards = null;
 
 	private mixed $action = null;
@@ -51,6 +48,10 @@ class Route extends Controller implements RouteInterface
 	private ?string $use = null;
 
 	private ?string $file = null;
+
+	private ?array $mapRoute = null;
+
+	private ?Closure $handleInvalidParameterType = null;
 
 	private static array $routes;
 
@@ -65,95 +66,6 @@ class Route extends Controller implements RouteInterface
 	private static ?array $view = null;
 
 	private static ?array $map = null;
-
-	/**
-	 * Get's all full request URL
-	 *
-	 * @static $request_uri
-	 * @var string $request_uri
-	 * @return string
-	 */
-	protected static string $request_uri;
-
-	/**
-	 *   ---------------------------------------------------------------------------------------------------------
-	 *
-	 *   This function handles getting files request and describe the type of request to handle according to `config.json` file in the root of the project,
-	 *   for more security, it disallow users in navigating to wrong paths or files of the project.
-	 *
-	 *
-	 *   This config method must be called before writing any other Route method or codes.
-	 *
-	 *   ---------------------------------------------------------------------------------------------------------
-	 */
-	public static function config(): void
-	{
-		$root_dir = Application::$basePath;
-		self::$request_uri = Application::$request_uri;
-
-		$req = preg_replace("/(^\/)|(\/$)/", '', self::$request_uri);
-		$file_url = "{$root_dir}public/$req";
-
-		$file = is_file($file_url) ? file_get_contents($file_url) : null;
-
-		$file_type = $file !== null ? self::file_type($file_url) : null;
-
-		$config_file = self::config_file();
-
-		/**
-		 *   ----------------------------------------------
-		 *   Config File & Request Router configurations
-		 *   ----------------------------------------------
-		 */
-		if ($file_type != null) {
-			$config = $config_file['deny'] ?? [];
-			$message = $config_file['message'] ?? [];
-			$contents = $config_file['message']['contents'] ?? null;
-			$http_code = $config_file['message']['http_code'] ?? 403;
-			$components = $config_file['message']['components'] ?? null;
-			$contentType = $config_file['message']['content-type'] ?? null;
-
-			foreach ($config as $denyFile) {
-				if (fnmatch(preg_replace("/(^\/)|(\/$)/", '', $denyFile), $req)) {
-					/**
-					 *  -----------------------------------------------
-					 *    Deny Request to current file
-					 *  -----------------------------------------------
-					 */
-					if (($t = gettype($http_code)) !== 'integer') {
-						throw new Exception(
-							"http_code in the PhpSlides configuration must be type int, $t given.",
-						);
-					}
-					http_response_code($http_code);
-
-					if ($contentType) {
-						header("Content-Type: $contentType");
-					}
-
-					if ($components) {
-						print_r(view::render($components));
-					} elseif ($contents) {
-						print_r($contents);
-					}
-
-					self::log();
-					exit();
-				}
-			}
-
-			/**
-			 *  -----------------------------------------------
-			 *    Proceed to accepts current file
-			 *  -----------------------------------------------
-			 */
-			header("Content-Type: $file_type");
-
-			print_r($file);
-			self::log();
-			exit();
-		}
-	}
 
 	/**
 	 *   ------------------------------------------------------------------------
@@ -223,6 +135,29 @@ class Route extends Controller implements RouteInterface
 	}
 
 	/**
+	 * Route Mapping
+	 *
+	 * @param string $route
+	 * @param Closure $callback
+	 */
+	public function route(string $route, Closure $callback): self
+	{
+		$route = rtrim('/', self::$map['route']) . '/' . ltrim('/', $route);
+
+		if (self::$map) {
+			$this->mapRoute = [
+				'route' => $route,
+				'method' => self::$map['method'],
+				'callback' => $callback,
+			];
+		} else {
+			throw new Exception('There is no map to route.');
+		}
+		self::$route[] = $route;
+		return $this;
+	}
+
+	/**
 	 * Action method
 	 * In outputting information to the client area
 	 *
@@ -262,6 +197,21 @@ class Route extends Controller implements RouteInterface
 		if (self::$map) {
 			$this->file = $file;
 		}
+		return $this;
+	}
+
+	/**
+	 * Sets a closure to handle invalid parameter types.
+	 *
+	 * This method allows you to define a custom closure that will be executed
+	 * when an invalid parameter type is encountered.
+	 *
+	 * @param Closure $closure The closure to handle invalid parameter types.
+	 * @return self Returns the current instance for method chaining.
+	 */
+	public function handleInvalidParameterType(Closure $closure): self
+	{
+		$this->handleInvalidParameterType = $closure;
 		return $this;
 	}
 
@@ -462,6 +412,11 @@ class Route extends Controller implements RouteInterface
 				$this->action;
 		}
 
+		if ($this->mapRoute !== null) {
+			$GLOBALS['__registered_routes'][$route_index]['mapRoute'] =
+				$this->mapRoute;
+		}
+
 		if (self::$any !== null) {
 			$GLOBALS['__registered_routes'][$route_index]['any'] = self::$any;
 		}
@@ -472,6 +427,12 @@ class Route extends Controller implements RouteInterface
 
 		if ($this->file !== null) {
 			$GLOBALS['__registered_routes'][$route_index]['file'] = $this->file;
+		}
+
+		if ($this->handleInvalidParameterType !== null) {
+			$GLOBALS['__registered_routes'][$route_index][
+				'handleInvalidParameterType'
+			] = $this->handleInvalidParameterType;
 		}
 
 		if (self::$method !== null) {

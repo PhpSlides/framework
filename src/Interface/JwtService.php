@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Interface;
+namespace PhpSlides\Src\Interface;
 
 /**
  * Interface JwtService

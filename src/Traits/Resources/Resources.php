@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Traits\Resources;
+namespace PhpSlides\Src\Traits\Resources;
 
 /**
  * Resources Trait
