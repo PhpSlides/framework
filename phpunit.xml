@@ -2,12 +2,27 @@
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.0/phpunit.xsd"
          beStrictAboutTestsThatDoNotTestAnything="false"
-         bootstrap="tests/tests/bootstrap.php"
+         colors="true"
+         stopOnFailure="false"
+         backupGlobals="false"
+         bootstrap="vendor/autoload.php"
          cacheDirectory=".phpunit.cache"
-         backupStaticProperties="false">
+         backupStaticProperties="false"
+         backupStaticAttributes="false">
     <testsuites>
         <testsuite name="PhpSlides Test Suite">
             <directory>tests/tests</directory>
         </testsuite>
     </testsuites>
+
+    <!-- Configure the logging options -->
+    <logging>
+        <log type="coverage-html" target="build/coverage-html" />
+    </logging>
+
+    <!-- Add any environment variables if needed -->
+    <php>
+        <env name="APP_NAME" value="PhpSlides"/>
+        <env name="APP_VERSION" value="1.4.3"/>
+    </php>
 </phpunit>
