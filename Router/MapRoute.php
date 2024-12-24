@@ -215,8 +215,8 @@ class MapRoute extends Controller implements MapInterface
 					$param_value = $value[1];
 
 					$parsed_value = static::matchStrictType(
-					 $param_types,
 					 $param_value,
+					 $param_types,
 					);
 					$req[$param_name] = $parsed_value;
 				}

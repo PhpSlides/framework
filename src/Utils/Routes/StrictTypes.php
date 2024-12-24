@@ -4,28 +4,38 @@ namespace PhpSlides\Src\Utils\Routes;
 
 use PhpSlides\Src\Utils\Routes\Exception\InvalidTypesException;
 
+/**
+ * Trait StrictTypes
+ *
+ * This trait is used to enforce strict type checking in the parameter types
+ *
+ * @package PhpSlides\Src\Utils\Routes
+ */
 trait StrictTypes
 {
 	/**
+	 * Matches the type of a given string against an array of types.
 	 *
-	 * @param string[] $types
-	 * @param string $haystack
-	 * @return int|bool|float|array|string
+	 * @param string $needle The string to check the type of.
+	 * @param array $haystack The array of types to match against.
+	 * @return bool Returns true if the type of the string matches any type in the array, false otherwise.
 	 */
-	protected static function matchType (array $types, string $haystack): bool
+	protected static function matchType (string $needle, array $haystack): bool
 	{
-		$typeOfHaystack = self::typeOfString($haystack);
+		$typeOfNeedle = self::typeOfString($needle);
 
-		foreach ($types as $type)
+		foreach ($haystack as $type)
 		{
-			$type = $type === 'INTEGER' ? 'INT' : strtoupper(trim($type));
+			$type = strtoupper(trim($type));
+			$type = $type === 'INTEGER' ? 'INT' : $type;
+			$type = $type === 'BOOLEAN' ? 'BOOL' : $type;
 
-			if (self::matches($type, $haystack))
+			if (self::matches($needle, $type))
 			{
 				return true;
 			}
 
-			if (strtoupper($type) === $typeOfHaystack)
+			if (strtoupper($type) === $typeOfNeedle)
 			{
 				return true;
 			}
@@ -34,76 +44,113 @@ trait StrictTypes
 		return false;
 	}
 
+
 	/**
+	 * Matches the given string against a list of types and returns the value
+	 * cast to the matched type.
 	 *
-	 * @param string[] $types
-	 * @param string $haystack
-	 * @return int|bool|float|array|string
+	 * @param string $needle The string to match and cast.
+	 * @param string[] $haystack The list of types to match against.
+	 * @return int|bool|float|array|string The value cast to the matched type.
+	 * @throws InvalidTypesException If the type of the needle does not match any type in the haystack.
 	 */
 	protected static function matchStrictType (
-	 array $types,
-	 string $haystack,
+	 string $needle,
+	 array $haystack,
 	): int|bool|float|array|string {
-		$types = array_map(fn ($t) => strtoupper($t), $types);
-		$typeOfHaystack = self::typeOfString($haystack);
+		$types = array_map(fn ($t) => strtoupper($t), $haystack);
+		$typeOfNeedle = self::typeOfString($needle);
 
-		if (self::matchType($types, $haystack))
+		if (self::matchType($needle, $types))
 		{
-			return match ($typeOfHaystack)
+			return match ($typeOfNeedle)
 			{
-				  'INT' => (int) $haystack,
-				  'BOOL' => (bool) $haystack,
-				  'FLOAT' => (float) $haystack,
-				  'ARRAY' => json_decode($haystack, true),
-				  default => $haystack,
+				  'INT' => (int) $needle,
+				  'BOOL' => (bool) $needle,
+				  'FLOAT' => (float) $needle,
+				  'ARRAY' => json_decode($needle, true),
+				  default => $needle,
 			};
 		}
 
-		throw InvalidTypesException::catchInvalidParameterTypes($types, $typeOfHaystack);
+		throw InvalidTypesException::catchInvalidParameterTypes($types, $typeOfNeedle);
 	}
 
-	private static function matches ($type, $haystack): bool
-	{
-		$typeOfHaystack = self::typeOfString((string) $haystack);
-		$typeOfHaystack2 = $typeOfHaystack;
-		$haystack2 = $haystack;
 
+	/**
+	 * Matches the type of the given needle against the specified haystack type.
+	 *
+	 * This method checks if the type of the needle matches the type specified in the haystack.
+	 * If the haystack specifies an array type, it will recursively check each element of the array.
+	 *
+	 * @param string $needle The value to check.
+	 * @param string $haystack The type specification to match against.
+	 * @return bool Returns true if the needle matches the haystack type, otherwise false.
+	 * @throws InvalidTypesException If the needle does not match the haystack type.
+	 */
+	private static function matches (string $needle, string $haystack): bool
+	{
+		$typeOfNeedle = self::typeOfString((string) $needle);
+		$typeOfNeedle2 = $typeOfNeedle;
+		$needle2 = $needle;
+
+		/**
+		 * MATCH ARRAY RECURSIVELY
+		 */
 		if (
-		preg_match('/ARRAY<(.+)>/', $type, $matches) &&
-		$typeOfHaystack === 'ARRAY'
+		preg_match('/ARRAY<(.+)>/', $haystack, $matches) &&
+		$typeOfNeedle === 'ARRAY'
 		)
 		{
-			$haystack = json_decode($haystack, true);
+			$needle = json_decode($needle, true);
 			$eachArrayTypes = explode(',', $matches[1]);
 
 			foreach ($eachArrayTypes as $key => $eachArrayType)
 			{
-				$haystack2 = is_array($haystack[$key])
-				 ? json_encode($haystack[$key])
-				 : (string) $haystack[$key];
+				$needle2 = is_array($needle[$key])
+				 ? json_encode($needle[$key])
+				 : (string) $needle[$key];
 
 				$eachTypes = preg_split('/\|(?![^<]*>)/', trim($eachArrayType));
-				$typeOfHaystack2 = self::typeOfString($haystack2);
+				$typeOfNeedle2 = self::typeOfString($needle2);
 
-				if (!self::matchType($eachTypes, $haystack2))
+				if (!self::matchType($needle2, $eachTypes))
 				{
 					$requested = implode(', ', $eachTypes);
 					InvalidTypesException::catchInvalidStrictTypes($eachTypes);
 					throw InvalidTypesException::catchInvalidParameterTypes(
 					 $eachTypes,
-					 $typeOfHaystack2,
-					 "Invalid request parameter type. {{$requested}} requested on array index $key, but got {{$typeOfHaystack2}}",
+					 $typeOfNeedle2,
+					 "Invalid request parameter type. {{$requested}} requested on array index $key, but got {{$typeOfNeedle2}}",
 					);
 				}
 			}
 			return true;
 		}
 
-		InvalidTypesException::catchInvalidStrictTypes($type);
+		InvalidTypesException::catchInvalidStrictTypes($haystack);
 		return false;
 	}
 
-	private static function typeOfString (string $string)
+
+	/**
+	 * Determines the type of a given string.
+	 *
+	 * This method analyzes the input string and returns a string representing its type.
+	 * The possible return values are:
+	 * - 'FLOAT' if the string represents a floating-point number.
+	 * - 'INT' if the string represents an integer.
+	 * - 'BOOL' if the string represents a boolean value ('true' or 'false').
+	 * - 'ALPHA' if the string contains only alphabetic characters.
+	 * - 'ALNUM' if the string contains only alphanumeric characters.
+	 * - 'JSON' if the string is a valid JSON object.
+	 * - 'ARRAY' if the string is a valid JSON array.
+	 * - 'STRING' if the string does not match any of the above types.
+	 *
+	 * @param string $string The input string to be analyzed.
+	 * @return string The type of the input string.
+	 */
+	protected static function typeOfString (string $string): string
 	{
 		$jd = json_decode($string, false);
 
