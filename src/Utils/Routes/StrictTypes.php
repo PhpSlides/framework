@@ -25,23 +25,20 @@ trait StrictTypes
 	 * @param string $haystack
 	 * @return int|bool|float|array|string
 	 */
-	protected static function matchType (
-	 array $types,
-	 string $haystack,
-	 ): int|bool|float|array|string|null {
+	protected static function matchType (array $types, string $haystack): bool
+	{
 		$typeOfHaystack = self::typeOfString($haystack);
 
 		foreach ($types as $type)
 		{
 			$type = $type === 'INTEGER' ? 'INT' : strtoupper(trim($type));
 
-			$s = self::matches($type, $haystack);
-			if (is_array($s))
+			if (self::matches($type, $haystack))
 			{
-				[ $haystack, $typeOfHaystack ] = $s;
+				return true;
 			}
 
-			if (!in_array($typeOfHaystack, self::$types))
+			if (!in_array($type, self::$types))
 			{
 				throw new Exception(
 				 "{{$type}} is not recognized as a URL parameter type",
@@ -50,19 +47,12 @@ trait StrictTypes
 
 			if (strtoupper($type) === $typeOfHaystack)
 			{
-				return match ($typeOfHaystack)
-				{
-					 'INT' => (int) $haystack,
-					 'BOOL' => (bool) $haystack,
-					 'FLOAT' => (float) $haystack,
-					 'ARRAY' => json_decode($haystack, true),
-					 default => $haystack,
-				};
+				return true;
 			}
 			print_r($haystack);
 		}
 
-		return null;
+		return false;
 	}
 
 	/**
@@ -76,50 +66,69 @@ trait StrictTypes
 	 string $haystack,
 	): int|bool|float|array|string {
 		$types = array_map(fn ($t) => strtoupper($t), $types);
-		$typeofHaystack = self::typeOfString($haystack);
+		$typeOfHaystack = self::typeOfString($haystack);
 
-		if (!is_null($s = self::matchType($types, $haystack)))
+		if (self::matchType($types, $haystack))
 		{
-			return $s;
+			return match ($typeOfHaystack)
+			{
+				 'INT' => (int) $haystack,
+				 'BOOL' => (bool) $haystack,
+				 'FLOAT' => (float) $haystack,
+				 'ARRAY' => json_decode($haystack, true),
+				 default => $haystack,
+			};
 		}
 
 		http_response_code(400);
 		if (Application::$handleInvalidParameterType)
 		{
-			print_r((Application::$handleInvalidParameterType)($typeofHaystack));
+			print_r((Application::$handleInvalidParameterType)($typeOfHaystack));
 			exit();
 		}
 		else
 		{
 			$requested = implode(', ', $types);
 			throw new Exception(
-			 "Invalid request parameter type. {{$requested}} requested, but got {{$typeofHaystack}}",
+			 "Invalid request parameter type. {{$requested}} requested, but got {{$typeOfHaystack}}",
 			);
 		}
 	}
 
-	private static function matches ($type, $haystack)
+	private static function matches ($type, $haystack): bool
 	{
 		$typeOfHaystack = self::typeOfString((string) $haystack);
+		$typeOfHaystack2 = $typeOfHaystack;
+		$haystack2 = $haystack;
 
-		if (preg_match('/ARRAY<(.+)>/', $type, $matches) && $typeOfHaystack === 'ARRAY')
+		if (
+		preg_match('/ARRAY<(.+)>/', $type, $matches) &&
+		$typeOfHaystack === 'ARRAY'
+		)
 		{
 			$haystack = json_decode($haystack, true);
 			$eachArrayTypes = explode(',', $matches[1]);
 
 			foreach ($eachArrayTypes as $key => $eachArrayType)
 			{
-				$haystack2 = $haystack[$key];
-				$eachTypes = preg_split('/\|(?![^<]*>)/', trim($eachArrayType));
-				$typeOfHaystack2 = self::typeOfString((string) $haystack2);
+				$haystack2 = is_array($haystack[$key])
+				 ? json_encode($haystack[$key])
+				 : (string) $haystack[$key];
 
-				if (is_null(self::matchType($eachTypes, (string) $haystack2)))
+				$eachTypes = preg_split('/\|(?![^<]*>)/', trim($eachArrayType));
+				$typeOfHaystack2 = self::typeOfString($haystack2);
+
+				if (!self::matchType($eachTypes, $haystack2))
 				{
 					http_response_code(400);
 
 					if (Application::$handleInvalidParameterType)
 					{
-						print_r((Application::$handleInvalidParameterType)($typeOfHaystack2));
+						print_r(
+						 (Application::$handleInvalidParameterType)(
+						  $typeOfHaystack2,
+						 ),
+						);
 						exit();
 					}
 					else
@@ -131,8 +140,10 @@ trait StrictTypes
 					}
 				}
 			}
-			return [ $haystack2, $typeOfHaystack2 ];
+			return true;
 		}
+
+		return false;
 	}
 
 	private static function typeOfString (string $string)
@@ -166,9 +177,9 @@ trait StrictTypes
 		{
 			return match (gettype($jd))
 			{
-				  'object' => 'JSON',
-				  'array' => 'ARRAY',
-				  default => 'STRING'
+				 'object' => 'JSON',
+				 'array' => 'ARRAY',
+				 default => 'STRING',
 			};
 		}
 		else
