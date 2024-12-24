@@ -4,7 +4,7 @@
 	"homepage": "https://github.com/PhpSlides",
 	"type": "library",
 	"license": "MIT",
-	"keywords": [ "framework", "phpslides" ],
+	"keywords": ["framework", "phpslides"],
 	"support": {
 		"issues": "https://github.com/PhpSlides/framework/issues",
 		"source": "https://github.com/PhpSlides/framework"
@@ -31,22 +31,23 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"PhpSlides\\": [ "src/Exception/" ],
-			"PhpSlides\\Src\\": [ "src/" ],
-			"PhpSlides\\Router\\": [ "Router/" ]
+			"PhpSlides\\": "src/Exception/",
+			"PhpSlides\\Src\\": "src/",
+			"PhpSlides\\Router\\": "Router/"
 		},
-		"files": [ "src/Bootstrap/App.php" ]
+		"files": ["src/Bootstrap/App.php"]
 	},
 	"autoload-dev": {
 		"psr-4": {
-			"PhpSlides\\Tests\\": "tests/"
+			"PhpSlides\\Tests\\": "tests/tests/"
 		}
 	},
 	"config": {
 		"preferred-install": "dist"
 	},
 	"scripts": {
-		"test": "vendor/bin/phpunit"
+		"test": "vendor/bin/phpunit",
+		"phpunit": "php vendor/bin/phpunit"
 	},
 	"minimum-stability": "stable",
 	"prefer-stable": true
