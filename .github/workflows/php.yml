@@ -2,9 +2,9 @@ name: PHP Composer
 
 on:
    push:
-      branches: ["dev"]
+      branches: ["master", "dev"]
    pull_request:
-      branches: ["dev"]
+      branches: ["master"]
 
 permissions:
    contents: read
@@ -14,7 +14,8 @@ jobs:
       runs-on: ubuntu-latest
 
       steps:
-         - uses: actions/checkout@v4
+         - name: Checkout repository
+           uses: actions/checkout@v4
 
          - name: Validate composer.json and composer.lock
            run: composer validate --strict
@@ -38,5 +39,18 @@ jobs:
          - name: Install dependencies
            run: composer install --prefer-dist --no-progress
 
-         - name: Run test suite
+   test:
+      runs-on: ubuntu-latest
+
+      steps:
+         - name: Checkout code
+           uses: actions/checkout@v4
+
+         - name: Set up PHP
+           uses: shivammathur/setup-php@v2
+           with:
+              php-version: 8.2
+              extensions: mbstring, intl
+
+         - name: Run Tests
            run: composer run-script test
