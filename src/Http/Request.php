@@ -29,7 +29,7 @@ class Request extends Application implements RequestInterface
 	 *
 	 * @param ?array $urlParam Optional URL parameters.
 	 */
-	public function __construct(?array $urlParam = null)
+	public function __construct (?array $urlParam = null)
 	{
 		$this->param = $urlParam;
 	}
@@ -43,9 +43,10 @@ class Request extends Application implements RequestInterface
 	 * @param ?string $key If specified, retrieves the value of the given parameter key.
 	 * @return mixed The URL parameters or a specific parameter value.
 	 */
-	public function urlParam(?string $key = null)
+	public function urlParam (?string $key = null)
 	{
-		if (!$key) {
+		if (!$key)
+		{
 			return (object) $this->validate($this->param);
 		}
 		return $this->validate($this->param[$key]);
@@ -60,26 +61,31 @@ class Request extends Application implements RequestInterface
 	 * @param ?string $name If specified, returns a specific query parameter by name.
 	 * @return mixed parsed query parameters or a specific parameter value.
 	 */
-	public function urlQuery(?string $name = null)
+	public function urlQuery (?string $name = null)
 	{
-		if (php_sapi_name() == 'cli-server') {
+		if (php_sapi_name() == 'cli-server')
+		{
 			$parsed = parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY);
-		} else {
+		}
+		else
+		{
 			$parsed = parse_url(
-				$_REQUEST['uri'] ?? $_SERVER['REQUEST_URI'],
-				PHP_URL_QUERY,
+			 $_REQUEST['uri'] ?? $_SERVER['REQUEST_URI'],
+			 PHP_URL_QUERY,
 			);
 		}
 
 		$cl = new stdClass();
 
-		if (!$parsed) {
+		if (!$parsed)
+		{
 			return $cl;
 		}
 		$parsed = mb_split('&', urldecode($parsed));
 
 		$i = 0;
-		while ($i < count($parsed)) {
+		while ($i < count($parsed))
+		{
 			$p = mb_split('=', $parsed[$i]);
 			$key = $p[0];
 			$value = $p[1] ? $this->validate($p[1]) : null;
@@ -88,7 +94,8 @@ class Request extends Application implements RequestInterface
 			$i++;
 		}
 
-		if (!$name) {
+		if (!$name)
+		{
 			return $cl;
 		}
 		return $cl->$name;
@@ -103,16 +110,20 @@ class Request extends Application implements RequestInterface
 	 * @param ?string $name The header name to retrieve. If omitted, returns all headers.
 	 * @return mixed The header, or a specific header value if `$name` is provided.
 	 */
-	public function header(?string $name = null)
+	public function header (?string $name = null)
 	{
 		$headers = getallheaders() ?: apache_request_headers();
 
-		if (!$name) {
+		if (!$name)
+		{
 			return $this->validate($headers);
 		}
-		if (isset($headers[$name])) {
+		if (isset($headers[$name]))
+		{
 			return $this->validate($headers[$name]);
-		} else {
+		}
+		else
+		{
 			return null;
 		}
 	}
@@ -125,7 +136,7 @@ class Request extends Application implements RequestInterface
 	 *
 	 * @return stdClass The authentication credentials.
 	 */
-	public function auth(): stdClass
+	public function auth (): stdClass
 	{
 		$cl = new stdClass();
 		$cl->basic = self::BasicAuthCredentials();
@@ -140,7 +151,7 @@ class Request extends Application implements RequestInterface
 	 * @param string $key The name of the header containing the API key. Default is 'Api-Key'.
 	 * @return bool Returns true if the API key is valid, false otherwise.
 	 */
-	public function apiKey(string $key = 'Api-Key')
+	public function apiKey (string $key = 'Api-Key')
 	{
 		return $this->validate(self::RequestApiKey($key));
 	}
@@ -154,15 +165,17 @@ class Request extends Application implements RequestInterface
 	 * @param ?string $name The name of the body parameter to retrieve.
 	 * @return mixed The body data or null if parsing fails.
 	 */
-	public function body(?string $name = null)
+	public function body (?string $name = null)
 	{
 		$data = json_decode(file_get_contents('php://input'), true);
 
-		if ($data === null || json_last_error() !== JSON_ERROR_NONE) {
+		if ($data === null || json_last_error() !== JSON_ERROR_NONE)
+		{
 			return null;
 		}
 
-		if ($name !== null) {
+		if ($name !== null)
+		{
 			return $this->validate($data[$name]);
 		}
 		return $this->validate($data);
@@ -177,12 +190,14 @@ class Request extends Application implements RequestInterface
 	 * @param ?string $key The key of the GET parameter.
 	 * @return mixed The parameter value, or null if not set.
 	 */
-	public function get(?string $key = null)
+	public function get (?string $key = null)
 	{
-		if (!$key) {
+		if (!$key)
+		{
 			return $this->validate($_GET);
 		}
-		if (!isset($_GET[$key])) {
+		if (!isset($_GET[$key]))
+		{
 			return null;
 		}
 		return $this->validate($_GET[$key]);
@@ -197,12 +212,14 @@ class Request extends Application implements RequestInterface
 	 * @param ?string $key The key of the POST parameter.
 	 * @return mixed The parameter value, or null if not set.
 	 */
-	public function post(?string $key = null)
+	public function post (?string $key = null)
 	{
-		if (!$key) {
+		if (!$key)
+		{
 			return $this->validate($_POST);
 		}
-		if (!isset($_POST[$key])) {
+		if (!isset($_POST[$key]))
+		{
 			return null;
 		}
 
@@ -219,12 +236,14 @@ class Request extends Application implements RequestInterface
 	 * @param ?string $key The key of the request parameter.
 	 * @return mixed The parameter value, or null if not set.
 	 */
-	public function request(?string $key = null)
+	public function request (?string $key = null)
 	{
-		if (!$key) {
+		if (!$key)
+		{
 			return $this->validate($_REQUEST);
 		}
-		if (!isset($_REQUEST[$key])) {
+		if (!isset($_REQUEST[$key]))
+		{
 			return null;
 		}
 
@@ -241,15 +260,18 @@ class Request extends Application implements RequestInterface
 	 * @param ?string $name The name of the file input.
 	 * @return ?object File data, or null if not set.
 	 */
-	public function files(?string $name = null): ?object
+	public function files (?string $name = null): ?object
 	{
-		if (!$name) {
+		if (!$name)
+		{
 			return (object) $_FILES;
 		}
-		if (!isset($_FILES[$name])) {
+		if (!isset($_FILES[$name]))
+		{
 			return null;
 		}
-		if ($_FILES[$name]['error'] !== UPLOAD_ERR_OK) {
+		if ($_FILES[$name]['error'] !== UPLOAD_ERR_OK)
+		{
 			return null;
 		}
 
@@ -265,9 +287,10 @@ class Request extends Application implements RequestInterface
 	 * @param ?string $key The key of the cookie.
 	 * @return mixed The cookie value, or null if not set.
 	 */
-	public function cookie(?string $key = null)
+	public function cookie (?string $key = null)
 	{
-		if (!$key) {
+		if (!$key)
+		{
 			return (object) $this->validate($_COOKIE);
 		}
 		return isset($_COOKIE[$key]) ? $this->validate($_COOKIE[$key]) : null;
@@ -282,13 +305,14 @@ class Request extends Application implements RequestInterface
 	 * @param ?string $key The key of the session value.
 	 * @return mixed The session value, or null if not set.
 	 */
-	public function session(?string $key = null)
+	public function session (?string $key = null)
 	{
 		// Start the session if it's not already started
 		session_status() < 2 && session_start();
 
 		// If no key is provided, return all session data as an object
-		if (!$key) {
+		if (!$key)
+		{
 			return (object) $this->validate($_SESSION);
 		}
 
@@ -303,7 +327,7 @@ class Request extends Application implements RequestInterface
 	 *
 	 * @return string The HTTP method of the request.
 	 */
-	public function method(): string
+	public function method (): string
 	{
 		return $_SERVER['REQUEST_METHOD'];
 	}
@@ -313,7 +337,7 @@ class Request extends Application implements RequestInterface
 	 *
 	 * @return string The URI.
 	 */
-	public function uri(): string
+	public function uri (): string
 	{
 		return self::$request_uri;
 	}
@@ -323,7 +347,7 @@ class Request extends Application implements RequestInterface
 	 *
 	 * @return object The parsed URL components.
 	 */
-	public function url(): object
+	public function url (): object
 	{
 		$uri = $this->uri();
 		$parsed = parse_url($uri);
@@ -341,10 +365,11 @@ class Request extends Application implements RequestInterface
 	 *
 	 * @return string The client's IP address.
 	 */
-	public function ip(): string
+	public function ip (): string
 	{
 		// Check for forwarded IP addresses from proxies or load balancers
-		if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+		if (isset($_SERVER['HTTP_X_FORWARDED_FOR']))
+		{
 			return $_SERVER['HTTP_X_FORWARDED_FOR'];
 		}
 		return $_SERVER['REMOTE_ADDR'];
@@ -357,7 +382,7 @@ class Request extends Application implements RequestInterface
 	 *
 	 * @return string The user agent.
 	 */
-	public function userAgent(): string
+	public function userAgent (): string
 	{
 		return $_SERVER['HTTP_USER_AGENT'];
 	}
@@ -369,10 +394,10 @@ class Request extends Application implements RequestInterface
 	 *
 	 * @return bool Returns true if the request is an AJAX request, otherwise false.
 	 */
-	public function isAjax(): bool
+	public function isAjax (): bool
 	{
 		return strtolower($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') ===
-			'xmlhttprequest';
+		 'xmlhttprequest';
 	}
 
 	/**
@@ -380,11 +405,11 @@ class Request extends Application implements RequestInterface
 	 *
 	 * @return string|null The referrer URL, or null if not set.
 	 */
-	public function referrer(): ?string
+	public function referrer (): ?string
 	{
 		return $_SERVER['HTTP_REFERER'] !== null
-			? $_SERVER['HTTP_REFERER']
-			: null;
+		 ? $_SERVER['HTTP_REFERER']
+		 : null;
 	}
 
 	/**
@@ -392,7 +417,7 @@ class Request extends Application implements RequestInterface
 	 *
 	 * @return string The server protocol.
 	 */
-	public function protocol(): string
+	public function protocol (): string
 	{
 		return $_SERVER['SERVER_PROTOCOL'];
 	}
@@ -402,7 +427,7 @@ class Request extends Application implements RequestInterface
 	 *
 	 * @return array The combined input data.
 	 */
-	public function all(): array
+	public function all (): array
 	{
 		$data = array_merge($_GET, $_POST, $this->body() ?? []);
 		return $this->validate($data);
@@ -415,9 +440,10 @@ class Request extends Application implements RequestInterface
 	 * @param string $key The key of the server parameter.
 	 * @return mixed The server parameter value, or null if not set.
 	 */
-	public function server(?string $key = null)
+	public function server (?string $key = null)
 	{
-		if (!$key) {
+		if (!$key)
+		{
 			return $this->validate($_SERVER);
 		}
 		return isset($_SERVER[$key]) ? $this->validate($_SERVER[$key]) : null;
@@ -429,7 +455,7 @@ class Request extends Application implements RequestInterface
 	 * @param string $method The HTTP method to check.
 	 * @return bool True if the request method matches, false otherwise.
 	 */
-	public function isMethod(string $method): bool
+	public function isMethod (string $method): bool
 	{
 		return strtoupper($this->method()) === strtoupper($method);
 	}
@@ -439,10 +465,10 @@ class Request extends Application implements RequestInterface
 	 *
 	 * @return bool True if the request is HTTPS, false otherwise.
 	 */
-	public function isHttps(): bool
+	public function isHttps (): bool
 	{
 		return (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ||
-			$_SERVER['SERVER_PORT'] == 443;
+		 $_SERVER['SERVER_PORT'] == 443;
 	}
 
 	/**
@@ -450,7 +476,7 @@ class Request extends Application implements RequestInterface
 	 *
 	 * @return int The request time as a Unix timestamp.
 	 */
-	public function requestTime(): int
+	public function requestTime (): int
 	{
 		return (int) $_SERVER['REQUEST_TIME'];
 	}
@@ -462,10 +488,10 @@ class Request extends Application implements RequestInterface
 	 *
 	 * @return string|null The content type, or null if not set.
 	 */
-	public function contentType(): ?string
+	public function contentType (): ?string
 	{
 		return $this->header('Content-Type') ??
-			($_SERVER['CONTENT_TYPE'] ?? null);
+		 ($_SERVER['CONTENT_TYPE'] ?? null);
 	}
 
 	/**
@@ -475,14 +501,14 @@ class Request extends Application implements RequestInterface
 	 *
 	 * @return int|null The content length, or null if not set.
 	 */
-	public function contentLength(): ?int
+	public function contentLength (): ?int
 	{
 		return isset($_SERVER['CONTENT_LENGTH'])
-			? (int) $_SERVER['CONTENT_LENGTH']
-			: null;
+		 ? (int) $_SERVER['CONTENT_LENGTH']
+		 : null;
 	}
 
-	public function csrf()
+	public function csrf ()
 	{
 		return $this->header('X-CSRF-TOKEN') ?: $this->header('X-Csrf-Token');
 	}

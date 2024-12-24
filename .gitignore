@@ -1,4 +1,29 @@
+# Ignore the build directory
+/build
+
+# Ignore the PHPUnit cache files
+/.phpunit.cache
+
+# Ignore the vendor directory, which contains third-party libraries
 /vendor
+
+# Ignore the access_log file, which logs access information
 access_log
+
+# Ignore the composer.lock file, which locks the dependencies of the project
 composer.lock
+
+# Ignore the composer.phar file, which is the Composer binary
 composer.phar
+
+# Ignore the PHPUnit result cache file, which stores the results of the last PHPUnit run
+.phpunit.result.cache
+
+# Ignore IDE and editor specific files
+/.idea
+/.vscode
+*.swp
+
+# Ignore OS generated files
+.DS_Store
+Thumbs.db

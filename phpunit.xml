@@ -1,8 +1,21 @@
-<phpunit>
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.0/phpunit.xsd"
+         beStrictAboutTestsThatDoNotTestAnything="false"
+         colors="true"
+         stopOnFailure="false"
+         backupGlobals="false"
+         bootstrap="vendor/autoload.php"
+         cacheDirectory=".phpunit.cache"
+         backupStaticProperties="false">
     <testsuites>
-        <testsuite name="Tests PhpSlides Framework">
-            <directory>./test/PHPUnit</directory>
+        <testsuite name="PhpSlides Test Suite">
+            <directory>tests/tests</directory>
         </testsuite>
     </testsuites>
-    <bootstrap>vendor/autoload.php</bootstrap>
+
+    <php>
+        <env name="APP_NAME" value="PhpSlides"/>
+        <env name="APP_VERSION" value="1.4.3"/>
+    </php>
 </phpunit>
