@@ -6,6 +6,7 @@ use DB;
 use Closure;
 use PhpSlides\Router\Route;
 use PhpSlides\Src\Http\Request;
+use PhpSlides\Src\Cli\Configure;
 use PhpSlides\Src\Forgery\Forge;
 use PhpSlides\Src\Logger\Logger;
 use PhpSlides\Src\Logger\DBLogger;
@@ -33,8 +34,8 @@ class Application extends Controller implements ApplicationInterface
 	use Logger;
 	use DBLogger
 	{
-		 Logger::log insteadof DBLogger;
-		 DBLogger::log as db_log;
+			Logger::log insteadof DBLogger;
+			DBLogger::log as db_log;
 	}
 
 	/**
@@ -98,7 +99,14 @@ class Application extends Controller implements ApplicationInterface
 	 */
 	private static function configure (): void
 	{
-		if (php_sapi_name() == 'cli-server')
+		if (php_sapi_name() == 'cli')
+		{
+			Configure::bootstrap();
+
+			self::$request_uri = '/';
+			self::$basePath = './tests/';
+		}
+		else if (php_sapi_name() == 'cli-server')
 		{
 			self::$request_uri = urldecode(
 			 parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),
@@ -125,7 +133,7 @@ class Application extends Controller implements ApplicationInterface
 		$req = new Request();
 		$protocol = $req->isHttps() ? 'https://' : 'http://';
 
-		self::$REMOTE_ADDR = $protocol . $req->server('HTTP_HOST');
+		self::$REMOTE_ADDR = $protocol . $req->server('HTTP_HOST') ?? 'localhost';
 	}
 
 	/**
