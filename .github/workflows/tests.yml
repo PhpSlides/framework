@@ -57,6 +57,7 @@ jobs:
          - name: Push changes to main
            run: |
               git branch -m main
+              git config pull.rebase false
               git pull origin main
               git pull origin dev
               git push origin HEAD
