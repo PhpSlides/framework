@@ -2,9 +2,11 @@ name: Execute Tests
 
 on:
    push:
-      branches: ["dev"]
+      branches:
+         - dev
    pull_request:
-      branches: ["dev"]
+      branches:
+         - dev
 
 permissions:
    contents: write
@@ -57,10 +59,10 @@ jobs:
          - name: Push changes to main
            run: |
               git fetch origin
-              git checkout main
+              git checkout -b main
               git config pull.rebase false
-              git pull origin main  # Get the latest changes from main
-              git merge origin/dev  # Merge the dev branch into main
-              git push origin main  # Push the changes to main
+              git pull origin main
+              git merge origin/dev --allow-unrelated-histories --no-ff
+              git push origin main
            env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
