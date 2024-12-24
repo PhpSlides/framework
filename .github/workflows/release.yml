@@ -1,4 +1,4 @@
-name: PHP Composer
+name: Configure and Run Tests Before Release
 
 on:
    push:
@@ -12,7 +12,7 @@ permissions:
    contents: read
 
 jobs:
-   build:
+   release:
       runs-on: ubuntu-latest
 
       strategy:
