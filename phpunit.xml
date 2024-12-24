@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.0/phpunit.xsd"
-         bootstrap="tests/tests/bootstrap.php">
+         beStrictAboutTestsThatDoNotTestAnything="false"
+         bootstrap="tests/tests/bootstrap.php"
+         cacheDirectory=".phpunit.cache"
+         backupStaticProperties="false">
     <testsuites>
-        <testsuite name="Tests PhpSlides Framework">
+        <testsuite name="PhpSlides Test Suite">
             <directory>tests/tests</directory>
         </testsuite>
     </testsuites>

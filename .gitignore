@@ -1,3 +1,5 @@
+/.phpunit.cache
+
 # Ignore the vendor directory, which contains third-party libraries
 /vendor
 
