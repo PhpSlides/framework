@@ -58,8 +58,8 @@ jobs:
 
          - name: Push changes to main
            run: |
-              git fetch origin
-              git checkout -b main
+              git fetch origin main dev
+              git checkout main
               git config pull.rebase false
               git pull origin main
               git merge origin/dev --allow-unrelated-histories --no-ff
