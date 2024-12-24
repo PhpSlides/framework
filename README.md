@@ -1,3 +1,3 @@
 # PhpSlides/framework
 
-The main code for PhpSlides..
+The main code for PhpSlides.
