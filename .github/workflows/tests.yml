@@ -63,10 +63,8 @@ jobs:
 
          - name: Push changes to main
            run: |
-              git branch main
-              git checkout main
-              git pull origin main
-              git merge origin/dev --allow-unrelated-histories
-              git push origin main
+              git checkout -b main
+              git reset --hard dev
+              git push -u -f origin main
            env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
