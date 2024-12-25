@@ -26,9 +26,10 @@ jobs:
 
          - name: Push changes to main
            run: |
-              git fetch
+              git fetch origin main dev
               git checkout main
-              git pull --rebase
+              git pull origin main dev --rebase
+              git merge origin/dev
               git push origin main
            env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
