@@ -28,7 +28,8 @@ jobs:
            run: |
               git checkout -b main
               git fetch
-              git pull
+              git pull origin main dev
+              git branch --set-upstream-to=origin/dev main
               git push -u origin main
            env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
