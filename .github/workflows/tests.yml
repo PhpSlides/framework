@@ -28,8 +28,8 @@ jobs:
            run: |
               git fetch origin main dev
               git checkout main
-              git pull origin main dev --rebase
-              git merge origin/dev
+              git pull
+              git merge origin/dev --rebase
               git push origin main
            env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
