@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Src\Loader;
+namespace PhpSlides\Core\Loader;
 
 use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
-use PhpSlides\Src\Foundation\Application;
+use PhpSlides\Core\Foundation\Application;
 
 /**
  * The HotReload class monitors specified directories for file changes,

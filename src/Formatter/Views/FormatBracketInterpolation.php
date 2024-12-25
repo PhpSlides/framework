@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpSlides\Src\Formatter\Views;
+namespace PhpSlides\Core\Formatter\Views;
 
 /**
  * Trait for handling bracket interpolation in view contents.
@@ -16,7 +16,7 @@ trait FormatBracketInterpolation
 	 * This constructor can be used to initialize any necessary values for the class
 	 * that uses this trait. It currently doesn't perform any operations.
 	 */
-	public function __construct()
+	public function __construct ()
 	{
 		// code...
 	}
@@ -30,23 +30,24 @@ trait FormatBracketInterpolation
 	 *
 	 * After processing, it updates the `$this->contents` property with the modified content.
 	 */
-	protected function bracket_interpolation()
+	protected function bracket_interpolation ()
 	{
 		// Replace bracket interpolation {{! ... !}}
 		$formattedContents = preg_replace(
-			'/\{\{!\s*.*?\s*!\}\}/s',
-			'',
-			$this->contents,
+		 '/\{\{!\s*.*?\s*!\}\}/s',
+		 '',
+		 $this->contents,
 		);
 
 		// Replace bracket interpolation {{ ... }}
 		$formattedContents = preg_replace_callback(
-			'/\{\{\s*(.*?)\s*\}\}/s',
-			function ($matches) {
-				$val = trim($matches[1], ';');
-				return '<' . '?php print_r(' . $val . '); ?' . '>';
-			},
-			$formattedContents,
+		 '/\{\{\s*(.*?)\s*\}\}/s',
+		 function ($matches)
+		 {
+			 $val = trim($matches[1], ';');
+			 return '<' . '?php print_r(' . $val . '); ?' . '>';
+		 },
+		 $formattedContents,
 		);
 
 		$this->contents = $formattedContents;

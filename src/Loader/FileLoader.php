@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpSlides\Src\Loader;
+namespace PhpSlides\Core\Loader;
 
 use PhpSlides\Exception;
 
@@ -27,13 +27,16 @@ class FileLoader
 	 * @throws Exception if the specified file does not exist.
 	 * @return self The instance for chaining.
 	 */
-	public function load($file): self
+	public function load ($file): self
 	{
-		if (file_exists($file)) {
+		if (file_exists($file))
+		{
 			$result = include $file;
 			$this->result[] = $result;
 			return $this;
-		} else {
+		}
+		else
+		{
 			throw new Exception("File does not exist: $file");
 		}
 	}
@@ -47,9 +50,10 @@ class FileLoader
 	 * @param string $file The file path to load.
 	 * @return self The instance for chaining.
 	 */
-	public function safeLoad($file): self
+	public function safeLoad ($file): self
 	{
-		if (file_exists($file)) {
+		if (file_exists($file))
+		{
 			$result = include $file;
 			$this->result[] = $result;
 		}
@@ -64,9 +68,10 @@ class FileLoader
 	 *
 	 * @return mixed The content of the loaded file(s), either as a single result or an array.
 	 */
-	public function getLoad()
+	public function getLoad ()
 	{
-		if (count($this->result ?? []) === 1) {
+		if (count($this->result ?? []) === 1)
+		{
 			return $this->result[0];
 		}
 		return $this->result;
@@ -83,16 +88,19 @@ class FileLoader
 	 * @throws Exception if the specified file does not exist.
 	 * @return self The instance for chaining.
 	 */
-	public function parseLoad(string $file): self
+	public function parseLoad (string $file): self
 	{
-		if (file_exists($file)) {
+		if (file_exists($file))
+		{
 			ob_start();
 			include $file;
 			$output = ob_get_clean();
 			$this->result[] =
-				$output !== false && strlen($output ?? '') > 0 ? $output : '';
+			 $output !== false && strlen($output ?? '') > 0 ? $output : '';
 			return $this;
-		} else {
+		}
+		else
+		{
 			throw new Exception("File does not exist: $file");
 		}
 	}
@@ -106,14 +114,15 @@ class FileLoader
 	 * @param string $file The file path to parse.
 	 * @return self The instance for chaining.
 	 */
-	public function parseSafeLoad(string $file): self
+	public function parseSafeLoad (string $file): self
 	{
-		if (file_exists($file)) {
+		if (file_exists($file))
+		{
 			ob_start();
 			include $file;
 			$output = ob_get_clean();
 			$this->result[] =
-				$output !== false && strlen($output ?? '') > 0 ? $output : '';
+			 $output !== false && strlen($output ?? '') > 0 ? $output : '';
 		}
 		return $this;
 	}

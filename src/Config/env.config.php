@@ -1,13 +1,16 @@
 <?php
 
 use Dotenv\Dotenv;
-use PhpSlides\Src\Foundation\Application;
+use PhpSlides\Core\Foundation\Application;
 
 $basePath = Application::$basePath === '' ? 'app/../' : Application::$basePath;
 
-try {
+try
+{
 	Dotenv::createUnsafeMutable($basePath)->load();
-} catch (Exception $e) {
+}
+catch ( Exception $e )
+{
 	exit($e->getMessage());
 }
 

@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Src;
+namespace PhpSlides\Core;
 
 /**
  * Class Props
@@ -25,7 +25,7 @@ class Props
 	 * @param string $key The name of the property being set.
 	 * @param mixed $value The value to assign to the property.
 	 */
-	public function __set(string $key, mixed $value)
+	public function __set (string $key, mixed $value)
 	{
 		self::$properties[$key] = $value;
 	}
@@ -40,9 +40,10 @@ class Props
 	 *
 	 * @throws Exception If the property does not exist.
 	 */
-	public function __get(string $key)
+	public function __get (string $key)
 	{
-		if (array_key_exists($key, self::$properties)) {
+		if (array_key_exists($key, self::$properties))
+		{
 			return self::$properties[$key];
 		}
 		throw new Exception("Property name `$key` does not exist.");
@@ -53,7 +54,7 @@ class Props
 	 *
 	 * @return array<string, mixed> An associative array containing all the properties and their values.
 	 */
-	public static function all(): array
+	public static function all (): array
 	{
 		return static::$properties;
 	}

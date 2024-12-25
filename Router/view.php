@@ -3,7 +3,7 @@
 namespace PhpSlides\Router;
 
 use component;
-use PhpSlides\Src\Foundation\Application;
+use PhpSlides\Core\Foundation\Application;
 
 /**
  * --------------------------------------------------------------
@@ -31,7 +31,7 @@ final class view
 	 *
 	 * --------------------------------------------------------------
 	 */
-	final public static function render(string $view, mixed ...$props): mixed
+	final public static function render (string $view, mixed ...$props): mixed
 	{
 		// split :: into array and extract the folder and files
 		$file = preg_replace('/(::)|::/', '/', $view);

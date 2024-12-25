@@ -1,9 +1,9 @@
 <?php
 
-namespace PhpSlides\Src\Parser;
+namespace PhpSlides\Core\Parser;
 
-use PhpSlides\Src\Logger\DBLogger;
-use PhpSlides\Src\Formatter\SqlFormat;
+use PhpSlides\Core\Logger\DBLogger;
+use PhpSlides\Core\Formatter\SqlFormat;
 
 /**
  * SqlParser is responsible for parsing SQL column definitions and constraints.
@@ -27,31 +27,31 @@ class SqlParser extends SqlFormat
 	 * as the SQL file is parsed.
 	 */
 	protected $column_types = [
-		'COLUMN_NAME' => null,
-		'TYPE' => null,
-		'LENGTH' => null,
-		'UNSIGNED' => null,
-		'ZEROFILL' => null,
-		'CHARACTER' => null,
-		'COLLATION' => null,
-		'NULL' => null,
-		'DEFAULT' => null,
-		'AUTO_INCREMENT' => null,
-		'UNIQUE' => null,
-		'PRIMARY' => null,
-		'INDEX' => null,
-		'CHECK' => null,
-		'FOREIGN' => null,
-		'REFERENCES' => null,
-		'DELETE' => null,
-		'UPDATE' => null,
-		'COMMENT' => null,
-		'VISIBLE' => null,
-		'STORAGE' => null,
-		'GENERATED' => null,
-		'VIRTUAL' => null,
-		'PERSISTENT' => null,
-		'OTHERS' => null,
+	'COLUMN_NAME' => null,
+	'TYPE' => null,
+	'LENGTH' => null,
+	'UNSIGNED' => null,
+	'ZEROFILL' => null,
+	'CHARACTER' => null,
+	'COLLATION' => null,
+	'NULL' => null,
+	'DEFAULT' => null,
+	'AUTO_INCREMENT' => null,
+	'UNIQUE' => null,
+	'PRIMARY' => null,
+	'INDEX' => null,
+	'CHECK' => null,
+	'FOREIGN' => null,
+	'REFERENCES' => null,
+	'DELETE' => null,
+	'UPDATE' => null,
+	'COMMENT' => null,
+	'VISIBLE' => null,
+	'STORAGE' => null,
+	'GENERATED' => null,
+	'VIRTUAL' => null,
+	'PERSISTENT' => null,
+	'OTHERS' => null,
 	];
 
 	/**
@@ -70,17 +70,19 @@ class SqlParser extends SqlFormat
 	 *
 	 * @return string The formatted SQL constraint for the column.
 	 */
-	public function parse(
-		string $column_name,
-		string $path,
-		array $constraint,
-		?string $table_name,
+	public function parse (
+	 string $column_name,
+	 string $path,
+	 array $constraint,
+	 ?string $table_name,
 	) {
 		$code = file($path);
 		$this->column_types['COLUMN_NAME'] = $column_name;
 
-		foreach ($code as $value) {
-			if (str_starts_with(trim($value), '#')) {
+		foreach ($code as $value)
+		{
+			if (str_starts_with(trim($value), '#'))
+			{
 				continue;
 			}
 
@@ -91,12 +93,15 @@ class SqlParser extends SqlFormat
 			$value = str_replace('__table__', $table_name, $value);
 			$value = str_replace('__column__', $column_name, $value);
 
-			if (array_key_exists($type, $this->column_types)) {
+			if (array_key_exists($type, $this->column_types))
+			{
 				$this->column_types[$type] = $value;
-			} else {
+			}
+			else
+			{
 				self::log(
-					'WARNING',
-					"`$type` key does not exist in `$column_name` column type",
+				 'WARNING',
+				 "`$type` key does not exist in `$column_name` column type",
 				);
 			}
 		}

@@ -2,8 +2,8 @@
 
 namespace PhpSlides\Router;
 
-use PhpSlides\Src\Controller\Controller;
-use PhpSlides\Src\Foundation\Application;
+use PhpSlides\Core\Controller\Controller;
+use PhpSlides\Core\Foundation\Application;
 use PhpSlides\Router\Interface\MapInterface;
 
 /**
@@ -18,8 +18,8 @@ use PhpSlides\Router\Interface\MapInterface;
  */
 class MapRoute extends Controller implements MapInterface
 {
-	use \PhpSlides\Src\Utils\Validate;
-	use \PhpSlides\Src\Utils\Routes\StrictTypes;
+	use \PhpSlides\Core\Utils\Validate;
+	use \PhpSlides\Core\Utils\Routes\StrictTypes;
 
 	/**
 	 * @var string|array $route The route(s) to be mapped.

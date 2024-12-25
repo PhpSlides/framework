@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpSlides\Src\Formatter\Views;
+namespace PhpSlides\Core\Formatter\Views;
 
 /**
  * Trait to format includes elements in PhpSlides view files.

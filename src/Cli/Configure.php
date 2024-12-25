@@ -5,7 +5,7 @@ namespace PhpSlides\Core\Cli;
 
 trait Configure
 {
-   public static function bootstrap ()
+   protected static function bootstrap ()
    {
       if (php_sapi_name() == 'cli')
       {

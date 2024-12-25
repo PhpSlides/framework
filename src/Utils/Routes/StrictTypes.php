@@ -1,15 +1,15 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Src\Utils\Routes;
+namespace PhpSlides\Core\Utils\Routes;
 
-use PhpSlides\Src\Utils\Routes\Exception\InvalidTypesException;
+use PhpSlides\Core\Utils\Routes\Exception\InvalidTypesException;
 
 /**
  * Trait StrictTypes
  *
  * This trait is used to enforce strict type checking in the parameter types
  *
- * @package PhpSlides\Src\Utils\Routes
+ * @package PhpSlides\Core\Utils\Routes
  */
 trait StrictTypes
 {
@@ -65,11 +65,11 @@ trait StrictTypes
 		{
 			return match ($typeOfNeedle)
 			{
-				  'INT' => (int) $needle,
-				  'BOOL' => (bool) $needle,
-				  'FLOAT' => (float) $needle,
-				  'ARRAY' => json_decode($needle, true),
-				  default => $needle,
+					'INT' => (int) $needle,
+					'BOOL' => (bool) $needle,
+					'FLOAT' => (float) $needle,
+					'ARRAY' => json_decode($needle, true),
+					default => $needle,
 			};
 		}
 
@@ -181,9 +181,9 @@ trait StrictTypes
 		{
 			return match (gettype($jd))
 			{
-				  'object' => 'JSON',
-				  'array' => 'ARRAY',
-				  default => 'STRING',
+					'object' => 'JSON',
+					'array' => 'ARRAY',
+					default => 'STRING',
 			};
 		}
 		else

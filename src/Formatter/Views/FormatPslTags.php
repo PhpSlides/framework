@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpSlides\Src\Formatter\Views;
+namespace PhpSlides\Core\Formatter\Views;
 
 /**
  * Trait to replace PhpSlides default tags in view files.

@@ -1,9 +1,9 @@
 <?php
 
-namespace PhpSlides\Src\Parser;
+namespace PhpSlides\Core\Parser;
 
 use DB;
-use PhpSlides\Src\Forgery\Forge;
+use PhpSlides\Core\Forgery\Forge;
 
 /**
  * ORMParser is responsible for parsing a given class name into database-specific
@@ -26,7 +26,7 @@ class ORMParser extends Forge
 	 *                      format `Namespace\Database\ClassName`.
 	 * @return string The formatted table name, derived from the class name.
 	 */
-	public function parse(string $class)
+	public function parse (string $class)
 	{
 		// Extract the segments of the class namespace.
 		$name = explode('\\', $class);

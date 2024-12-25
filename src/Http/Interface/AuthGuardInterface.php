@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpSlides\Src\Http\Interface;
+namespace PhpSlides\Core\Http\Interface;
 
 interface AuthGuardInterface
 {
@@ -13,5 +13,5 @@ interface AuthGuardInterface
 	 *
 	 * @return bool Returns true if the request is authorized, false otherwise.
 	 */
-	public function authorize(): bool;
+	public function authorize (): bool;
 }

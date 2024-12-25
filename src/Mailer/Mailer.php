@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpSlides\Src\Mailer;
+namespace PhpSlides\Core\Mailer;
 
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\PHPMailer;

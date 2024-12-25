@@ -1,8 +1,8 @@
 <?php
 
-namespace PhpSlides\Src\Loader;
+namespace PhpSlides\Core\Loader;
 
-use PhpSlides\Src\Foundation\Application;
+use PhpSlides\Core\Foundation\Application;
 
 /**
  * The Autoloader class automatically loads ORM-related classes by scanning
@@ -17,7 +17,7 @@ class Autoloader
 	 * The constructor triggers the ORM loader, which scans designated directories
 	 * to find and instantiate ORM classes at runtime.
 	 */
-	public function __construct()
+	public function __construct ()
 	{
 		self::ORMLoad();
 	}
@@ -31,16 +31,15 @@ class Autoloader
 	 * without manual inclusion, making the application structure modular and
 	 * maintainable.
 	 */
-	protected static function ORMLoad()
+	protected static function ORMLoad ()
 	{
-		foreach (
-			glob(Application::$basePath . 'App/Forgery/*/*/*.php')
-			as $value
-		) {
+		foreach (glob(Application::$basePath . 'App/Forgery/*/*/*.php') as $value)
+		{
 			$class = explode('.', $value);
-			$class = str_replace(['App/', '/'], ['', '\\'], $class[0]);
+			$class = str_replace([ 'App/', '/' ], [ '', '\\' ], $class[0]);
 
-			if (class_exists($class)) {
+			if (class_exists($class))
+			{
 				new $class();
 			}
 		}

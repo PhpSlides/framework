@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Src\Logger;
+namespace PhpSlides\Core\Logger;
 
 use DateTime;
-use PhpSlides\Src\Foundation\Application;
+use PhpSlides\Core\Foundation\Application;
 
 /**
  * Logger trait for logging HTTP request details.
@@ -27,7 +27,7 @@ trait Logger
 	 *
 	 * @return void
 	 */
-	protected static function log(): void
+	protected static function log (): void
 	{
 		// Define the log file path.
 		$log_path = Application::$basePath . 'requests.log';
@@ -58,7 +58,8 @@ trait Logger
 		$content = "$remote_addr - - [$date] \"$method /$uri $http_protocol\" $http_code\n";
 
 		// If logging is enabled and the request is not for hot-reload, log the entry.
-		if (Application::$log === true && $uri !== $hot_reload_url) {
+		if (Application::$log === true && $uri !== $hot_reload_url)
+		{
 			$log = fopen($log_path, 'a');
 			fwrite($log, $content);
 			fclose($log);

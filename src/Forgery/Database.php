@@ -1,11 +1,11 @@
 <?php
 
-namespace PhpSlides\Src\Forgery;
+namespace PhpSlides\Core\Forgery;
 
 use DB;
-use PhpSlides\Src\Logger\DBLogger;
-use PhpSlides\Src\Database\Connection;
-use PhpSlides\Src\Database\Database as DB_ORM;
+use PhpSlides\Core\Logger\DBLogger;
+use PhpSlides\Core\Database\Connection;
+use PhpSlides\Core\Database\Database as DB_ORM;
 
 /**
  * Abstract class for managing database operations.
@@ -26,28 +26,32 @@ abstract class Database extends DB_ORM
 	 *
 	 * @param string $db_name The name of the database to be created.
 	 */
-	protected static function createDB($db_name)
+	protected static function createDB ($db_name)
 	{
-		try {
+		try
+		{
 			// Initialize database connection
 			Connection::init();
 
 			// Check if the database already exists
 			$query = DB::query(
-				'SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME=%s',
-				$db_name,
+			 'SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME=%s',
+			 $db_name,
 			);
 
 			// If the database does not exist, create it
-			if (empty($query)) {
+			if (empty($query))
+			{
 				DB::query('CREATE DATABASE %b', $db_name);
 				static::log('INFO', "Created Database `$db_name`");
 			}
-		} catch (\Exception $e) {
+		}
+		catch ( \Exception $e )
+		{
 			// Log any exceptions that occur during the database creation
 			static::log(
-				'ERROR',
-				"Unable to create Database `$db_name`. [Exception]: {$e->getMessage()}",
+			 'ERROR',
+			 "Unable to create Database `$db_name`. [Exception]: {$e->getMessage()}",
 			);
 		}
 	}
@@ -60,23 +64,25 @@ abstract class Database extends DB_ORM
 	 *
 	 * @param string $db_name The name of the database to be dropped.
 	 */
-	protected static function dropDB($db_name)
+	protected static function dropDB ($db_name)
 	{
-		try {
+		try
+		{
 			// Initialize database connection
 			Connection::init();
 
 			// Check if the database exists
 			$query = DB::query(
-				'SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME=%s',
-				$db_name,
+			 'SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME=%s',
+			 $db_name,
 			);
 
 			// If the database does not exist, log a warning
-			if (empty($query)) {
+			if (empty($query))
+			{
 				static::log(
-					'WARNING',
-					"Cannot drop unexisting database `$db_name`",
+				 'WARNING',
+				 "Cannot drop unexisting database `$db_name`",
 				);
 				return;
 			}
@@ -84,11 +90,13 @@ abstract class Database extends DB_ORM
 			// Drop the database
 			DB::query('DROP DATABASE %b', $db_name);
 			static::log('INFO', "Dropped Database `$db_name`.");
-		} catch (\Exception $e) {
+		}
+		catch ( \Exception $e )
+		{
 			// Log any exceptions that occur during the database drop
 			static::log(
-				'ERROR',
-				"Unable to drop Database `$db_name`. [Exception]: {$e->getMessage()}",
+			 'ERROR',
+			 "Unable to drop Database `$db_name`. [Exception]: {$e->getMessage()}",
 			);
 		}
 	}
@@ -102,24 +110,26 @@ abstract class Database extends DB_ORM
 	 * @param string $db_name The name of the database containing the table.
 	 * @param string $db_table The name of the table to be dropped.
 	 */
-	protected static function dropTable($db_name, $db_table)
+	protected static function dropTable ($db_name, $db_table)
 	{
-		try {
+		try
+		{
 			// Initialize database connection
 			Connection::init();
 
 			// Check if the table exists in the database
 			$query = DB::query(
-				'SELECT * FROM information_schema.tables WHERE table_schema=%s AND table_name=%s',
-				$db_name,
-				$db_table,
+			 'SELECT * FROM information_schema.tables WHERE table_schema=%s AND table_name=%s',
+			 $db_name,
+			 $db_table,
 			);
 
 			// If the table does not exist, log a warning
-			if (empty($query)) {
+			if (empty($query))
+			{
 				static::log(
-					'WARNING',
-					"Cannot drop unexisting table `$db_table` in `$db_name` Database",
+				 'WARNING',
+				 "Cannot drop unexisting table `$db_table` in `$db_name` Database",
 				);
 				return;
 			}
@@ -127,14 +137,16 @@ abstract class Database extends DB_ORM
 			// Drop the table
 			DB::query('DROP TABLE %b.%b', $db_name, $db_table);
 			static::log(
-				'INFO',
-				"Dropped Table `$db_table` in `$db_name` Database.",
+			 'INFO',
+			 "Dropped Table `$db_table` in `$db_name` Database.",
 			);
-		} catch (\Exception $e) {
+		}
+		catch ( \Exception $e )
+		{
 			// Log any exceptions that occur during the table drop
 			static::log(
-				'ERROR',
-				"Unable to drop Table `$db_table` in `$db_name` Database. [Exception]: {$e->getMessage()}",
+			 'ERROR',
+			 "Unable to drop Table `$db_table` in `$db_name` Database. [Exception]: {$e->getMessage()}",
 			);
 		}
 	}

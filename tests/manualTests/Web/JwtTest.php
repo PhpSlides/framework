@@ -1,6 +1,6 @@
 <?php
 
-use PhpSlides\Src\Web\JWT;
+use PhpSlides\Core\Web\JWT;
 
 include_once __DIR__ . '/../autoload.php';
 include_once __DIR__ . '/../../src/Globals/Functions.php';
@@ -8,7 +8,7 @@ include_once __DIR__ . '/../../src/Globals/Functions.php';
 /**
  * Testing and creating new PayLoad with the `payload` function
  */
-$payload = payload(data: ['user_id' => '555'], expires: time() + 3600);
+$payload = payload(data: [ 'user_id' => '555' ], expires: time() + 3600);
 
 /**
  * Testing JwtService encode method
@@ -20,7 +20,8 @@ $token = JWT::encode($payload);
  */
 $verifyToken = JWT::verify($token);
 
-if ($verifyToken) {
+if ($verifyToken)
+{
 	/**
 	 * Testing JwtService decode method
 	 */

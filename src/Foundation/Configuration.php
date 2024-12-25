@@ -1,13 +1,13 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Src\Foundation;
+namespace PhpSlides\Core\Foundation;
 
 use PhpSlides\Exception;
 use PhpSlides\Router\view;
 
 trait Configuration
 {
-	use \PhpSlides\Src\Traits\FileHandler;
+	use \PhpSlides\Core\Traits\FileHandler;
 
 	/**
 	 * The base path of the application.
@@ -36,7 +36,7 @@ trait Configuration
 	 *
 	 * @throws Exception If the HTTP response code in the configuration is not an integer.
 	 */
-	protected static function config(): void
+	protected static function config (): void
 	{
 		$root_dir = self::$basePath;
 
@@ -54,34 +54,42 @@ trait Configuration
 		 *   Config File & Request Router configurations
 		 *   ----------------------------------------------
 		 */
-		if ($file_type != null) {
+		if ($file_type != null)
+		{
 			$config = $config_file['deny'] ?? [];
 			$contents = $config_file['message']['contents'] ?? null;
 			$http_code = $config_file['message']['http_code'] ?? 403;
 			$components = $config_file['message']['components'] ?? null;
 			$contentType = $config_file['message']['content-type'] ?? null;
 
-			foreach ($config as $denyFile) {
-				if (fnmatch(preg_replace("/(^\/)|(\/$)/", '', $denyFile), $req)) {
+			foreach ($config as $denyFile)
+			{
+				if (fnmatch(preg_replace("/(^\/)|(\/$)/", '', $denyFile), $req))
+				{
 					/**
 					 *  -----------------------------------------------
 					 *    Deny Request to current file
 					 *  -----------------------------------------------
 					 */
-					if (($t = gettype($http_code)) !== 'integer') {
+					if (($t = gettype($http_code)) !== 'integer')
+					{
 						throw new Exception(
-							"http_code in the PhpSlides configuration must be type int, $t given.",
+						 "http_code in the PhpSlides configuration must be type int, $t given.",
 						);
 					}
 					http_response_code($http_code);
 
-					if ($contentType) {
+					if ($contentType)
+					{
 						header("Content-Type: $contentType");
 					}
 
-					if ($components) {
+					if ($components)
+					{
 						print_r(view::render($components));
-					} elseif ($contents) {
+					}
+					elseif ($contents)
+					{
 						print_r($contents);
 					}
 

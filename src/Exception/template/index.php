@@ -16,103 +16,103 @@ $sid = session_id();
 </head>
 
 <script>
-document.head.innerHTML = ''
-document.title = 'Parse Error - <?php echo $message; ?>'
+   document.head.innerHTML = ''
+   document.title = 'Parse Error - <?php echo $message; ?>'
 </script>
 
 <style type="text/css" media="all">
-<?php echo file_get_contents(__DIR__ . '/src/highlight.min.css');
-?>
+   <?php echo file_get_contents(__DIR__ . '/src/highlight.min.css');
+   ?>
 </style>
 
 <style type="text/css" media="all">
-* {
-   margin: 0;
-   padding: 0;
-}
+   * {
+      margin: 0;
+      padding: 0;
+   }
 
-body {
-   color: white;
-   background-color: #510303;
-}
+   body {
+      color: white;
+      background-color: #510303;
+   }
 
-header {
-   padding: 25px 10px;
-   padding-left: 20px;
-   border-radius: 0 0 25px 25px;
-   background-color: #a60303;
-}
+   header {
+      padding: 25px 10px;
+      padding-left: 20px;
+      border-radius: 0 0 25px 25px;
+      background-color: #a60303;
+   }
 
-header h3 {
-   font-size: 18px;
-   font-family: Tahoma;
-   margin-bottom: 10px;
-   text-transform: uppercase;
-   font-weight: 700;
-}
+   header h3 {
+      font-size: 18px;
+      font-family: Tahoma;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      font-weight: 700;
+   }
 
-header span {
-   font-size: 14px;
-   font-weight: 500;
-   font-family: monospace;
-   word-break: break-word;
-   overflow-wrap: break-word;
-}
+   header span {
+      font-size: 14px;
+      font-weight: 500;
+      font-family: monospace;
+      word-break: break-word;
+      overflow-wrap: break-word;
+   }
 
-.h {
-   color: whitesmoke;
-   font-size: 18px;
-   font-weight: 700;
-   margin-left: 5px;
-   font-family: Tahoma, Sans-Serif;
-}
+   .h {
+      color: whitesmoke;
+      font-size: 18px;
+      font-weight: 700;
+      margin-left: 5px;
+      font-family: Tahoma, Sans-Serif;
+   }
 
-.container {
-   padding: 15px;
-   margin-top: 10px;
-}
+   .container {
+      padding: 15px;
+      margin-top: 10px;
+   }
 
-.code-wrapper {
-   padding: 10px;
-   font-size: 15px;
-   margin-top: 10px;
-   border-radius: 10px;
-   background-color: #714935;
-   font-family: Tahoma, Sans-Serif;
-}
+   .code-wrapper {
+      padding: 10px;
+      font-size: 15px;
+      margin-top: 10px;
+      border-radius: 10px;
+      background-color: #714935;
+      font-family: Tahoma, Sans-Serif;
+   }
 
-.code-wrapper>span {
-   color: #e0e0e0;
-   display: block;
-   margin-bottom: 13px;
-   word-break: break-word;
-   overflow-wrap: break-word;
-}
+   .code-wrapper>span {
+      color: #e0e0e0;
+      display: block;
+      margin-bottom: 13px;
+      word-break: break-word;
+      overflow-wrap: break-word;
+   }
 
-.code-wrapper span:last-child {
-   margin-bottom: 0;
-}
+   .code-wrapper span:last-child {
+      margin-bottom: 0;
+   }
 
-.code-wrapper pre code {
-   padding: 10px 0;
-   font-size: 14px;
-   min-height: 20px;
-   border-radius: 7px;
-   background-color: #b8a9a9;
-}
+   .code-wrapper pre code {
+      padding: 10px 0;
+      font-size: 14px;
+      min-height: 20px;
+      border-radius: 7px;
+      background-color: #b8a9a9;
+   }
 
-.highlighted-line {
-   padding-right: 10px;
-   background-color: yellow;
-}
+   .highlighted-line {
+      padding-right: 10px;
+      background-color: yellow;
+   }
 
-.hljs-line-numbers {
-   padding-left: 12px;
-   margin-right: 10px;
-   padding-right: 10px;
-   user-select: none;
-   border-right: 1px solid #ccc;
-}
+   .hljs-line-numbers {
+      padding-left: 12px;
+      margin-right: 10px;
+      padding-right: 10px;
+      user-select: none;
+      border-right: 1px solid #ccc;
+   }
 </style>
 
 <body>
@@ -145,40 +145,40 @@ header span {
    </div>
 
    <script>
-   <?php echo file_get_contents(__DIR__ . '/src/highlight.min.js'); ?>
+      <?php echo file_get_contents(__DIR__ . '/src/highlight.min.js'); ?>
    </script>
 
    <script>
-   document.addEventListener('DOMContentLoaded', (event) => {
-      document.querySelectorAll('pre code').forEach((block) => {
-         hljs.highlightElement(block);
-         addLineNumbers(block);
-         highlightSpecificLines(block, [<?php echo $line; ?>]); // Highlight lines 2 and 3
+      document.addEventListener('DOMContentLoaded', (event) => {
+         document.querySelectorAll('pre code').forEach((block) => {
+            hljs.highlightElement(block);
+            addLineNumbers(block);
+            highlightSpecificLines(block, [<?php echo $line; ?>]); // Highlight lines 2 and 3
+         });
       });
-   });
 
-   function addLineNumbers(block) {
-      const codeLines = <?php echo $code_keys . ";\n"; ?>
-      const lines = block.innerHTML.split('\n');
+      function addLineNumbers(block) {
+         const codeLines = <?php echo $code_keys . ";\n"; ?>
+         const lines = block.innerHTML.split('\n');
 
-      block.innerHTML = lines.map((line, index) => {
-         if (codeLines[index] != undefined) {
-            return `<span class="hljs-line-numbers">${codeLines[index] + 1}</span>${line}`;
-         }
-      }).join('\n');
-   }
+         block.innerHTML = lines.map((line, index) => {
+            if (codeLines[index] != undefined) {
+               return `<span class="hljs-line-numbers">${codeLines[index] + 1}</span>${line}`;
+            }
+         }).join('\n');
+      }
 
-   function highlightSpecificLines(block, linesToHighlight) {
-      const codeLines = <?php echo $code_keys . ";\n"; ?>
-      const lines = block.innerHTML.split('\n');
+      function highlightSpecificLines(block, linesToHighlight) {
+         const codeLines = <?php echo $code_keys . ";\n"; ?>
+         const lines = block.innerHTML.split('\n');
 
-      block.innerHTML = lines.map((line, index) => {
-         if (linesToHighlight.includes(codeLines[index] + 1)) {
-            return `<span class="highlighted-line">${line}</span>`;
-         }
-         return line;
-      }).join('\n');
-   }
+         block.innerHTML = lines.map((line, index) => {
+            if (linesToHighlight.includes(codeLines[index] + 1)) {
+               return `<span class="highlighted-line">${line}</span>`;
+            }
+            return line;
+         }).join('\n');
+      }
    </script>
 
    <?php
@@ -189,25 +189,25 @@ header span {
      : 'http://';
 
    $addr =
-    \PhpSlides\Src\Foundation\Application::$REMOTE_ADDR .
+    \PhpSlides\Core\Foundation\Application::$REMOTE_ADDR .
     "/hot-reload-a$sid/worker";
-   $phpslides_version = \PhpSlides\Src\Foundation\Application::PHPSLIDES_VERSION;
+   $phpslides_version = \PhpSlides\Core\Foundation\Application::PHPSLIDES_VERSION;
 
    if (getenv('HOT_RELOAD') == 'true'): ?>
-   <script>
-   /**
-    * PHPSLIDES HOT RELOAD GENERATED
-    *
-    * @version <?php echo $phpslides_version; ?>
-    * @author Dave Conco < info@dconco.dev>
-    * @copyright 2023 - 2024 Dave Conco
-    */
-   new Worker('<?php echo $addr; ?>').addEventListener('message', (event) => {
-      if (event.data === 'reload') {
-         window.location.reload();
-      }
-   })
-   </script>
+      <script>
+      /**
+       * PHPSLIDES HOT RELOAD GENERATED
+       *
+       * @version <?php echo $phpslides_version; ?>
+       * @author Dave Conco < info@dconco.dev>
+       * @copyright 2023 - 2024 Dave Conco
+            */
+         new Worker('<?php echo $addr; ?>').addEventListener('message', (event) => {
+            if (event.data === 'reload') {
+               window.location.reload();
+            }
+         })
+      </script>
    <?php endif;
    ?>
 </body>

@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Src\Http\Auth;
+namespace PhpSlides\Core\Http\Auth;
 
-use PhpSlides\Src\Http\Request;
-use PhpSlides\Src\Http\Interface\AuthGuardInterface;
+use PhpSlides\Core\Http\Request;
+use PhpSlides\Core\Http\Interface\AuthGuardInterface;
 
 /**
  * The Base AuthGuard
@@ -30,7 +30,7 @@ abstract class AuthGuard implements AuthGuardInterface
 	 *
 	 * @param Request $request The HTTP request object.
 	 */
-	public function __construct(Request $request)
+	public function __construct (Request $request)
 	{
 		self::$request = $request;
 	}
@@ -44,5 +44,5 @@ abstract class AuthGuard implements AuthGuardInterface
 	 *
 	 * @return bool Returns true if the request is authorized, false otherwise.
 	 */
-	abstract public function authorize(): bool;
+	abstract public function authorize (): bool;
 }

@@ -1,8 +1,8 @@
 <?php
 
-namespace PhpSlides\Src\Cache;
+namespace PhpSlides\Core\Cache;
 
-use PhpSlides\Src\Foundation\Application;
+use PhpSlides\Core\Foundation\Application;
 
 /**
  * Class Cache
@@ -20,10 +20,11 @@ class Cache
 	 * effectively clearing all cached files. It is commonly used to
 	 * reset the cache during development or when cache corruption occurs.
 	 */
-	public function clear()
+	public function clear ()
 	{
 		// Check if the cache directory exists
-		if (is_dir(Application::$basePath . 'app/cache')) {
+		if (is_dir(Application::$basePath . 'app/cache'))
+		{
 			// Remove the cache directory
 			rmdir(Application::$basePath . 'app/cache');
 		}
@@ -36,10 +37,11 @@ class Cache
 	 * It is typically used during development when hot reload functionality
 	 * needs to be reset or reloaded.
 	 */
-	public function clearHotReload()
+	public function clearHotReload ()
 	{
 		// Check if the hot-reload cache file exists
-		if (file_exists(Application::$basePath . 'app/cache/hot-reload.json')) {
+		if (file_exists(Application::$basePath . 'app/cache/hot-reload.json'))
+		{
 			// Delete the hot-reload cache file
 			unlink(Application::$basePath . 'app/cache/hot-reload.json');
 		}

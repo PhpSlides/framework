@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Src\Controller;
+namespace PhpSlides\Core\Controller;
 
 abstract class Controller extends RouteController
 {

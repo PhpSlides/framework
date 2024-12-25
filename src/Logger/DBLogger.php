@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Src\Logger;
+namespace PhpSlides\Core\Logger;
 
 use DateTime;
-use PhpSlides\Src\Foundation\Application;
+use PhpSlides\Core\Foundation\Application;
 
 /**
  * DBLogger trait for logging database-related messages.
@@ -28,7 +28,7 @@ trait DBLogger
 	 *                           log message to be recorded.
 	 * @return void
 	 */
-	protected static function log(string ...$message): void
+	protected static function log (string ...$message): void
 	{
 		// Extract the log type and message.
 		$type = $message[0];
@@ -51,7 +51,8 @@ trait DBLogger
 		$content = "[$date] [$type] $message\n";
 
 		// Log entry if database logging is enabled and the URI is not hot-reload.
-		if (Application::$db_log === true && $uri !== $hot_reload_url) {
+		if (Application::$db_log === true && $uri !== $hot_reload_url)
+		{
 			$log = fopen($log_path, 'a');
 			fwrite($log, $content);
 			fclose($log);

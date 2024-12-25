@@ -1,9 +1,9 @@
 <?php
 
-namespace PhpSlides\Src\Traits;
+namespace PhpSlides\Core\Traits;
 
 use PhpSlides\Exception;
-use PhpSlides\Src\Logger\Logger;
+use PhpSlides\Core\Logger\Logger;
 
 trait FileHandler
 {
@@ -20,12 +20,14 @@ trait FileHandler
 	 * @return bool|string The MIME type of the file as a string, or `false` if the file doesn't exist.
 	 * @throws Exception If the `fileinfo` extension is not enabled in PHP.
 	 */
-	public static function file_type(string $filename): bool|string
+	public static function file_type (string $filename): bool|string
 	{
-		if (is_file($filename)) {
-			if (!extension_loaded('fileinfo')) {
+		if (is_file($filename))
+		{
+			if (!extension_loaded('fileinfo'))
+			{
 				throw new Exception(
-					'Fileinfo extension is not enabled. Please enable it in your php.ini configuration.',
+				 'Fileinfo extension is not enabled. Please enable it in your php.ini configuration.',
 				);
 			}
 
@@ -37,11 +39,13 @@ trait FileHandler
 			$file_ext = strtolower(end($file_ext));
 
 			if (
-				$file_type === 'text/plain' ||
-				$file_type === 'application/x-empty' ||
-				$file_type === 'application/octet-stream'
-			) {
-				switch ($file_ext) {
+			$file_type === 'text/plain' ||
+			$file_type === 'application/x-empty' ||
+			$file_type === 'application/octet-stream'
+			)
+			{
+				switch ($file_ext)
+				{
 					case 'css':
 						return 'text/css';
 					case 'txt':
@@ -87,10 +91,14 @@ trait FileHandler
 					default:
 						return 'text/plain';
 				}
-			} else {
+			}
+			else
+			{
 				return $file_type;
 			}
-		} else {
+		}
+		else
+		{
 			return false;
 		}
 	}

@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Src\Formatter\Views;
+namespace PhpSlides\Core\Formatter\Views;
 
-use PhpSlides\Src\Foundation\Application;
+use PhpSlides\Core\Foundation\Application;
 
 /**
  * Trait to add Hot Reload functionality in PhpSlides view files.

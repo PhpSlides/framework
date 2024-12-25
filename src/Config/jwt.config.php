@@ -1,10 +1,10 @@
 <?php
 
 use PhpSlides\Exception;
-use PhpSlides\Src\Loader\FileLoader;
-use PhpSlides\Src\Foundation\Application;
+use PhpSlides\Core\Loader\FileLoader;
+use PhpSlides\Core\Foundation\Application;
 
 return (new FileLoader())
-	->safeLoad(Application::$configsDir . 'jwt.php')
-	->getLoad() ?:
-	[];
+ ->safeLoad(Application::$configsDir . 'jwt.php')
+ ->getLoad() ?:
+ [];

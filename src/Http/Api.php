@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Src\Http;
+namespace PhpSlides\Core\Http;
 
 use PhpSlides\Exception;
-use PhpSlides\Src\Controller\Controller;
-use PhpSlides\Src\Http\Interface\ApiInterface;
+use PhpSlides\Core\Controller\Controller;
+use PhpSlides\Core\Http\Interface\ApiInterface;
 
 /**
  * The Api class provides a fluent interface to define API routes,
@@ -45,14 +45,17 @@ class Api extends Controller implements ApiInterface
 	 * @throws \PhpSlides\Exception
 	 * @return self
 	 */
-	public static function __callStatic($method, $args): self
+	public static function __callStatic ($method, $args): self
 	{
-		if (str_starts_with($method, 'v')) {
+		if (str_starts_with($method, 'v'))
+		{
 			$method_v = str_replace('_', '.', $method);
 			self::$version = $method_v;
 
 			return new self();
-		} else {
+		}
+		else
+		{
 			throw new Exception('Version method starts with `v`');
 		}
 	}
@@ -63,10 +66,12 @@ class Api extends Controller implements ApiInterface
 	 * @param string $name The name to assign to the route.
 	 * @return self
 	 */
-	public function name(string $name): self
+	public function name (string $name): self
 	{
-		if (is_array(end(self::$regRoute))) {
-			for ($i = 0; $i < count(end(self::$regRoute)); $i++) {
+		if (is_array(end(self::$regRoute)))
+		{
+			for ($i = 0; $i < count(end(self::$regRoute)); $i++)
+			{
 				add_route_name($name . '::' . $i, end(self::$regRoute)[$i]);
 				self::$allRoutes[$name . '::' . $i] = end(self::$regRoute)[$i];
 			}
@@ -86,36 +91,38 @@ class Api extends Controller implements ApiInterface
 	 * if null is given, then it's consider optional, accepts all methods.
 	 * @return self
 	 */
-	public function route(
-		string $url,
-		string|array|null $controller = null,
-		?string $req_method = null,
+	public function route (
+	 string $url,
+	 string|array|null $controller = null,
+	 ?string $req_method = null,
 	): self {
 		$define = $this->define;
 
 		// checks if $define is set, then assign $define methods to $url & $controller parameters
 		$url =
-			$define !== null
-				? rtrim($define['url'], '/') . '/' . trim($url, '/')
-				: trim($url, '/');
+		 $define !== null
+		  ? rtrim($define['url'], '/') . '/' . trim($url, '/')
+		  : trim($url, '/');
 		$url = trim($url, '/');
 
 		$uri = strtolower(self::$BASE_URL . self::$version . '/' . $url);
 		self::$regRoute[] = $uri;
 
 		$route = [
-			'url' => $uri,
-			'guards' => $this->guards ?? null,
-			'r_method' => $req_method,
-			'controller' =>
-				$define['controller'] ??
-				(is_array($controller) ? $controller[0] : $controller),
+		 'url' => $uri,
+		 'guards' => $this->guards ?? null,
+		 'r_method' => $req_method,
+		 'controller' =>
+		  $define['controller'] ??
+		  (is_array($controller) ? $controller[0] : $controller),
 		];
 
-		if ($define !== null && $controller !== null) {
+		if ($define !== null && $controller !== null)
+		{
 			$route['c_method'] = trim($controller, '@');
 		}
-		if (is_array($controller)) {
+		if (is_array($controller))
+		{
 			$route['c_method'] = $controller[1];
 		}
 
@@ -133,7 +140,7 @@ class Api extends Controller implements ApiInterface
 	 * @param ?string ...$guards String parameters of registered guards.
 	 * @return self
 	 */
-	public function withGuard(?string ...$guards): self
+	public function withGuard (?string ...$guards): self
 	{
 		$this->guards = empty($guards) ? null : $guards;
 		return $this;
@@ -146,11 +153,11 @@ class Api extends Controller implements ApiInterface
 	 * @param string $controller The controller handling the routes.
 	 * @return self
 	 */
-	public function define(string $url, string $controller): self
+	public function define (string $url, string $controller): self
 	{
 		$this->define = [
-			'url' => $url,
-			'controller' => $controller,
+		 'url' => $url,
+		 'controller' => $controller,
 		];
 
 		return $this;
@@ -162,32 +169,34 @@ class Api extends Controller implements ApiInterface
 	 * @param array An associative array where the key is the route and the value is an array with the HTTP method and controller method.
 	 * @return self
 	 */
-	public function map(array $rest_url): self
+	public function map (array $rest_url): self
 	{
 		$define = $this->define;
 
-		if ($define !== null) {
+		if ($define !== null)
+		{
 			/**
 			 * Get the map value, keys as the route url
 			 */
 			$routes = array_keys($rest_url);
 			$base = strtolower(
-				self::$BASE_URL .
-					self::$version .
-					'/' .
-					trim($define['url'], '/') .
-					'/',
+			 self::$BASE_URL .
+			  self::$version .
+			  '/' .
+			  trim($define['url'], '/') .
+			  '/',
 			);
 
 			/**
 			 * Map route url array to the full base url
 			 */
 			$full_url = array_map(
-				fn($route) => $base . ltrim($route, '/'),
-				$routes,
+			 fn ($route) => $base . ltrim($route, '/'),
+			 $routes,
 			);
 
-			$rest_url = array_map(function ($uri) {
+			$rest_url = array_map(function ($uri)
+			{
 				$uri[] = $this->guards ?? null;
 				return $uri;
 			}, $rest_url);
@@ -213,12 +222,12 @@ class Api extends Controller implements ApiInterface
 	 *
 	 * @return self
 	 */
-	public static function v1(): self
+	public static function v1 (): self
 	{
 		return self::__callStatic('v1', 0);
 	}
 
-	public static function v1_0(): self
+	public static function v1_0 (): self
 	{
 		return self::__callStatic('v1_0', 0);
 	}

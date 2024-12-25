@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Src\Utils\Routes\Exception;
+namespace PhpSlides\Core\Utils\Routes\Exception;
 
 use Closure;
-use PhpSlides\Src\Foundation\Application;
+use PhpSlides\Core\Foundation\Application;
 
 class InvalidTypesException extends \PhpSlides\Exception
 {
@@ -104,7 +104,7 @@ class InvalidTypesException extends \PhpSlides\Exception
       {
          if (!$message)
          {
-            $requested = implode(', ', $$typeRequested);
+            $requested = implode(', ', $typeRequested);
             return new self(
              "Invalid request parameter type. {{$requested}} requested, but got {{$typeGotten}}",
             );

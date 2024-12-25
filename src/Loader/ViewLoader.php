@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Src\Loader;
+namespace PhpSlides\Core\Loader;
 
 use PhpSlides\Exception;
-use PhpSlides\Src\Formatter\ViewFormatter;
+use PhpSlides\Core\Formatter\ViewFormatter;
 
 /**
  * The ViewLoader class dynamically loads and formats view files, applying
@@ -32,13 +32,14 @@ class ViewLoader
 	 * @throws Exception if the specified view file does not exist.
 	 * @return self The instance for chaining.
 	 */
-	public function load(string $viewFile, mixed ...$props): self
+	public function load (string $viewFile, mixed ...$props): self
 	{
 		if (
-			!is_file($viewFile) &&
-			!is_file($viewFile . '.psl') &&
-			!is_file($viewFile . '.view.php')
-		) {
+		!is_file($viewFile) &&
+		!is_file($viewFile . '.psl') &&
+		!is_file($viewFile . '.view.php')
+		)
+		{
 			throw new Exception("File does not exist: $viewFile");
 		}
 		return self::safeLoad($viewFile, ...$props);
@@ -56,15 +57,18 @@ class ViewLoader
 	 * @param mixed ...$props Properties to be available in the view file.
 	 * @return self The instance for chaining.
 	 */
-	public function safeLoad(string $viewFile, mixed ...$props): self
+	public function safeLoad (string $viewFile, mixed ...$props): self
 	{
-		if (is_file($viewFile . '.psl')) {
+		if (is_file($viewFile . '.psl'))
+		{
 			$viewFile = $viewFile . '.psl';
 		}
-		if (is_file($viewFile . '.view.php')) {
+		if (is_file($viewFile . '.view.php'))
+		{
 			$viewFile = $viewFile . '.view.php';
 		}
-		if (is_file($viewFile)) {
+		if (is_file($viewFile))
+		{
 			// Generate filename and directory for formatted file.
 			$gen_file = explode('/', $viewFile);
 			$new_name = explode('.', end($gen_file), 2);
@@ -76,7 +80,8 @@ class ViewLoader
 			$file_contents = file_get_contents($viewFile);
 			$file_contents = $this->format($file_contents, ...$props);
 
-			try {
+			try
+			{
 				// Write formatted contents to the generated file and parse it.
 				$file = fopen($gen_file, 'w');
 				fwrite($file, $file_contents);
@@ -86,7 +91,9 @@ class ViewLoader
 				$this->result[] = $parsedLoad->getLoad();
 
 				unset($GLOBALS['__gen_file_path']);
-			} finally {
+			}
+			finally
+			{
 				// Remove generated file and reset global file path.
 				unlink($gen_file);
 				$GLOBALS['__gen_file_path'] = $viewFile;
@@ -104,9 +111,10 @@ class ViewLoader
 	 * @return mixed The content of the loaded view file(s), either as a single
 	 *               result or an array.
 	 */
-	public function getLoad()
+	public function getLoad ()
 	{
-		if (count($this->result ?? []) === 1) {
+		if (count($this->result ?? []) === 1)
+		{
 			return $this->result[0];
 		}
 		return $this->result;
@@ -119,7 +127,7 @@ class ViewLoader
 	 * @param mixed ...$props Properties to apply within the view file.
 	 * @return string The formatted view file content.
 	 */
-	private function format(string $contents, mixed ...$props)
+	private function format (string $contents, mixed ...$props)
 	{
 		return (new ViewFormatter($contents))->resolve(...$props);
 	}

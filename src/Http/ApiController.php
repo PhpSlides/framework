@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Src\Http;
+namespace PhpSlides\Core\Http;
 
 /**
  * Interface ApiController
@@ -17,7 +17,7 @@ abstract class ApiController
 	 * @param Request $request The request object containing request parameters.
 	 * @return mixed The response containing the list of resources.
 	 */
-	public function index(Request $request)
+	public function index (Request $request)
 	{
 	}
 
@@ -27,7 +27,7 @@ abstract class ApiController
 	 * @param Request $request The request object containing request parameters.
 	 * @return mixed The response containing the resource data.
 	 */
-	public function show(Request $request)
+	public function show (Request $request)
 	{
 	}
 
@@ -37,7 +37,7 @@ abstract class ApiController
 	 * @param Request $request The request object containing the data for the new resource.
 	 * @return mixed The response indicating the result of the creation operation.
 	 */
-	public function store(Request $request)
+	public function store (Request $request)
 	{
 	}
 
@@ -47,7 +47,7 @@ abstract class ApiController
 	 * @param Request $request The request object containing the updated data for the resource.
 	 * @return mixed The response indicating the result of the update operation.
 	 */
-	public function update(Request $request)
+	public function update (Request $request)
 	{
 	}
 
@@ -57,7 +57,7 @@ abstract class ApiController
 	 * @param Request $request The request object containing the partial data for the resource.
 	 * @return mixed The response indicating the result of the partial update operation.
 	 */
-	public function patch(Request $request)
+	public function patch (Request $request)
 	{
 	}
 
@@ -67,7 +67,7 @@ abstract class ApiController
 	 * @param Request $request The request object containing the identifier of the resource to be deleted.
 	 * @return mixed The response indicating the result of the delete operation.
 	 */
-	public function destroy(Request $request)
+	public function destroy (Request $request)
 	{
 	}
 
@@ -77,7 +77,7 @@ abstract class ApiController
 	 * @param Request $request The request object containing request parameters.
 	 * @return mixed The response indicating the error.
 	 */
-	public function error(Request $request)
+	public function error (Request $request)
 	{
 	}
 
@@ -87,7 +87,7 @@ abstract class ApiController
 	 * @param Request $request The request object containing request parameters.
 	 * @return mixed The response indicating the default action.
 	 */
-	public function __default(Request $request)
+	public function __default (Request $request)
 	{
 		http_response_code(405);
 	}

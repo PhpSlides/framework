@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Src\Interface;
+namespace PhpSlides\Core\Interface;
 
 /**
  * Interface JwtService
@@ -15,7 +15,7 @@ interface JwtService
 	 * @param array $payload The payload to be encoded in the JWT.
 	 * @return string The encoded JWT string.
 	 */
-	public static function encode(array $payload): string;
+	public static function encode (array $payload): string;
 
 	/**
 	 * Decode a JWT string into a PHP object.
@@ -24,7 +24,7 @@ interface JwtService
 	 * @param bool $parsed If true, removes standard claims like 'iss', 'iat', and 'exp' from the decoded object.
 	 * @return object The decoded JWT as a PHP object.
 	 */
-	public static function decode(string $token, bool $parsed = true): object;
+	public static function decode (string $token, bool $parsed = true): object;
 
 	/**
 	 * Verify the validity of a JWT.
@@ -32,5 +32,5 @@ interface JwtService
 	 * @param string $token The JWT string to verify.
 	 * @return bool Returns false if the token is invalid
 	 */
-	public static function verify(string $token): bool;
+	public static function verify (string $token): bool;
 }

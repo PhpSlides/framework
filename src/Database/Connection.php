@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpSlides\Src\Database;
+namespace PhpSlides\Core\Database;
 
 use DB;
 
@@ -48,7 +48,7 @@ class Connection
 		 static::$db_type,
 		 static::$host,
 		 static::$port,
-		 static::$db_name
+		 static::$db_name,
 		);
 
 		// Set the user and password for the database connection
@@ -76,7 +76,7 @@ class Connection
 		 static::$db_type,
 		 static::$host,
 		 static::$port,
-		 static::$db_name
+		 static::$db_name,
 		);
 	}
 

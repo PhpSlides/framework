@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Src\Interface;
+namespace PhpSlides\Core\Interface;
 
 interface ApplicationInterface
 {
@@ -9,5 +9,5 @@ interface ApplicationInterface
 	 *
 	 * @return void
 	 */
-	public function create(): void;
+	public function create (): void;
 }
