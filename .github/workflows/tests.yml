@@ -26,11 +26,8 @@ jobs:
 
          - name: Push changes to main
            run: |
-              git checkout -b main
-              git fetch
-              git config pull.rebase true
-              git pull origin main dev
-              git branch --set-upstream-to=origin/dev main
-              git push -u origin main
+              git checkout main
+              git reset --hard dev
+              git checkout -
            env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
