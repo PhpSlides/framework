@@ -17,7 +17,7 @@ Route::get(
  },
 );
 
-Route::map(GET, "$dir/user/{id: int|bool|array<array<int>, string>|alnum}")
+Route::map(GET, "$dir/user/{id: int|bool|array<array<int, string>, string>|alnum}")
  ->action(function (Request $req)
  {
 	 echo '<br>';

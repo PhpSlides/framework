@@ -50,7 +50,7 @@ class InvalidTypesException extends \PhpSlides\Exception
       {
          foreach ($type as $t)
          {
-            if (!in_array($t, self::$types))
+            if (!in_array($t, self::$types) && !preg_match('/<(.+)>/', (string) $t))
             {
                if (!$message)
                {
@@ -65,7 +65,7 @@ class InvalidTypesException extends \PhpSlides\Exception
       }
       else
       {
-         if (!in_array($type, self::$types))
+         if (!in_array($type, self::$types) && !preg_match('/<(.+)>/', (string) $type))
          {
             if (!$message)
             {

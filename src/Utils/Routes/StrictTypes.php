@@ -2,6 +2,7 @@
 
 namespace PhpSlides\Core\Utils\Routes;
 
+use PhpSlides\Exception;
 use PhpSlides\Core\Utils\Routes\Exception\InvalidTypesException;
 
 /**
@@ -66,13 +67,14 @@ trait StrictTypes
 			return match ($typeOfNeedle)
 			{
 					'INT' => (int) $needle,
-					'BOOL' => (bool) $needle,
+					'BOOL' => filter_var($needle, FILTER_VALIDATE_BOOLEAN),
 					'FLOAT' => (float) $needle,
 					'ARRAY' => json_decode($needle, true),
 					default => $needle,
 			};
 		}
 
+		InvalidTypesException::catchInvalidStrictTypes($haystack);
 		throw InvalidTypesException::catchInvalidParameterTypes($types, $typeOfNeedle);
 	}
 
@@ -103,10 +105,20 @@ trait StrictTypes
 		)
 		{
 			$needle = json_decode($needle, true);
-			$eachArrayTypes = explode(',', $matches[1]);
+			$eachArrayTypes = preg_split('/,(?![^<]*>)/', $matches[1]);
+
+			if (!is_array($needle))
+			{
+				throw new Exception("Invalid request parameter type. {ARRAY} requested, but got {{$typeOfNeedle}}");
+			}
 
 			foreach ($eachArrayTypes as $key => $eachArrayType)
 			{
+				if (!isset($needle[$key]))
+				{
+					throw new Exception("Array index $key not found in the request parameter");
+				}
+
 				$needle2 = is_array($needle[$key])
 				 ? json_encode($needle[$key])
 				 : (string) $needle[$key];
@@ -152,20 +164,13 @@ trait StrictTypes
 	 */
 	protected static function typeOfString (string $string): string
 	{
-		$jd = json_decode($string, false);
+		$decoded = json_decode($string, false);
 
 		if (is_numeric($string))
 		{
-			if (strpos($string, '.') !== false)
-			{
-				return 'FLOAT';
-			}
-			else
-			{
-				return 'INT';
-			}
+			return strpos($string, '.') !== false ? 'FLOAT' : 'INT';
 		}
-		elseif (is_bool($string) || $string === 'true' || $string === 'false')
+		elseif (filter_var($string, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null)
 		{
 			return 'BOOL';
 		}
@@ -179,16 +184,14 @@ trait StrictTypes
 		}
 		elseif (json_last_error() === JSON_ERROR_NONE)
 		{
-			return match (gettype($jd))
+			return match (gettype($decoded))
 			{
 					'object' => 'JSON',
 					'array' => 'ARRAY',
 					default => 'STRING',
 			};
 		}
-		else
-		{
-			return 'STRING';
-		}
+
+		return 'STRING';
 	}
 }
