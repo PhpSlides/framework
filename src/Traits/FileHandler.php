@@ -1,9 +1,9 @@
 <?php
 
-namespace PhpSlides\Src\Traits;
+namespace PhpSlides\Core\Traits;
 
 use PhpSlides\Exception;
-use PhpSlides\Src\Logger\Logger;
+use PhpSlides\Core\Logger\Logger;
 
 trait FileHandler
 {

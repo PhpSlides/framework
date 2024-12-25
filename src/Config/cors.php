@@ -1,8 +1,8 @@
 <?php
 
-use PhpSlides\Src\Logger\Logger;
-use PhpSlides\Src\Loader\FileLoader;
-use PhpSlides\Src\Foundation\Application;
+use PhpSlides\Core\Logger\Logger;
+use PhpSlides\Core\Loader\FileLoader;
+use PhpSlides\Core\Foundation\Application;
 
 $cors =
 	(new FileLoader())

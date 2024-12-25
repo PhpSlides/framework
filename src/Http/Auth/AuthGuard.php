@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Src\Http\Auth;
+namespace PhpSlides\Core\Http\Auth;
 
-use PhpSlides\Src\Http\Request;
-use PhpSlides\Src\Http\Interface\AuthGuardInterface;
+use PhpSlides\Core\Http\Request;
+use PhpSlides\Core\Http\Interface\AuthGuardInterface;
 
 /**
  * The Base AuthGuard

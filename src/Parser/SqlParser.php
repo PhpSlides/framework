@@ -1,9 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace PhpSlides\Src\Parser;
+namespace PhpSlides\Core\Parser;
 
-use PhpSlides\Src\Logger\DBLogger;
-use PhpSlides\Src\Formatter\SqlFormat;
+use PhpSlides\Core\Logger\DBLogger;
+use PhpSlides\Core\Formatter\SqlFormat;
 
 /**
  * SqlParser is responsible for parsing SQL column definitions and constraints.

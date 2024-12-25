@@ -1,8 +1,8 @@
 <?php
 
 use PhpSlides\Router\Route;
-use PhpSlides\Src\Http\Request;
-use PhpSlides\Src\Foundation\Render;
+use PhpSlides\Core\Http\Request;
+use PhpSlides\Core\Foundation\Render;
 
 include_once __DIR__ . '/../autoload.php';
 include_once __DIR__ . '/../../../src/Globals/Functions.php';

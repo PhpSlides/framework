@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpSlides\Src\Formatter\Views;
+namespace PhpSlides\Core\Formatter\Views;
 
 /**
  * Trait for handling bracket interpolation in view contents.

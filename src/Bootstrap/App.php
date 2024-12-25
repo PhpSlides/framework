@@ -3,4 +3,4 @@
 /**
  * Start the PhpSlides Application
  */
-(new \PhpSlides\Src\Foundation\Application())->create();
+(new \PhpSlides\Core\Foundation\Application())->create();

@@ -1,13 +1,13 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Src\Foundation;
+namespace PhpSlides\Core\Foundation;
 
 use PhpSlides\Exception;
 use PhpSlides\Router\view;
 
 trait Configuration
 {
-	use \PhpSlides\Src\Traits\FileHandler;
+	use \PhpSlides\Core\Traits\FileHandler;
 
 	/**
 	 * The base path of the application.

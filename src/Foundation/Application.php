@@ -1,21 +1,21 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Src\Foundation;
+namespace PhpSlides\Core\Foundation;
 
 use DB;
 use Closure;
 use PhpSlides\Router\Route;
-use PhpSlides\Src\Http\Request;
-use PhpSlides\Src\Forgery\Forge;
-use PhpSlides\Src\Logger\Logger;
-use PhpSlides\Src\Logger\DBLogger;
-use PhpSlides\Src\Loader\HotReload;
-use PhpSlides\Src\Database\Database;
-use PhpSlides\Src\Loader\Autoloader;
-use PhpSlides\Src\Loader\FileLoader;
-use PhpSlides\Src\Database\Connection;
-use PhpSlides\Src\Controller\Controller;
-use PhpSlides\Src\Interface\ApplicationInterface;
+use PhpSlides\Core\Http\Request;
+use PhpSlides\Core\Forgery\Forge;
+use PhpSlides\Core\Logger\Logger;
+use PhpSlides\Core\Logger\DBLogger;
+use PhpSlides\Core\Loader\HotReload;
+use PhpSlides\Core\Database\Database;
+use PhpSlides\Core\Loader\Autoloader;
+use PhpSlides\Core\Loader\FileLoader;
+use PhpSlides\Core\Database\Connection;
+use PhpSlides\Core\Controller\Controller;
+use PhpSlides\Core\Interface\ApplicationInterface;
 
 /**
  * Class Application
@@ -29,7 +29,7 @@ use PhpSlides\Src\Interface\ApplicationInterface;
  */
 class Application extends Controller implements ApplicationInterface
 {
-	use \PhpSlides\Src\Cli\Configure;
+	use \PhpSlides\Core\Cli\Configure;
 	use Configuration;
 	use Logger;
 	use DBLogger {

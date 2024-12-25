@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Src\Cli;
+namespace PhpSlides\Core\Cli;
 
 trait Configure
 {

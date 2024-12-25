@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace PhpSlides\Src\Controller;
+namespace PhpSlides\Core\Controller;
 
 use PhpSlides\Exception;
-use PhpSlides\Src\Http\Request;
-use PhpSlides\Src\Logger\Logger;
-use PhpSlides\Src\Loader\ViewLoader;
-use PhpSlides\Src\Foundation\Application;
+use PhpSlides\Core\Http\Request;
+use PhpSlides\Core\Logger\Logger;
+use PhpSlides\Core\Loader\ViewLoader;
+use PhpSlides\Core\Foundation\Application;
 
 class RouteController
 {
