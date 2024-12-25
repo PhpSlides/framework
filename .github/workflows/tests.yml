@@ -64,7 +64,7 @@ jobs:
          - name: Push changes to main
            run: |
               git branch -M main
-              git merge dev
+              git merge origin/dev
               git push origin main
            env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
