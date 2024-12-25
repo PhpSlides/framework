@@ -46,7 +46,8 @@
 		"preferred-install": "dist"
 	},
 	"scripts": {
-		"test": "phpunit || vendor/bin/phpunit || php vendor/bin/phpunit"
+		"test": "phpunit || vendor/bin/phpunit || php vendor/bin/phpunit",
+		"post-install-cmd": [ "PhpSlides\\Core\\Cache\\Cache::clear()" ]
 	},
 	"minimum-stability": "stable",
 	"prefer-stable": true

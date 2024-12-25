@@ -20,7 +20,7 @@ class Cache
 	 * effectively clearing all cached files. It is commonly used to
 	 * reset the cache during development or when cache corruption occurs.
 	 */
-	public function clear ()
+	public static function clear ()
 	{
 		// Check if the cache directory exists
 		if (is_dir(Application::$basePath . 'app/cache'))
@@ -37,7 +37,7 @@ class Cache
 	 * It is typically used during development when hot reload functionality
 	 * needs to be reset or reloaded.
 	 */
-	public function clearHotReload ()
+	public static function clearHotReload ()
 	{
 		// Check if the hot-reload cache file exists
 		if (file_exists(Application::$basePath . 'app/cache/hot-reload.json'))
