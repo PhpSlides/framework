@@ -28,6 +28,7 @@ jobs:
            run: |
               git checkout -b main
               git fetch
+              git config pull.rebase true
               git pull origin main dev
               git branch --set-upstream-to=origin/dev main
               git push -u origin main
