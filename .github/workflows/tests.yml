@@ -45,7 +45,7 @@ jobs:
            run: composer install --prefer-dist --no-progress
 
          - name: Run Tests
-           run: composer run-script Tests
+           run: composer run-script test
 
    push_to_main:
       runs-on: ubuntu-latest
