@@ -17,11 +17,11 @@ Route::get(
  },
 );
 
-Route::map(GET, "$dir/user/{id: int|bool|array<array<int, string>, string>|alnum}")
+Route::map(GET, "$dir/user/{id: int<6>|bool|array<array<int, string>, string>|alnum}")
  ->action(function (Request $req)
  {
 	 echo '<br>';
-	 return $req->urlParam();
+	 return $req->urlParam('id');
  })
  ->route('/posts/{id: int}', function (Request $req, Closure $accept)
  {

@@ -66,11 +66,11 @@ trait StrictTypes
 		{
 			return match ($typeOfNeedle)
 			{
-					'INT' => (int) $needle,
-					'BOOL' => filter_var($needle, FILTER_VALIDATE_BOOLEAN),
-					'FLOAT' => (float) $needle,
-					'ARRAY' => json_decode($needle, true),
-					default => $needle,
+				  'INT' => (int) $needle,
+				  'BOOL' => filter_var($needle, FILTER_VALIDATE_BOOLEAN),
+				  'FLOAT' => (float) $needle,
+				  'ARRAY' => json_decode($needle, true),
+				  default => $needle,
 			};
 		}
 
@@ -140,6 +140,23 @@ trait StrictTypes
 			return true;
 		}
 
+		/**
+		 * MATCH INT<MIN, MAX>
+		 */
+		if (preg_match('/INT<(\d+)(?:,\s*(\d+))?>/', $haystack, $matches) && $typeOfNeedle === 'INT')
+		{
+			$min = (int) $matches[1];
+			$max = (int) $matches[2] ?? null;
+			$needle = (int) $needle;
+
+			if ((!$max && $min < $needle) || $max && ($needle < $min || $needle > $max))
+			{
+				$requested = !$max ? "INT min ($min)" : "INT min ($min), max($max)";
+				throw new Exception("Invalid request parameter type. {{$requested}} requested, but got {{$needle}}");
+			}
+			return true;
+		}
+
 		InvalidTypesException::catchInvalidStrictTypes($haystack);
 		return false;
 	}
@@ -186,9 +203,9 @@ trait StrictTypes
 		{
 			return match (gettype($decoded))
 			{
-					'object' => 'JSON',
-					'array' => 'ARRAY',
-					default => 'STRING',
+				  'object' => 'JSON',
+				  'array' => 'ARRAY',
+				  default => 'STRING',
 			};
 		}
 
