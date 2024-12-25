@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Src\Foundation;
+namespace PhpSlides\Core\Foundation;
 
-use PhpSlides\Src\Controller\Controller;
-use PhpSlides\Src\Foundation\Application;
-use PhpSlides\Src\Traits\Resources\Resources;
+use PhpSlides\Core\Controller\Controller;
+use PhpSlides\Core\Foundation\Application;
+use PhpSlides\Core\Traits\Resources\Resources;
 
 /**
  * Handles the rendering of all registered routes.

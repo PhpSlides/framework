@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Src\Loader;
+namespace PhpSlides\Core\Loader;
 
 use PhpSlides\Exception;
-use PhpSlides\Src\Formatter\ViewFormatter;
+use PhpSlides\Core\Formatter\ViewFormatter;
 
 /**
  * The ViewLoader class dynamically loads and formats view files, applying

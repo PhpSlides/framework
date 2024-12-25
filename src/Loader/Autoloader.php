@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace PhpSlides\Src\Loader;
+namespace PhpSlides\Core\Loader;
 
-use PhpSlides\Src\Foundation\Application;
+use PhpSlides\Core\Foundation\Application;
 
 /**
  * The Autoloader class automatically loads ORM-related classes by scanning

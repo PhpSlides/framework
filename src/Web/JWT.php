@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Src\Web;
+namespace PhpSlides\Core\Web;
 
 use Firebase\JWT\Key;
 use Firebase\JWT\JWT as WebToken;
-use PhpSlides\Src\Loader\FileLoader;
-use PhpSlides\Src\Interface\JwtService;
+use PhpSlides\Core\Loader\FileLoader;
+use PhpSlides\Core\Interface\JwtService;
 
 /**
  * The JwtService class provides methods for encoding, decoding, and verifying JSON Web Tokens (JWT).

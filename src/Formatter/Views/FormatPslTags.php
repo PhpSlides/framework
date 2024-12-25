@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpSlides\Src\Formatter\Views;
+namespace PhpSlides\Core\Formatter\Views;
 
 /**
  * Trait to replace PhpSlides default tags in view files.
@@ -17,7 +17,7 @@ trait FormatPslTags
 	 * This constructor is a placeholder for any necessary initialization for
 	 * the class using this trait. It currently does not perform any operations.
 	 */
-	public function __construct ()
+	public function __construct()
 	{
 		// code...
 	}
@@ -30,21 +30,20 @@ trait FormatPslTags
 	 * PHP tags to remove unnecessary semicolons and ensures the code is correctly
 	 * formatted for execution.
 	 */
-	protected function psl_tags ()
+	protected function psl_tags()
 	{
 		// Regular expression to match any PHP opening and closing tags
 		$formattedContents = preg_replace_callback(
-		 '/<' . '\?' . '\s+([\s\S]*?)\s*\?' . '>/s',
-		 function ($matches)
-		 {
-			 // Trim the content inside the PHP tags, removing trailing semicolons
- 			$val = trim($matches[1]);
-			 $val = str_ends_with(')', $val) ? $val . ';' : $val;
+			'/<' . '\?' . '\s+([\s\S]*?)\s*\?' . '>/s',
+			function ($matches) {
+				// Trim the content inside the PHP tags, removing trailing semicolons
+				$val = trim($matches[1]);
+				$val = str_ends_with(')', $val) ? $val . ';' : $val;
 
-			 // Reformat the PHP content and return it
- 			return '<' . '?php ' . $val . ' ?' . '>';
-		 },
-		 $this->contents,
+				// Reformat the PHP content and return it
+				return '<' . '?php ' . $val . ' ?' . '>';
+			},
+			$this->contents,
 		);
 
 		// Update the contents with the formatted PHP code blocks

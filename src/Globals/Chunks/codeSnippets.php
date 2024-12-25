@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * Retrieves a snippet of code around a specific line number from a given file.

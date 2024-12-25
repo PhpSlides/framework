@@ -17,8 +17,8 @@ namespace PhpSlides\Router;
 
 use Closure;
 use PhpSlides\Exception;
-use PhpSlides\Src\Traits\FileHandler;
-use PhpSlides\Src\Controller\Controller;
+use PhpSlides\Core\Traits\FileHandler;
+use PhpSlides\Core\Controller\Controller;
 use PhpSlides\Router\Interface\RouteInterface;
 
 /**

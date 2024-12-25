@@ -2,7 +2,7 @@
 
 include_once __DIR__ . '/../../autoload.php';
 
-use PhpSlides\Src\Http\Request as HttpRequest;
+use PhpSlides\Core\Http\Request as HttpRequest;
 
 class Request extends HttpRequest
 {

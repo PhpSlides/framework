@@ -2,9 +2,9 @@
 
 use PhpSlides\Exception;
 use PhpSlides\Router\Route;
-use PhpSlides\Src\Loader\FileLoader;
-use PhpSlides\Src\Loader\ViewLoader;
-use PhpSlides\Src\Foundation\Application;
+use PhpSlides\Core\Loader\FileLoader;
+use PhpSlides\Core\Loader\ViewLoader;
+use PhpSlides\Core\Foundation\Application;
 
 /**
  * Sets an environment variable '__DIR__' with the base path of the application.
@@ -352,7 +352,7 @@ function Props(?string $name = null)
 		$name = "_$name";
 	}
 
-	return (new \PhpSlides\Src\Props())->$name;
+	return (new \PhpSlides\Core\Props())->$name;
 }
 
 function ExceptionHandler(Throwable $exception)

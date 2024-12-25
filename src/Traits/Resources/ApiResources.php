@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Src\Traits\Resources;
+namespace PhpSlides\Core\Traits\Resources;
 
 use PhpSlides\Exception;
 use PhpSlides\Router\MapRoute;
-use PhpSlides\Src\Http\Request;
-use PhpSlides\Src\Loader\FileLoader;
+use PhpSlides\Core\Http\Request;
+use PhpSlides\Core\Loader\FileLoader;
 
 trait ApiResources
 {

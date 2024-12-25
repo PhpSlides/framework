@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Src\Forgery;
+namespace PhpSlides\Core\Forgery;
 
 use DB;
-use PhpSlides\Src\Parser\SqlParser;
-use PhpSlides\Src\Foundation\Application;
+use PhpSlides\Core\Parser\SqlParser;
+use PhpSlides\Core\Foundation\Application;
 
 class Forge extends Database
 {

@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Src\Http;
+namespace PhpSlides\Core\Http;
 
 use stdClass;
-use PhpSlides\Src\Foundation\Application;
-use PhpSlides\Src\Http\Interface\RequestInterface;
+use PhpSlides\Core\Foundation\Application;
+use PhpSlides\Core\Http\Interface\RequestInterface;
 
 /**
  * Class Request
@@ -14,8 +14,8 @@ use PhpSlides\Src\Http\Interface\RequestInterface;
  */
 class Request extends Application implements RequestInterface
 {
-	use \PhpSlides\Src\Utils\Validate;
-	use \PhpSlides\Src\Http\Auth\Authorization;
+	use \PhpSlides\Core\Utils\Validate;
+	use \PhpSlides\Core\Http\Auth\Authorization;
 
 	/**
 	 * @var ?array The URL parameters.

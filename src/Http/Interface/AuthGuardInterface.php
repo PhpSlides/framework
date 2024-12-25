@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpSlides\Src\Http\Interface;
+namespace PhpSlides\Core\Http\Interface;
 
 interface AuthGuardInterface
 {

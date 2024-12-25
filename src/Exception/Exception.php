@@ -2,7 +2,7 @@
 
 namespace PhpSlides;
 
-use PhpSlides\Src\Loader\FileLoader;
+use PhpSlides\Core\Loader\FileLoader;
 use Exception as DefaultException;
 use PhpSlides\Interface\SlidesException;
 

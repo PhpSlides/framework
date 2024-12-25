@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace PhpSlides\Src\Controller;
+namespace PhpSlides\Core\Controller;
 
 use PhpSlides\Exception;
 

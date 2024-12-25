@@ -1,11 +1,11 @@
 <?php
 
-namespace PhpSlides\Src\Forgery;
+namespace PhpSlides\Core\Forgery;
 
 use DB;
-use PhpSlides\Src\Logger\DBLogger;
-use PhpSlides\Src\Database\Connection;
-use PhpSlides\Src\Database\Database as DB_ORM;
+use PhpSlides\Core\Logger\DBLogger;
+use PhpSlides\Core\Database\Connection;
+use PhpSlides\Core\Database\Database as DB_ORM;
 
 /**
  * Abstract class for managing database operations.

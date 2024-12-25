@@ -3,7 +3,7 @@
 namespace PhpSlides\Router;
 
 use component;
-use PhpSlides\Src\Foundation\Application;
+use PhpSlides\Core\Foundation\Application;
 
 /**
  * --------------------------------------------------------------

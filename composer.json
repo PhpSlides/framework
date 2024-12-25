@@ -32,7 +32,7 @@
 	"autoload": {
 		"psr-4": {
 			"PhpSlides\\": "src/Exception/",
-			"PhpSlides\\Src\\": "src/",
+			"PhpSlides\\Core\\": "src/",
 			"PhpSlides\\Router\\": "Router/"
 		},
 		"files": ["src/Bootstrap/App.php"]

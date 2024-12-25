@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Src\Logger;
+namespace PhpSlides\Core\Logger;
 
 use DateTime;
-use PhpSlides\Src\Foundation\Application;
+use PhpSlides\Core\Foundation\Application;
 
 /**
  * DBLogger trait for logging database-related messages.

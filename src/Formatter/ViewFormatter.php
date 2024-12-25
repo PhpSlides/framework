@@ -1,13 +1,13 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Src\Formatter;
+namespace PhpSlides\Core\Formatter;
 
-use PhpSlides\Src\Formatter\Views\FormatPslTags;
-use PhpSlides\Src\Formatter\Views\FormatIncludes;
-use PhpSlides\Src\Formatter\Views\FormatHotReload;
-use PhpSlides\Src\Formatter\Views\HandleProperties;
-use PhpSlides\Src\Formatter\Views\FormatImportQuotes;
-use PhpSlides\Src\Formatter\Views\FormatBracketInterpolation;
+use PhpSlides\Core\Formatter\Views\FormatPslTags;
+use PhpSlides\Core\Formatter\Views\FormatIncludes;
+use PhpSlides\Core\Formatter\Views\FormatHotReload;
+use PhpSlides\Core\Formatter\Views\HandleProperties;
+use PhpSlides\Core\Formatter\Views\FormatImportQuotes;
+use PhpSlides\Core\Formatter\Views\FormatBracketInterpolation;
 
 /**
  * Handles the formatting of view files for PhpSlides.
@@ -16,7 +16,7 @@ use PhpSlides\Src\Formatter\Views\FormatBracketInterpolation;
  * It applies multiple transformations such as handling includes, hot reloads, import quotes,
  * bracket interpolation, PSL tags, and properties for dynamic rendering.
  *
- * @package PhpSlides\Src\Formatter
+ * @package PhpSlides\Core\Formatter
  * @author Dave Conco <info@dconco.dev>
  * @copyright 2024 Dave Conco
  */

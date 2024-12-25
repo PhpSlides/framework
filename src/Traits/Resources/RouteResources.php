@@ -1,14 +1,14 @@
 <?php declare(strict_types=1);
 
-namespace PhpSlides\Src\Traits\Resources;
+namespace PhpSlides\Core\Traits\Resources;
 
 use Closure;
-use PhpSlides\Src\view;
+use PhpSlides\Core\view;
 use PhpSlides\Exception;
 use PhpSlides\Router\MapRoute;
-use PhpSlides\Src\Http\Request;
-use PhpSlides\Src\Loader\FileLoader;
-use PhpSlides\Src\Foundation\Application;
+use PhpSlides\Core\Http\Request;
+use PhpSlides\Core\Loader\FileLoader;
+use PhpSlides\Core\Foundation\Application;
 
 trait RouteResources
 {
