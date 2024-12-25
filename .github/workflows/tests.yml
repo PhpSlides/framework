@@ -65,7 +65,7 @@ jobs:
            run: |
               git fetch origin main dev
               git checkout main
-              git pull main dev --no-rabase
+              git pull --no-rabase main dev
               git push origin main
            env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
