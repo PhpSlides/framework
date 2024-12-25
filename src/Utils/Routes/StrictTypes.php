@@ -123,7 +123,7 @@ trait StrictTypes
 				 ? json_encode($needle[$key])
 				 : (string) $needle[$key];
 
-				$eachTypes = preg_split('/\|(?![^<]*>)/', trim($eachArrayType));
+				$eachTypes = preg_split('/\|(?![^<]*>)/', trim(strtoupper($eachArrayType)));
 				$typeOfNeedle2 = self::typeOfString($needle2);
 
 				if (!self::matchType($needle2, $eachTypes))
@@ -149,7 +149,7 @@ trait StrictTypes
 			$max = (int) $matches[2] ?? null;
 			$needle = (int) $needle;
 
-			if ((!$max && $min < $needle) || $max && ($needle < $min || $needle > $max))
+			if ((!$max && $needle < $min) || $max && ($needle < $min || $needle > $max))
 			{
 				$requested = !$max ? "INT min ($min)" : "INT min ($min), max($max)";
 				throw new Exception("Invalid request parameter type. {{$requested}} requested, but got {{$needle}}");
@@ -169,9 +169,7 @@ trait StrictTypes
 	 * The possible return values are:
 	 * - 'FLOAT' if the string represents a floating-point number.
 	 * - 'INT' if the string represents an integer.
-	 * - 'BOOL' if the string represents a boolean value ('true' or 'false').
-	 * - 'ALPHA' if the string contains only alphabetic characters.
-	 * - 'ALNUM' if the string contains only alphanumeric characters.
+	 * - 'BOOL' if the string represents a boolean value.
 	 * - 'JSON' if the string is a valid JSON object.
 	 * - 'ARRAY' if the string is a valid JSON array.
 	 * - 'STRING' if the string does not match any of the above types.
@@ -190,14 +188,6 @@ trait StrictTypes
 		elseif (filter_var($string, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null)
 		{
 			return 'BOOL';
-		}
-		elseif (ctype_alpha($string))
-		{
-			return 'ALPHA';
-		}
-		elseif (ctype_alnum($string))
-		{
-			return 'ALNUM';
 		}
 		elseif (json_last_error() === JSON_ERROR_NONE)
 		{

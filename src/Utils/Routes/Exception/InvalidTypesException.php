@@ -14,8 +14,6 @@ class InvalidTypesException extends \PhpSlides\Exception
     * - INT: Integer
     * - BOOL: Boolean
     * - JSON: JSON string
-    * - ALPHA: Alphabetic characters
-    * - ALNUM: Alphanumeric characters
     * - ARRAY: Array
     * - FLOAT: Floating point number
     * - STRING: String
@@ -26,8 +24,6 @@ class InvalidTypesException extends \PhpSlides\Exception
    'INT',
    'BOOL',
    'JSON',
-   'ALPHA',
-   'ALNUM',
    'ARRAY',
    'FLOAT',
    'STRING',
@@ -48,6 +44,8 @@ class InvalidTypesException extends \PhpSlides\Exception
    {
       if (is_array($type))
       {
+         $type = array_map(fn($t) => strtoupper($t), $type);
+         
          foreach ($type as $t)
          {
             if (!in_array($t, self::$types) && !preg_match('/<(.+)>/', (string) $t))
@@ -65,6 +63,7 @@ class InvalidTypesException extends \PhpSlides\Exception
       }
       else
       {
+         $type = strtoupper($type);
          if (!in_array($type, self::$types) && !preg_match('/<(.+)>/', (string) $type))
          {
             if (!$message)
@@ -105,13 +104,13 @@ class InvalidTypesException extends \PhpSlides\Exception
          if (!$message)
          {
             $requested = implode(', ', $typeRequested);
-            return new self(
-             "Invalid request parameter type. {{$requested}} requested, but got {{$typeGotten}}",
-            );
+            $requested = preg_replace('/<[^<>]*>/', '', $requested);
+
+            return new self(htmlspecialchars("Invalid request parameter type. {{$requested}} requested, but got {{$typeGotten}}"));
          }
          else
          {
-            return new self($message);
+            return new self(htmlspecialchars($message));
          }
       }
    }
