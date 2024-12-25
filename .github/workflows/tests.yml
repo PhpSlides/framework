@@ -66,8 +66,7 @@ jobs:
               git fetch origin main dev
               git checkout main
               git config pull.rebase false
-              git pull origin main
-              git merge origin/dev --allow-unrelated-histories --no-ff
+              git pull origin main dev
               git push origin main
            env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
