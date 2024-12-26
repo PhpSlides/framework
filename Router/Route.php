@@ -51,6 +51,8 @@ class Route extends Controller implements RouteInterface
 
 	private ?array $mapRoute = null;
 
+	private bool $caseSensitive = false;
+
 	private ?Closure $handleInvalidParameterType = null;
 
 	private static array $routes;
@@ -222,6 +224,12 @@ class Route extends Controller implements RouteInterface
 	public function handleInvalidParameterType (Closure $closure): self
 	{
 		$this->handleInvalidParameterType = $closure;
+		return $this;
+	}
+	
+	public function caseSensitive (): self
+	{
+		$this->caseSensitive = true;
 		return $this;
 	}
 
@@ -403,6 +411,10 @@ class Route extends Controller implements RouteInterface
 	{
 		$route_index = end(self::$route);
 		$route_index = is_array($route_index) ? $route_index[0] : $route_index;
+
+		$GLOBALS['__registered_routes'][$route_index][
+		 'caseSensitive'
+		] = $this->caseSensitive;
 
 		if (self::$map !== null)
 		{

@@ -30,8 +30,6 @@ trait RouteResources
 
 	protected static ?string $file = null;
 
-	protected static ?Closure $handleInvalidParameterType = null;
-
 	protected static array|bool $map_info = false;
 
 	/**
@@ -71,12 +69,6 @@ trait RouteResources
 				$static->__action();
 			}
 		}
-	}
-
-	protected static function __handleInvalidParameterType (): void
-	{
-		Application::$handleInvalidParameterType =
-		 self::$handleInvalidParameterType;
 	}
 
 	protected static function __any (?Request $request = null): void

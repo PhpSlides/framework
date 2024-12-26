@@ -64,14 +64,13 @@ class MapRoute extends Controller implements MapInterface
 		 *   |   $_REQUEST['uri'] will be empty if req uri is /
 		 *   ----------------------------------------------
 		 */
-		self::$request_uri = strtolower(
-		 preg_replace("/(^\/)|(\/$)/", '', Application::$request_uri),
-		);
+		self::$request_uri =
+		 preg_replace("/(^\/)|(\/$)/", '', Application::$request_uri);
 		self::$request_uri = empty(self::$request_uri) ? '/' : self::$request_uri;
 
 		self::$route = is_array($route)
 		 ? $route
-		 : strtolower(preg_replace("/(^\/)|(\/$)/", '', $route));
+		 : preg_replace("/(^\/)|(\/$)/", '', $route);
 
 		//  Firstly, resolve route with pattern
 		if (is_array(self::$route))
@@ -191,9 +190,15 @@ class MapRoute extends Controller implements MapInterface
 		 *   -----------------------------------
 		 */
 		$reqUri = str_replace('/', '\\/', $reqUri);
+		$route = self::$route;
+		
+		if (Application::$caseInSensitive === true) {
+		   $reqUri = strtolower($reqUri);
+		   $route = strtolower($route);
+		}
 
 		// now matching route with regex
-		if (preg_match("/$reqUri/", self::$route . '$'))
+		if (preg_match("/$reqUri/", $route . '$'))
 		{
 			// checks if the requested method is of the given route
 			if (
@@ -247,6 +252,7 @@ class MapRoute extends Controller implements MapInterface
 	{
 		$uri = [];
 		$str_route = '';
+		$request_uri = self::$request_uri;
 
 		if (is_array(self::$route))
 		{
@@ -255,13 +261,19 @@ class MapRoute extends Controller implements MapInterface
 				$each_route = preg_replace("/(^\/)|(\/$)/", '', self::$route[$i]);
 
 				empty($each_route)
-				 ? array_push($uri, strtolower('/'))
-				 : array_push($uri, strtolower($each_route));
+				 ? array_push($uri, '/')
+				 : array_push($uri, Application::$caseInSensitive === true ? strtolower($each_route) : $each_route);
 			}
 		}
 		else
 		{
 			$str_route = empty(self::$route) ? '/' : self::$route;
+		}
+		
+		
+		if (Application::$caseInSensitive === true) {
+		   $request_uri = strtolower($request_uri);
+		   $str_route = strtolower($str_route);
 		}
 
 		if (
@@ -329,9 +341,15 @@ class MapRoute extends Controller implements MapInterface
 	 */
 	private function validatePattern (string $pattern): array|bool
 	{
+	   $request_uri = self::$request_uri;
 		$pattern = preg_replace("/(^\/)|(\/$)/", '', trim(substr($pattern, 8)));
 
-		if (fnmatch($pattern, self::$request_uri))
+		if (Application::$caseInSensitive === true) {
+		   $request_uri = strtolower($request_uri);
+		   $pattern = strtolower($pattern);
+		}
+
+		if (fnmatch($pattern, $request_uri))
 		{
 			if (
 			!in_array($_SERVER['REQUEST_METHOD'], self::$method) &&

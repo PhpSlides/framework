@@ -18,14 +18,18 @@ Route::get(
 
 Route::map(
 	GET,
-	"$dir/user/{id: int<6, 10>|bool|array<array<int<5,5>|bool>, string>}",
+	"$dir/User/{id: int<6, 10>|bool|array<array<int<5,5>|bool>, string>}/{status: enum<success|failed|pending>}",
 )
 	->action(function (Request $req) {
 		echo '<br>';
-		return $req->urlParam('id');
+		return $req->url();
 	})
 	->route('/posts/{id: int}', function (Request $req, Closure $accept) {
 		$accept('POST');
-	});
+	})
+	->handleInvalidParameterType(function ($type) {
+		return $type;
+	})
+	->caseSensitive();
 
 Render::WebRoute();

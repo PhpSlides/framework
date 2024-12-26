@@ -33,8 +33,9 @@ final class Render extends Controller
 
 		foreach ($reg_route as $route)
 		{
-			self::$handleInvalidParameterType =
-			 $route['handleInvalidParameterType'] ?? null;
+			$caseSensitive = $route['caseSensitive'];
+			$handleInvalidParameterType = $route['handleInvalidParameterType'] ?? null;
+
 			self::$redirect = $route['redirect'] ?? null;
 			self::$method = $route['method'] ?? null;
 			self::$guards = $route['guards'] ?? null;
@@ -45,14 +46,8 @@ final class Render extends Controller
 			self::$use = $route['use'] ?? null;
 			self::$map = $route['map'] ?? null;
 
-			if (self::$handleInvalidParameterType)
-			{
-				self::__handleInvalidParameterType();
-			}
-			else
-			{
-				Application::$handleInvalidParameterType = null;
-			}
+			Application::$handleInvalidParameterType = $handleInvalidParameterType;
+			Application::$caseInSensitive = !$caseSensitive;
 
 			if (self::$map)
 			{

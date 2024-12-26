@@ -106,7 +106,7 @@ class InvalidTypesException extends \PhpSlides\Exception
             $requested = implode(', ', $typeRequested);
             $requested = preg_replace('/<[^<>]*>/', '', $requested);
 
-            return new self(htmlspecialchars("Invalid request parameter type. {{$requested}} requested, but got {{$typeGotten}}"));
+            return new self(htmlspecialchars("Invalid request parameter type: Expected {{$requested}}, but received {{$typeGotten}}."));
          }
          else
          {

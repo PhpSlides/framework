@@ -41,7 +41,7 @@ class Application extends Controller implements ApplicationInterface
 	/**
 	 * The version of the PhpSlides application.
 	 */
-	public const PHPSLIDES_VERSION = '1.4.3';
+	public const PHPSLIDES_VERSION = '1.4.4';
 
 	/**
 	 * @var string $REMOTE_ADDR The remote address of the client making the request.
@@ -89,6 +89,8 @@ class Application extends Controller implements ApplicationInterface
 	 * The directory path for script resources (e.g., JavaScript files).
 	 */
 	public static string $scriptsDir;
+	
+	public static bool $caseInSensitive = true;
 
 	public static ?Closure $handleInvalidParameterType;
 
