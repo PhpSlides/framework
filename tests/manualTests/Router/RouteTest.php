@@ -18,7 +18,7 @@ Route::get(
 
 Route::map(
 	GET,
-	"$dir/User/{id: int<6, 10>|bool|array<array<int<5,5>|bool>, string>}/{status: enum<success|failed|pending>}",
+	"$dir/User/{id: int<6, 10>|string<3,3>|bool|array<array<int<5,5>|bool>, string>}/{status: enum<success|failed|pending>}",
 )
 	->action(function (Request $req) {
 		echo '<br>';
@@ -27,9 +27,9 @@ Route::map(
 	->route('/posts/{id: int}', function (Request $req, Closure $accept) {
 		$accept('POST');
 	})
-	->handleInvalidParameterType(function ($type) {
+	/*->handleInvalidParameterType(function ($type) {
 		return $type;
-	})
+	})*/
 	->caseSensitive();
 
 Render::WebRoute();

@@ -88,6 +88,8 @@ trait StrictTypes
 	 */
 	private static function matches(string $needle, string $haystack): bool
 	{
+		$haystack = preg_replace('/INTEGER<(.+)>/', 'INT<$1>', $haystack);
+
 		$typeOfNeedle = self::typeOfString((string) $needle);
 		$typeOfNeedle2 = $typeOfNeedle;
 		$needle2 = $needle;
@@ -106,7 +108,7 @@ trait StrictTypes
 				$requested = implode(', ', $eachArrayTypes);
 				throw InvalidTypesException::catchInvalidParameterTypes(
 					$eachArrayTypes,
-					$typeOfNeedle
+					$typeOfNeedle,
 				);
 			}
 
@@ -157,7 +159,33 @@ trait StrictTypes
 				(!$max && $needle < $min) ||
 				($max && ($needle < $min || $needle > $max))
 			) {
-				$requested = !$max ? "INT min ($min)" : "INT min ($min), max($max)";
+				$requested = !$max ? "INT min($min)" : "INT min($min), max($max)";
+				throw InvalidTypesException::catchInvalidParameterTypes(
+					[$requested],
+					(string) $needle,
+				);
+			}
+			return true;
+		}
+
+		/**
+		 * MATCH STRING<MIN, MAX> LENGTH
+		 */
+		if (
+			preg_match('/STRING<(\d+)(?:,\s*(\d+))?>/', $haystack, $matches) &&
+			$typeOfNeedle === 'STRING'
+		) {
+			$min = (int) $matches[1];
+			$max = (int) $matches[2] ?? null;
+			$needle = (int) strlen($needle);
+
+			if (
+				(!$max && $needle < $min) ||
+				($max && ($needle < $min || $needle > $max))
+			) {
+				$requested = !$max
+					? "STRING min($min)"
+					: "STRING min($min), max($max)";
 				throw InvalidTypesException::catchInvalidParameterTypes(
 					[$requested],
 					(string) $needle,
