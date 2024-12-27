@@ -88,9 +88,15 @@ final class Render extends Controller
 
 		foreach ($reg_route as $route)
 		{
+			$caseSensitive = $route['caseSensitive'] ?? false;
+			$handleInvalidParameterType = $route['handleInvalidParameterType'] ?? null;
+
 			self::$apiMap = $route['map'] ?? null;
 			self::$route = $route['route'] ?? null;
 
+			Application::$handleInvalidParameterType = $handleInvalidParameterType;
+			Application::$caseInSensitive = !$caseSensitive;
+			
 			if (self::$route)
 			{
 				$static->__route();
@@ -107,10 +113,10 @@ final class Render extends Controller
 	 * Placeholder function for handling form routes.
 	 * Currently, the implementation for form routes is not defined.
 	 */
-	public static function FormsRoute ()
+	public static function FormRoute ()
 	{
 		self::Load();
-		$reg_route = $GLOBALS['__registered_forms_routes'] ?? null;
+		$reg_route = $GLOBALS['__registered_form_routes'] ?? null;
 
 		// Future form handling can be implemented here.
 	}

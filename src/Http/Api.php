@@ -2,6 +2,7 @@
 
 namespace PhpSlides\Core\Http;
 
+use Closure;
 use PhpSlides\Exception;
 use PhpSlides\Core\Controller\Controller;
 use PhpSlides\Core\Http\Interface\ApiInterface;
@@ -22,7 +23,7 @@ class Api extends Controller implements ApiInterface
 	 * The base URL for all API routes. Default is '/api/'
 	 * @var string
 	 */
-	public static string $BASE_URL = '/api/';
+	private string $base_url = '/api/';
 
 	/**
 	 * The API version. Default is 'v1'
@@ -33,6 +34,10 @@ class Api extends Controller implements ApiInterface
 	private ?array $define = null;
 
 	private ?array $guards = null;
+
+	private bool $caseSensitive = false;
+
+	private ?Closure $handleInvalidParameterType = null;
 
 	private static array $regRoute = [];
 
@@ -101,11 +106,10 @@ class Api extends Controller implements ApiInterface
 		// checks if $define is set, then assign $define methods to $url & $controller parameters
 		$url =
 		 $define !== null
-		  ? rtrim($define['url'], '/') . '/' . trim($url, '/')
+		  ? trim($define['url'], '/') . '/' . trim($url, '/')
 		  : trim($url, '/');
-		$url = trim($url, '/');
 
-		$uri = strtolower(self::$BASE_URL . self::$version . '/' . $url);
+		$uri = $this->base_url . self::$version . '/' . $url;
 		self::$regRoute[] = $uri;
 
 		$route = [
@@ -146,6 +150,26 @@ class Api extends Controller implements ApiInterface
 		return $this;
 	}
 
+	public function prefix (?string $url = '/api/'): self
+	{
+		$this->base_url = $url;
+		return $this;
+	}
+
+	public function caseSensitive (): self
+	{
+	   $route = is_array(self::$regRoute) ? self::$regRoute[0] : self::$regRoute;
+		$GLOBALS['__registered_api_routes'][$route]['caseSensitive'] = true;
+		return $this;
+	}
+
+	public function handleInvalidParameterType (Closure $closure): self
+	{
+	   $route = is_array(self::$regRoute) ? self::$regRoute[0] : self::$regRoute;
+		$GLOBALS['__registered_api_routes'][$route]['handleInvalidParameterType'] = $closure;
+		return $this;
+	}
+
 	/**
 	 * Defines a base URL and controller for subsequent route mappings.
 	 *
@@ -179,13 +203,12 @@ class Api extends Controller implements ApiInterface
 			 * Get the map value, keys as the route url
 			 */
 			$routes = array_keys($rest_url);
-			$base = strtolower(
-			 self::$BASE_URL .
+			$base =
+			 $this->base_url .
 			  self::$version .
 			  '/' .
 			  trim($define['url'], '/') .
-			  '/',
-			);
+			  '/';
 
 			/**
 			 * Map route url array to the full base url
@@ -227,6 +250,12 @@ class Api extends Controller implements ApiInterface
 		return self::__callStatic('v1', 0);
 	}
 
+	/**
+	 * Define an API route for version 1.0
+	 * Also in use for defining urls
+	 *
+	 * @return self
+	 */
 	public static function v1_0 (): self
 	{
 		return self::__callStatic('v1_0', 0);
