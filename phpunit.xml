@@ -10,7 +10,7 @@
          backupStaticProperties="false">
     <testsuites>
         <testsuite name="PhpSlides Test Suite">
-            <directory>tests/tests</directory>
+            <directory>tests/__tests__</directory>
         </testsuite>
     </testsuites>
 
