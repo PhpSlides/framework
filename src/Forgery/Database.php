@@ -4,8 +4,8 @@ namespace PhpSlides\Core\Forgery;
 
 use DB;
 use PhpSlides\Core\Logger\DBLogger;
+use PhpSlides\Core\Database\Forgery;
 use PhpSlides\Core\Database\Connection;
-use PhpSlides\Core\Database\Database as DB_ORM;
 
 /**
  * Abstract class for managing database operations.
@@ -14,7 +14,7 @@ use PhpSlides\Core\Database\Database as DB_ORM;
  * It also includes error logging functionality via the DBLogger trait, which
  * logs the success or failure of operations.
  */
-abstract class Database extends DB_ORM
+abstract class Database extends Forgery
 {
 	use DBLogger;
 

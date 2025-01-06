@@ -10,7 +10,7 @@ use PhpSlides\Core\Forgery\Forge;
 use PhpSlides\Core\Logger\Logger;
 use PhpSlides\Core\Logger\DBLogger;
 use PhpSlides\Core\Loader\HotReload;
-use PhpSlides\Core\Database\Database;
+use PhpSlides\Core\Database\Forgery;
 use PhpSlides\Core\Loader\Autoloader;
 use PhpSlides\Core\Loader\FileLoader;
 use PhpSlides\Core\Database\Connection;
@@ -193,7 +193,7 @@ class Application extends Controller implements ApplicationInterface
 		}
 		catch ( \Exception $e )
 		{
-			Database::$_connect_error = $e->getMessage();
+			Forgery::$_connect_error = $e->getMessage();
 			goto EXECUTION;
 		}
 		new Forge();
