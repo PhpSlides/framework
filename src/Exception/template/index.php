@@ -17,7 +17,7 @@ $sid = session_id();
 
 <script>
    document.head.innerHTML = ''
-   document.title = 'Parse Error - <?php echo $message; ?>'
+   document.title = 'PhpSlides - Uncaught Exception'
 </script>
 
 <style type="text/css" media="all">
@@ -117,7 +117,7 @@ $sid = session_id();
 
 <body>
    <header>
-      <h3>Parse Error</h3>
+      <h3>Uncaught Exception</h3>
       <span><?php echo $message; ?></span>
    </header>
 

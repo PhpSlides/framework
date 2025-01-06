@@ -18,7 +18,6 @@ class Connection
 	public static $host;
 	public static $port;
 	public static $user;
-	public static $db_name;
 	public static $db_type;
 	public static $password;
 
@@ -32,23 +31,22 @@ class Connection
 	 *
 	 * @return void
 	 */
-	static function connect ()
+	static function connect()
 	{
 		// Set connection parameters from environment variables
-		static::$port = getenv('DB_PORT') ?: 3306;
-		static::$host = getenv('DB_HOST') ?: '0.0.0.0';
-		static::$user = getenv('DB_USER') ?: 'root';
-		static::$db_name = getenv('DB_BASE') ?: '';
-		static::$db_type = getenv('DB_CONN') ?: 'mysql';
-		static::$password = getenv('DB_PASS') ?: '';
+		static::$port = getenv('DB_PORT');
+		static::$host = getenv('DB_HOST');
+		static::$user = getenv('DB_USERNAME');
+		static::$db_type = getenv('DB_CONNECTION');
+		static::$password = getenv('DB_PASSWORD');
 
 		// Construct DSN (Data Source Name) for the database connection
 		DB::$dsn = sprintf(
-		 '%s:host=%s;port=%s;dbname=%s',
-		 static::$db_type,
-		 static::$host,
-		 static::$port,
-		 static::$db_name,
+			'%s:host=%s;port=%s;dbname=%s',
+			static::$db_type,
+			static::$host,
+			static::$port,
+			'php_slides',
 		);
 
 		// Set the user and password for the database connection
@@ -65,18 +63,18 @@ class Connection
 	 *
 	 * @return void
 	 */
-	static function reconnect ()
+	static function reconnect()
 	{
 		// Disconnect the current database connection
 		DB::disconnect();
 
 		// Recreate the DSN and reconnect with the new parameters
 		DB::$dsn = sprintf(
-		 '%s:host=%s;port=%s;dbname=%s',
-		 static::$db_type,
-		 static::$host,
-		 static::$port,
-		 static::$db_name,
+			'%s:host=%s;port=%s;dbname=%s',
+			static::$db_type,
+			static::$host,
+			static::$port,
+			'SchemaDb',
 		);
 	}
 
@@ -89,10 +87,10 @@ class Connection
 	 *
 	 * @return void
 	 */
-	static function init ()
+	static function init()
 	{
-		DB::$host = static::$host ?? getenv('DB_HOST') ?: 3306;
-		DB::$user = static::$user ?? getenv('DB_USER') ?: 'root';
-		DB::$password = static::$password ?? getenv('DB_PASS') ?: '';
+		DB::$host = static::$host ?? getenv('DB_HOST');
+		DB::$user = static::$user ?? getenv('DB_USERNAME');
+		DB::$password = static::$password ?? getenv('DB_PASSWORD');
 	}
 }
