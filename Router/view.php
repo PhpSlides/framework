@@ -2,7 +2,7 @@
 
 namespace PhpSlides\Router;
 
-use component;
+use function component;
 use PhpSlides\Core\Foundation\Application;
 
 /**
@@ -35,7 +35,7 @@ final class view
 	{
 		// split :: into array and extract the folder and files
 		$file = preg_replace('/(::)|::/', '/', $view);
-		$file = strtolower(trim($file, '\/\/'));
+		$file = trim($file, '\/\/');
 		$file_uri = Application::$viewsDir . $file;
 		header('Content-Type: text/html');
 

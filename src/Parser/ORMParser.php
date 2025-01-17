@@ -26,7 +26,7 @@ class ORMParser extends Forge
 	 *                      format `Namespace\Database\ClassName`.
 	 * @return string The formatted table name, derived from the class name.
 	 */
-	public function parse (string $class)
+	public function parse(string $class)
 	{
 		// Extract the segments of the class namespace.
 		$name = explode('\\', $class);
@@ -38,7 +38,7 @@ class ORMParser extends Forge
 		$name = static::format(end($name));
 
 		// Set the active database to the parsed database name.
-		DB::useDB($db_name);
+		DB::useDB($class::$_dbname ?? $db_name);
 
 		// Return the table name for ORM use.
 		return $name;

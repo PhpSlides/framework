@@ -23,6 +23,12 @@ abstract class Forgery extends MeekroORM
 	public static ?string $_connect_error = null;
 
 	/**
+	 * @var string $_dbname
+	 * Define the database name to use in reference to this class
+	 */
+	public static string $_dbname;
+
+	/**
 	 * Initialize the current table in using non-static mode.
 	 *
 	 * The constructor invokes the `static()` method to initialize the current

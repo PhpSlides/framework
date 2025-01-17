@@ -60,7 +60,7 @@ class Forge extends Database
 
 		try
 		{
-			DB::useDB(self::format($db_name));
+			DB::useDB(getenv('DB_BASENAME') ?: self::format($db_name));
 			$all_class = [];
 
 			foreach (glob(Application::$basePath . "App/Forgery/$db_name/*") as $value)

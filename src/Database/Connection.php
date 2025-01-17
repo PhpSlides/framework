@@ -39,14 +39,16 @@ class Connection
 		static::$user = getenv('DB_USERNAME');
 		static::$db_type = getenv('DB_CONNECTION');
 		static::$password = getenv('DB_PASSWORD');
+		static::$db_base = getenv('DB_BASENAME') ?: 'php_slides';
 
 		// Construct DSN (Data Source Name) for the database connection
 		DB::$dsn = sprintf(
 			'%s:host=%s;port=%s;dbname=%s',
 			static::$db_type,
 			static::$host,
+			static::$host,
 			static::$port,
-			'php_slides',
+			static::$db_base,
 		);
 
 		// Set the user and password for the database connection
@@ -74,7 +76,7 @@ class Connection
 			static::$db_type,
 			static::$host,
 			static::$port,
-			'SchemaDb',
+			static::$db_base,
 		);
 	}
 
