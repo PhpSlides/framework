@@ -24,8 +24,10 @@ Route::map(
 		echo '<br>';
 		return $req->url();
 	})
-	->route('/posts/{id: int}', function (Request $req, Closure $accept) {
-		$accept('POST');
+	->route('/posts/{post_id: int}', function (Request $req, Closure $accept) {
+		$accept(GET, fn($method) => "`$method` method is not allowed");
+
+		return 'ddd';
 	})
 	/*->handleInvalidParameterType(function ($type) {
 		return $type;

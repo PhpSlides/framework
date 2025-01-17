@@ -35,11 +35,11 @@ class JWT implements JwtService
 	 *
 	 * @return void
 	 */
-	private static function setup (): void
+	private static function setup(): void
 	{
 		$jwt = (new FileLoader())
-		 ->load(__DIR__ . '/../Config/jwt.config.php')
-		 ->getLoad();
+			->load(__DIR__ . '/../Config/jwt.config.php')
+			->getLoad();
 
 		self::$issuer = $jwt['issuer'];
 		self::$algorithm = $jwt['algorithm'];
@@ -55,7 +55,7 @@ class JWT implements JwtService
 	 *
 	 * @throws \UnexpectedValueException If there is an error during encoding, such as an invalid key or algorithm.
 	 */
-	public static function encode (array $payload): string
+	public static function encode(array $payload): string
 	{
 		self::setup();
 		return WebToken::encode($payload, self::$secretKey, self::$algorithm);
@@ -72,16 +72,15 @@ class JWT implements JwtService
 	 *
 	 * @throws \Exception If the token is invalid, expired, or cannot be decoded.
 	 */
-	public static function decode (string $token, bool $parsed = true): object
+	public static function decode(string $token, bool $parsed = true): object
 	{
 		self::setup();
 		$decodedToken = WebToken::decode(
-		 $token,
-		 new Key(self::$secretKey, self::$algorithm),
+			$token,
+			new Key(self::$secretKey, self::$algorithm),
 		);
 
-		if ($parsed === true)
-		{
+		if ($parsed === true) {
 			unset($decodedToken->iss);
 			unset($decodedToken->iat);
 			unset($decodedToken->exp);
@@ -98,20 +97,16 @@ class JWT implements JwtService
 	 *
 	 * @throws \Exception If the token cannot be decoded or if the issuer is invalid.
 	 */
-	public static function verify (string $token): bool
+	public static function verify(string $token): bool
 	{
-		try
-		{
+		try {
 			$token = self::decode($token, false);
-		}
-		catch ( \Exception $e )
-		{
+		} catch (\Exception $e) {
 			return false;
 		}
 
 		// Validate that the issuer matches the expected issuer
-		if (self::$issuer !== $token->iss)
-		{
+		if (self::$issuer !== $token->iss) {
 			return false;
 		}
 		return true;

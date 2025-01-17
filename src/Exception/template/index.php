@@ -1,7 +1,7 @@
 <?php
 $code_values = htmlspecialchars(
- implode('', array_values($codeSnippet['parsedCode'])),
- ENT_NOQUOTES,
+	implode('', array_values($codeSnippet['parsedCode'])),
+	ENT_NOQUOTES,
 );
 $code_keys = json_encode(array_keys($codeSnippet['parsedCode']));
 $sid = session_id();
@@ -21,8 +21,7 @@ $sid = session_id();
 </script>
 
 <style type="text/css" media="all">
-   <?php echo file_get_contents(__DIR__ . '/src/highlight.min.css');
-   ?>
+   <?php echo file_get_contents(__DIR__ . '/src/highlight.min.css'); ?>
 </style>
 
 <style type="text/css" media="all">
@@ -124,8 +123,13 @@ $sid = session_id();
    <div class="container">
       <span class="h">Source File »</span>
 
-      <div class="code-wrapper">
-         <span><b>File: </b><?php echo $file . ':' . $line; ?></span>
+      <div class="code-wrapper"> 
+         <span><b>File: </b><?php echo ltrim(
+         	$file ?? 'Anonymous',
+         	\PhpSlides\Core\Foundation\Application::$basePath,
+         ) .
+         	':' .
+         	$line; ?></span>
          <pre><code class="language-php"><?php echo $code_values; ?></code></pre>
       </div>
    </div>
@@ -134,12 +138,15 @@ $sid = session_id();
       <span class="h">Call Stack »</span>
 
       <div class="code-wrapper">
-         <?php foreach ($trace as $key => $value)
-         {
-            $key = $key + 1;
-            $_file = $value['file'] ?? 'Unknown';
-            $_line = $value['line'] ?? 1;
-            echo "<span>$key. {$_file}:{$_line}</span>";
+         <?php foreach ($trace as $key => $value) {
+         	$key = $key + 1;
+         	$_file =
+         		ltrim(
+         			$value['file'] ?? 'Anonymous',
+         			\PhpSlides\Core\Foundation\Application::$basePath,
+         		) ?? 'Unknown';
+         	$_line = $value['line'] ?? 1;
+         	echo "<span>$key. {$_file}:{$_line}</span>";
          } ?>
       </div>
    </div>
@@ -183,15 +190,16 @@ $sid = session_id();
 
    <?php
    $protocol =
-    (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ||
-    $_SERVER['SERVER_PORT'] == 443
-     ? 'https://'
-     : 'http://';
+   	(!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ||
+   	$_SERVER['SERVER_PORT'] == 443
+   		? 'https://'
+   		: 'http://';
 
    $addr =
-    \PhpSlides\Core\Foundation\Application::$REMOTE_ADDR .
-    "/hot-reload-a$sid/worker";
-   $phpslides_version = \PhpSlides\Core\Foundation\Application::PHPSLIDES_VERSION;
+   	\PhpSlides\Core\Foundation\Application::$REMOTE_ADDR .
+   	"/hot-reload-a$sid/worker";
+   $phpslides_version =
+   	\PhpSlides\Core\Foundation\Application::PHPSLIDES_VERSION;
 
    if (getenv('HOT_RELOAD') == 'true'): ?>
       <script>

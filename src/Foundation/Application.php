@@ -113,7 +113,7 @@ class Application extends Controller implements ApplicationInterface
 			self::$request_uri = urldecode(
 			 parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),
 			);
-			self::$basePath = '';
+			self::$basePath = '.';
 		}
 		else
 		{
@@ -130,6 +130,10 @@ class Application extends Controller implements ApplicationInterface
 			self::$basePath = strrpos($self, $find)
 			 ? substr_replace($self, '/', strrpos($self, $find), strlen($find))
 			 : '../../';
+		}
+
+		if (realpath(self::$basePath)) {
+		   self::$basePath = realpath(self::$basePath) . '/';
 		}
 
 		$req = new Request();

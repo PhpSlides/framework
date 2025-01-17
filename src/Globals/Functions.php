@@ -97,7 +97,7 @@ const ABSOLUTE_PATH = 1;
  * @param mixed ...$props Additional properties to pass to the view loader.
  * @return mixed The loaded view content.
  */
-function component (string $filename, mixed ...$props): mixed
+function component(string $filename, mixed ...$props): mixed
 {
 	$loaded = (new ViewLoader())->load($filename, ...$props);
 	return $loaded->getLoad();
@@ -116,7 +116,7 @@ $GLOBALS['__routes'] = [];
  * @param string|array $value Named route value
  * @return void
  */
-function add_route_name (string $name, string|array $value): void
+function add_route_name(string $name, string|array $value): void
 {
 	$GLOBALS['__routes'][$name] = $value;
 }
@@ -129,92 +129,71 @@ function add_route_name (string $name, string|array $value): void
  *
  * @return array|object|string returns the route value
  */
-function route (
- string|null $name = null,
- array|null $param = null,
+function route(
+	string|null $name = null,
+	array|null $param = null,
 ): array|object|string {
 	$routes = $GLOBALS['__routes'] ?? [];
 
-	if ($name === null)
-	{
+	if ($name === null) {
 		$route_class = new stdClass();
 
-		foreach ($routes as $key => $value)
-		{
-			if (preg_match_all('/(?<={).+?(?=})/', $value))
-			{
-				$route_class->$key = function (string ...$args) use ($routes, $value, $key, )
-				{
+		foreach ($routes as $key => $value) {
+			if (preg_match_all('/(?<={).+?(?=})/', $value)) {
+				$route_class->$key = function (string ...$args) use (
+					$routes,
+					$value,
+					$key,
+				) {
 					$route = '';
 
-					if (count($args) === 0)
-					{
+					if (count($args) === 0) {
 						$route = $routes[$key];
-					}
-					else
-					{
-						for ($i = 0; $i < count($args); $i++)
-						{
-							if ($i === 0)
-							{
+					} else {
+						for ($i = 0; $i < count($args); $i++) {
+							if ($i === 0) {
 								$route = preg_replace(
-								 '/\{[^}]+\}/',
-								 $args[$i],
-								 $value,
-								 1,
+									'/\{[^}]+\}/',
+									$args[$i],
+									$value,
+									1,
 								);
-							}
-							else
-							{
+							} else {
 								$route = preg_replace(
-								 '/\{[^}]+\}/',
-								 $args[$i],
-								 $route,
-								 1,
+									'/\{[^}]+\}/',
+									$args[$i],
+									$route,
+									1,
 								);
 							}
 						}
 					}
 					return $route;
 				};
-			}
-			else
-			{
+			} else {
 				$route_class->$key = $value;
 			}
 		}
 
 		return $route_class;
-	}
-	else
-	{
-		if (!array_key_exists($name, $routes))
-		{
+	} else {
+		if (!array_key_exists($name, $routes)) {
 			return '';
-		}
-		else
-		{
-			if ($param === null)
-			{
+		} else {
+			if ($param === null) {
 				return $routes[$name];
-			}
-			else
-			{
+			} else {
 				$route = '';
 
-				for ($i = 0; $i < count($param); $i++)
-				{
-					if ($i === 0)
-					{
+				for ($i = 0; $i < count($param); $i++) {
+					if ($i === 0) {
 						$route = preg_replace(
-						 '/\{[^}]+\}/',
-						 $param[$i],
-						 $routes[$name],
-						 1,
+							'/\{[^}]+\}/',
+							$param[$i],
+							$routes[$name],
+							1,
 						);
-					}
-					else
-					{
+					} else {
 						$route = preg_replace('/\{[^}]+\}/', $param[$i], $route, 1);
 					}
 				}
@@ -236,13 +215,12 @@ function route (
  *
  * @return string The generated URL for the asset file.
  */
-function asset (string $filename, string $path_type = RELATIVE_PATH): string
+function asset(string $filename, string $path_type = RELATIVE_PATH): string
 {
 	$filename = preg_replace('/(::)|::/', '/', $filename);
 	$filename = strtolower(trim($filename, '\/\/'));
 
-	switch (php_sapi_name())
-	{
+	switch (php_sapi_name()) {
 		case 'cli-server':
 			$root_path = '/';
 			break;
@@ -251,32 +229,29 @@ function asset (string $filename, string $path_type = RELATIVE_PATH): string
 			$self = $_SERVER['PHP_SELF'];
 
 			$root_path = substr_replace(
-			 $self,
-			 '/',
-			 strrpos($self, $find),
-			 strlen($find),
+				$self,
+				'/',
+				strrpos($self, $find),
+				strlen($find),
 			);
 			break;
 	}
 
 	$path = './';
-	if (!empty(Application::$request_uri))
-	{
+	if (!empty(Application::$request_uri)) {
 		$root_pathExp = explode('/', trim($root_path, '/'));
 		$reqUri = explode('/', trim(Application::$request_uri, '/'));
 
-		for ($i = 0; $i < count($reqUri) - count($root_pathExp); $i++)
-		{
+		for ($i = 0; $i < count($reqUri) - count($root_pathExp); $i++) {
 			$path .= '../';
 		}
 	}
 
-	return match ($path_type)
-	{
-			RELATIVE_PATH => "$path$filename",
-			ABSOLUTE_PATH => "$root_path$filename",
-			REMOTE_PATH => Application::$REMOTE_ADDR . '/' . $filename,
-			default => $filename,
+	return match ($path_type) {
+		RELATIVE_PATH => "$path$filename",
+		ABSOLUTE_PATH => "$root_path$filename",
+		REMOTE_PATH => Application::$REMOTE_ADDR . '/' . $filename,
+		default => $filename,
 	};
 }
 
@@ -289,10 +264,9 @@ function asset (string $filename, string $path_type = RELATIVE_PATH): string
  *
  * @throws Exception If the file does not exist.
  */
-function import (string $file)
+function import(string $file)
 {
-	if (!is_file($file))
-	{
+	if (!is_file($file)) {
 		throw new Exception("File does not exist: $file");
 	}
 
@@ -317,18 +291,17 @@ function import (string $file)
  * 	exp: int
  * }
  */
-function payload (
- array $data,
- string $expires,
- string $issued_at = 'now',
- string $issuer = '',
+function payload(
+	array $data,
+	string $expires,
+	string $issued_at = 'now',
+	string $issuer = '',
 ): array {
 	$jwt = (new FileLoader())
-	 ->load(__DIR__ . '/../Config/jwt.config.php')
-	 ->getLoad();
+		->load(__DIR__ . '/../Config/jwt.config.php')
+		->getLoad();
 
-	if ($issuer === '')
-	{
+	if ($issuer === '') {
 		$issuer = $jwt['issuer'];
 	}
 
@@ -336,12 +309,12 @@ function payload (
 	$issued_at = (new DateTimeImmutable($issued_at))->getTimestamp();
 
 	return array_merge(
-	 [
-	  'iss' => $issuer,
-	  'iat' => $issued_at,
-	  'exp' => $expires,
-	 ],
-	 $data,
+		[
+			'iss' => $issuer,
+			'iat' => $issued_at,
+			'exp' => $expires,
+		],
+		$data,
 	);
 }
 
@@ -356,25 +329,19 @@ function payload (
  *
  * @return array|mixed The value of the specified property, or all properties if no name is given.
  */
-function Props (?string $name = null)
+function Props(?string $name = null)
 {
-	if ($name === null)
-	{
+	if ($name === null) {
 		$allProperties = \PhpSlides\Core\Props::all();
 		$filteredProperties = [];
 
-		foreach ($allProperties as $key => $value)
-		{
-			if (str_starts_with($key, '_'))
-			{
+		foreach ($allProperties as $key => $value) {
+			if (str_starts_with($key, '_')) {
 				$numericKey = substr($key, 1);
-				if (is_numeric($numericKey))
-				{
+				if (is_numeric($numericKey)) {
 					$filteredProperties[$numericKey] = $value;
 				}
-			}
-			else
-			{
+			} else {
 				$filteredProperties[$key] = $value;
 			}
 		}
@@ -382,28 +349,24 @@ function Props (?string $name = null)
 		return $filteredProperties;
 	}
 
-	if (is_numeric($name))
-	{
+	if (is_numeric($name)) {
 		$name = "_$name";
 	}
 
 	return (new \PhpSlides\Core\Props())->$name;
 }
 
-function ExceptionHandler (Throwable $exception)
+function ExceptionHandler(Throwable $exception)
 {
 	// Check if the exception is a CustomException to use its specific methods
-	if ($exception instanceof Exception)
-	{
+	if ($exception instanceof Exception) {
 		$message = $exception->getMessage();
 		$file = $exception->getFilteredFile();
 		$line = $exception->getFilteredLine();
 		$trace = $exception->filterStackTrace();
 		$codeSnippet = $exception->getCodeSnippet();
 		$detailedMessage = $exception->getDetailedMessage();
-	}
-	else
-	{
+	} else {
 		// For base Exception, use default methods
 		$message = $exception->getMessage();
 
@@ -417,22 +380,21 @@ function ExceptionHandler (Throwable $exception)
 
 		$codeSnippet = getCodeSnippet($file, $line, 10, 10);
 		$detailedMessage = sprintf(
-		 'Error: %s in %s on line %d',
-		 $exception->getMessage(),
-		 $file,
-		 $line,
+			'Error: %s in %s on line %d',
+			$exception->getMessage(),
+			$file,
+			$line,
 		);
 	}
 
 	// Log the detailed error message
 	error_log($detailedMessage);
 
-	if (Exception::$IS_API === true)
-	{
+	if (Exception::$IS_API === true) {
 		echo json_encode([
-		 'exception' => $message,
-		 'file' => $file,
-		 'line' => $line,
+			'exception' => $message,
+			'file' => $file,
+			'line' => $line,
 		]);
 		exit();
 	}
