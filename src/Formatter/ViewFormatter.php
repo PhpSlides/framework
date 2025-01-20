@@ -39,16 +39,16 @@ class ViewFormatter
 	 *
 	 * @param string $contents The raw contents of the view file to be formatted.
 	 */
-	public function __construct (string $contents)
+	public function __construct(string $contents)
 	{
 		$this->contents = $contents;
 
 		// Apply various formatting operations
+		$this->psl_tags();
+		$this->bracket_interpolation();
 		$this->includes();
 		$this->hot_reload();
 		$this->import_quotes();
-		$this->bracket_interpolation();
-		$this->psl_tags();
 	}
 
 	/**
@@ -61,7 +61,7 @@ class ViewFormatter
 	 *
 	 * @return string The formatted contents of the view file with properties applied.
 	 */
-	public function resolve (mixed ...$props)
+	public function resolve(mixed ...$props)
 	{
 		// Apply properties handling to the view
 		$this->properties(...$props);
