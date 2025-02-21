@@ -95,7 +95,7 @@ class ViewLoader
 			finally
 			{
 				// Remove generated file and reset global file path.
-				unlink($gen_file);
+				if (is_file($gen_file)) unlink($gen_file);
 				$GLOBALS['__gen_file_path'] = $viewFile;
 			}
 		}
