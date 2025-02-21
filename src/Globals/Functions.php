@@ -218,7 +218,7 @@ function route(
 function asset(string $filename, string $path_type = RELATIVE_PATH): string
 {
 	$filename = preg_replace('/(::)|::/', '/', $filename);
-	$filename = strtolower(trim($filename, '\/\/'));
+	$filename = trim($filename, '\/\/');
 
 	switch (php_sapi_name()) {
 		case 'cli-server':
